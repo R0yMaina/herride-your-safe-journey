@@ -10,9 +10,9 @@ export const Route = createFileRoute("/book")({
 });
 
 const tiers = [
-  { id: "lite", name: "HerLite", desc: "Quick & affordable", price: "$8.20", min: "3 min", icon: Sparkles, hot: false },
-  { id: "comfort", name: "HerComfort", desc: "Spacious & premium", price: "$12.40", min: "5 min", icon: Crown, hot: true },
-  { id: "share", name: "HerShare", desc: "Split with verified women", price: "$5.10", min: "7 min", icon: Users, hot: false },
+  { id: "lite", name: "HerLite", desc: "Quick & affordable", price: "Ksh 1,060", min: "3 min", icon: Sparkles, hot: false },
+  { id: "comfort", name: "HerComfort", desc: "Spacious & premium", price: "Ksh 1,600", min: "5 min", icon: Crown, hot: true },
+  { id: "share", name: "HerShare", desc: "Split with verified women", price: "Ksh 660", min: "7 min", icon: Users, hot: false },
 ];
 
 function Book() {
@@ -74,7 +74,7 @@ function Book() {
           </div>
 
           <Link to="/matching" className="block text-center w-full py-4 rounded-full bg-primary text-primary-foreground font-semibold shadow-glow">
-            Confirm HerComfort · $12.40
+            Confirm HerComfort · Ksh 1,600
           </Link>
         </div>
       </div>

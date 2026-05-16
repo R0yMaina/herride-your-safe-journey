@@ -43,7 +43,7 @@ function Home() {
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-muted-foreground uppercase tracking-wider">Wallet</div>
-                <div className="text-sm font-semibold text-primary">$42.80</div>
+                <div className="text-sm font-semibold text-primary">Ksh 5,500</div>
               </div>
             </div>
 

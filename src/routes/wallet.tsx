@@ -32,8 +32,8 @@ function Wallet() {
             <div className="absolute -right-10 -top-10 w-40 h-40 rounded-full bg-white/30 blur-2xl" />
             <div className="relative">
               <div className="text-xs uppercase tracking-wider font-semibold">HerRide balance</div>
-              <div className="font-display text-5xl font-semibold mt-2">$42.80</div>
-              <div className="text-xs opacity-70 mt-1">+ $5 student bonus this week</div>
+              <div className="font-display text-5xl font-semibold mt-2">Ksh 5,500</div>
+              <div className="text-xs opacity-70 mt-1">+ Ksh 650 student bonus this week</div>
               <div className="flex gap-2 mt-5">
                 <button className="flex-1 py-2.5 rounded-full bg-noir text-white text-sm font-semibold">Top up</button>
                 <button className="flex-1 py-2.5 rounded-full bg-white/90 text-noir text-sm font-semibold">Send</button>
@@ -51,7 +51,7 @@ function Wallet() {
           </div>
           <h2 className="font-display text-lg font-semibold mt-6 mb-2">Recent rides</h2>
           <div className="bg-card border border-border rounded-3xl divide-y divide-border">
-            {[{d:"Tonight 9:42 PM",to:"Sunset Blvd",a:"$12.40"},{d:"Tue 8:10 AM",to:"UCLA Campus",a:"$6.80"},{d:"Mon 11:30 PM",to:"Home",a:"$9.20"}].map((r)=>(
+            {[{d:"Tonight 9:42 PM",to:"Sunset Blvd",a:"Ksh 1,600"},{d:"Tue 8:10 AM",to:"UCLA Campus",a:"Ksh 880"},{d:"Mon 11:30 PM",to:"Home",a:"Ksh 1,200"}].map((r)=>(
               <div key={r.d} className="flex items-center justify-between p-4">
                 <div><div className="text-sm font-semibold">{r.to}</div><div className="text-xs text-muted-foreground">{r.d}</div></div>
                 <div className="font-display text-lg">{r.a}</div>

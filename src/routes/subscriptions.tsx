@@ -9,9 +9,9 @@ export const Route = createFileRoute("/subscriptions")({
 });
 
 const plans = [
-  { n: "HerLite", p: "$19", desc: "Casual commuter", feat: ["10% off all rides","Priority female matching","24/7 SOS"], hot: false },
-  { n: "HerPro", p: "$39", desc: "Daily commuter", feat: ["25% off all rides","Free SOS hotline","Scheduled rides","2 free shared rides / wk"], hot: true },
-  { n: "HerElite", p: "$79", desc: "Premium lifestyle", feat: ["35% off all rides","Concierge female drivers","Unlimited shared rides","Late-night escort"], hot: false },
+  { n: "HerLite", p: "Ksh 2,500", desc: "Casual commuter", feat: ["10% off all rides","Priority female matching","24/7 SOS"], hot: false },
+  { n: "HerPro", p: "Ksh 5,000", desc: "Daily commuter", feat: ["25% off all rides","Free SOS hotline","Scheduled rides","2 free shared rides / wk"], hot: true },
+  { n: "HerElite", p: "Ksh 10,000", desc: "Premium lifestyle", feat: ["35% off all rides","Concierge female drivers","Unlimited shared rides","Late-night escort"], hot: false },
 ];
 
 function Subs() {
