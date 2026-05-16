@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TripRouteImport } from './routes/trip'
+import { Route as SosRouteImport } from './routes/sos'
 import { Route as MatchingRouteImport } from './routes/matching'
 import { Route as HomeRouteImport } from './routes/home'
 import { Route as BookRouteImport } from './routes/book'
@@ -19,6 +20,11 @@ import { Route as IndexRouteImport } from './routes/index'
 const TripRoute = TripRouteImport.update({
   id: '/trip',
   path: '/trip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SosRoute = SosRouteImport.update({
+  id: '/sos',
+  path: '/sos',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MatchingRoute = MatchingRouteImport.update({
@@ -53,6 +59,7 @@ export interface FileRoutesByFullPath {
   '/book': typeof BookRoute
   '/home': typeof HomeRoute
   '/matching': typeof MatchingRoute
+  '/sos': typeof SosRoute
   '/trip': typeof TripRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +68,7 @@ export interface FileRoutesByTo {
   '/book': typeof BookRoute
   '/home': typeof HomeRoute
   '/matching': typeof MatchingRoute
+  '/sos': typeof SosRoute
   '/trip': typeof TripRoute
 }
 export interface FileRoutesById {
@@ -70,14 +78,23 @@ export interface FileRoutesById {
   '/book': typeof BookRoute
   '/home': typeof HomeRoute
   '/matching': typeof MatchingRoute
+  '/sos': typeof SosRoute
   '/trip': typeof TripRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/book' | '/home' | '/matching' | '/trip'
+  fullPaths: '/' | '/auth' | '/book' | '/home' | '/matching' | '/sos' | '/trip'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/book' | '/home' | '/matching' | '/trip'
-  id: '__root__' | '/' | '/auth' | '/book' | '/home' | '/matching' | '/trip'
+  to: '/' | '/auth' | '/book' | '/home' | '/matching' | '/sos' | '/trip'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/book'
+    | '/home'
+    | '/matching'
+    | '/sos'
+    | '/trip'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -86,6 +103,7 @@ export interface RootRouteChildren {
   BookRoute: typeof BookRoute
   HomeRoute: typeof HomeRoute
   MatchingRoute: typeof MatchingRoute
+  SosRoute: typeof SosRoute
   TripRoute: typeof TripRoute
 }
 
@@ -96,6 +114,13 @@ declare module '@tanstack/react-router' {
       path: '/trip'
       fullPath: '/trip'
       preLoaderRoute: typeof TripRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sos': {
+      id: '/sos'
+      path: '/sos'
+      fullPath: '/sos'
+      preLoaderRoute: typeof SosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/matching': {
@@ -142,6 +167,7 @@ const rootRouteChildren: RootRouteChildren = {
   BookRoute: BookRoute,
   HomeRoute: HomeRoute,
   MatchingRoute: MatchingRoute,
+  SosRoute: SosRoute,
   TripRoute: TripRoute,
 }
 export const routeTree = rootRouteImport
