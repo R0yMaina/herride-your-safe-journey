@@ -13,6 +13,7 @@ import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TripRouteImport } from './routes/trip'
 import { Route as SosRouteImport } from './routes/sos'
 import { Route as ShareTripRouteImport } from './routes/share-trip'
+import { Route as ScheduledRouteImport } from './routes/scheduled'
 import { Route as RatingsRouteImport } from './routes/ratings'
 import { Route as MatchingRouteImport } from './routes/matching'
 import { Route as HomeRouteImport } from './routes/home'
@@ -38,6 +39,11 @@ const SosRoute = SosRouteImport.update({
 const ShareTripRoute = ShareTripRouteImport.update({
   id: '/share-trip',
   path: '/share-trip',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ScheduledRoute = ScheduledRouteImport.update({
+  id: '/scheduled',
+  path: '/scheduled',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RatingsRoute = RatingsRouteImport.update({
@@ -78,6 +84,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof HomeRoute
   '/matching': typeof MatchingRoute
   '/ratings': typeof RatingsRoute
+  '/scheduled': typeof ScheduledRoute
   '/share-trip': typeof ShareTripRoute
   '/sos': typeof SosRoute
   '/trip': typeof TripRoute
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/home': typeof HomeRoute
   '/matching': typeof MatchingRoute
   '/ratings': typeof RatingsRoute
+  '/scheduled': typeof ScheduledRoute
   '/share-trip': typeof ShareTripRoute
   '/sos': typeof SosRoute
   '/trip': typeof TripRoute
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/home': typeof HomeRoute
   '/matching': typeof MatchingRoute
   '/ratings': typeof RatingsRoute
+  '/scheduled': typeof ScheduledRoute
   '/share-trip': typeof ShareTripRoute
   '/sos': typeof SosRoute
   '/trip': typeof TripRoute
@@ -117,6 +126,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/matching'
     | '/ratings'
+    | '/scheduled'
     | '/share-trip'
     | '/sos'
     | '/trip'
@@ -129,6 +139,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/matching'
     | '/ratings'
+    | '/scheduled'
     | '/share-trip'
     | '/sos'
     | '/trip'
@@ -141,6 +152,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/matching'
     | '/ratings'
+    | '/scheduled'
     | '/share-trip'
     | '/sos'
     | '/trip'
@@ -154,6 +166,7 @@ export interface RootRouteChildren {
   HomeRoute: typeof HomeRoute
   MatchingRoute: typeof MatchingRoute
   RatingsRoute: typeof RatingsRoute
+  ScheduledRoute: typeof ScheduledRoute
   ShareTripRoute: typeof ShareTripRoute
   SosRoute: typeof SosRoute
   TripRoute: typeof TripRoute
@@ -188,6 +201,13 @@ declare module '@tanstack/react-router' {
       path: '/share-trip'
       fullPath: '/share-trip'
       preLoaderRoute: typeof ShareTripRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/scheduled': {
+      id: '/scheduled'
+      path: '/scheduled'
+      fullPath: '/scheduled'
+      preLoaderRoute: typeof ScheduledRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ratings': {
@@ -242,6 +262,7 @@ const rootRouteChildren: RootRouteChildren = {
   HomeRoute: HomeRoute,
   MatchingRoute: MatchingRoute,
   RatingsRoute: RatingsRoute,
+  ScheduledRoute: ScheduledRoute,
   ShareTripRoute: ShareTripRoute,
   SosRoute: SosRoute,
   TripRoute: TripRoute,
