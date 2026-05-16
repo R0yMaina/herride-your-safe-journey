@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TripRouteImport } from './routes/trip'
 import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
+import { Route as StudentRouteImport } from './routes/student'
 import { Route as SosRouteImport } from './routes/sos'
 import { Route as SharedRidesRouteImport } from './routes/shared-rides'
 import { Route as ShareTripRouteImport } from './routes/share-trip'
@@ -37,6 +38,11 @@ const TripRoute = TripRouteImport.update({
 const SubscriptionsRoute = SubscriptionsRouteImport.update({
   id: '/subscriptions',
   path: '/subscriptions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentRoute = StudentRouteImport.update({
+  id: '/student',
+  path: '/student',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SosRoute = SosRouteImport.update({
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/share-trip': typeof ShareTripRoute
   '/shared-rides': typeof SharedRidesRoute
   '/sos': typeof SosRoute
+  '/student': typeof StudentRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/trip': typeof TripRoute
   '/wallet': typeof WalletRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByTo {
   '/share-trip': typeof ShareTripRoute
   '/shared-rides': typeof SharedRidesRoute
   '/sos': typeof SosRoute
+  '/student': typeof StudentRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/trip': typeof TripRoute
   '/wallet': typeof WalletRoute
@@ -140,6 +148,7 @@ export interface FileRoutesById {
   '/share-trip': typeof ShareTripRoute
   '/shared-rides': typeof SharedRidesRoute
   '/sos': typeof SosRoute
+  '/student': typeof StudentRoute
   '/subscriptions': typeof SubscriptionsRoute
   '/trip': typeof TripRoute
   '/wallet': typeof WalletRoute
@@ -158,6 +167,7 @@ export interface FileRouteTypes {
     | '/share-trip'
     | '/shared-rides'
     | '/sos'
+    | '/student'
     | '/subscriptions'
     | '/trip'
     | '/wallet'
@@ -174,6 +184,7 @@ export interface FileRouteTypes {
     | '/share-trip'
     | '/shared-rides'
     | '/sos'
+    | '/student'
     | '/subscriptions'
     | '/trip'
     | '/wallet'
@@ -190,6 +201,7 @@ export interface FileRouteTypes {
     | '/share-trip'
     | '/shared-rides'
     | '/sos'
+    | '/student'
     | '/subscriptions'
     | '/trip'
     | '/wallet'
@@ -207,6 +219,7 @@ export interface RootRouteChildren {
   ShareTripRoute: typeof ShareTripRoute
   SharedRidesRoute: typeof SharedRidesRoute
   SosRoute: typeof SosRoute
+  StudentRoute: typeof StudentRoute
   SubscriptionsRoute: typeof SubscriptionsRoute
   TripRoute: typeof TripRoute
   WalletRoute: typeof WalletRoute
@@ -233,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/subscriptions'
       fullPath: '/subscriptions'
       preLoaderRoute: typeof SubscriptionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student': {
+      id: '/student'
+      path: '/student'
+      fullPath: '/student'
+      preLoaderRoute: typeof StudentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sos': {
@@ -327,6 +347,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShareTripRoute: ShareTripRoute,
   SharedRidesRoute: SharedRidesRoute,
   SosRoute: SosRoute,
+  StudentRoute: StudentRoute,
   SubscriptionsRoute: SubscriptionsRoute,
   TripRoute: TripRoute,
   WalletRoute: WalletRoute,
