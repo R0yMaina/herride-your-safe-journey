@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WalletRouteImport } from './routes/wallet'
 import { Route as TripRouteImport } from './routes/trip'
 import { Route as SosRouteImport } from './routes/sos'
+import { Route as SharedRidesRouteImport } from './routes/shared-rides'
 import { Route as ShareTripRouteImport } from './routes/share-trip'
 import { Route as ScheduledRouteImport } from './routes/scheduled'
 import { Route as RatingsRouteImport } from './routes/ratings'
@@ -34,6 +35,11 @@ const TripRoute = TripRouteImport.update({
 const SosRoute = SosRouteImport.update({
   id: '/sos',
   path: '/sos',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SharedRidesRoute = SharedRidesRouteImport.update({
+  id: '/shared-rides',
+  path: '/shared-rides',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ShareTripRoute = ShareTripRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/ratings': typeof RatingsRoute
   '/scheduled': typeof ScheduledRoute
   '/share-trip': typeof ShareTripRoute
+  '/shared-rides': typeof SharedRidesRoute
   '/sos': typeof SosRoute
   '/trip': typeof TripRoute
   '/wallet': typeof WalletRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/ratings': typeof RatingsRoute
   '/scheduled': typeof ScheduledRoute
   '/share-trip': typeof ShareTripRoute
+  '/shared-rides': typeof SharedRidesRoute
   '/sos': typeof SosRoute
   '/trip': typeof TripRoute
   '/wallet': typeof WalletRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/ratings': typeof RatingsRoute
   '/scheduled': typeof ScheduledRoute
   '/share-trip': typeof ShareTripRoute
+  '/shared-rides': typeof SharedRidesRoute
   '/sos': typeof SosRoute
   '/trip': typeof TripRoute
   '/wallet': typeof WalletRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/ratings'
     | '/scheduled'
     | '/share-trip'
+    | '/shared-rides'
     | '/sos'
     | '/trip'
     | '/wallet'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/ratings'
     | '/scheduled'
     | '/share-trip'
+    | '/shared-rides'
     | '/sos'
     | '/trip'
     | '/wallet'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/ratings'
     | '/scheduled'
     | '/share-trip'
+    | '/shared-rides'
     | '/sos'
     | '/trip'
     | '/wallet'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   RatingsRoute: typeof RatingsRoute
   ScheduledRoute: typeof ScheduledRoute
   ShareTripRoute: typeof ShareTripRoute
+  SharedRidesRoute: typeof SharedRidesRoute
   SosRoute: typeof SosRoute
   TripRoute: typeof TripRoute
   WalletRoute: typeof WalletRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/sos'
       fullPath: '/sos'
       preLoaderRoute: typeof SosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shared-rides': {
+      id: '/shared-rides'
+      path: '/shared-rides'
+      fullPath: '/shared-rides'
+      preLoaderRoute: typeof SharedRidesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/share-trip': {
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   RatingsRoute: RatingsRoute,
   ScheduledRoute: ScheduledRoute,
   ShareTripRoute: ShareTripRoute,
+  SharedRidesRoute: SharedRidesRoute,
   SosRoute: SosRoute,
   TripRoute: TripRoute,
   WalletRoute: WalletRoute,
