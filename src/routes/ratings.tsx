@@ -5,7 +5,7 @@ import { Star } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/ratings")({
-  head: () => ({ meta: [{ title: "Rate ride — HerRide" }, { name: "description", content: "Rate your driver." }] }),
+  head: () => ({ meta: [{ title: "Rate ride — HeriRide" }, { name: "description", content: "Rate your driver." }] }),
   component: Ratings,
 });
 

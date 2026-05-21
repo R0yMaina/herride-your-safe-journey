@@ -5,7 +5,7 @@ import { MapCanvas } from "@/components/MapCanvas";
 import { ShieldCheck, BadgeCheck, Venus } from "lucide-react";
 
 export const Route = createFileRoute("/matching")({
-  head: () => ({ meta: [{ title: "Matching — HerRide" }, { name: "description", content: "Matching you with a verified female driver." }] }),
+  head: () => ({ meta: [{ title: "Matching — HeriRide" }, { name: "description", content: "Matching you with a verified female driver." }] }),
   component: Matching,
 });
 

@@ -6,7 +6,7 @@ import { Plus, MapPin, Clock, Calendar, CheckCircle2, Circle } from "lucide-reac
 import { useState } from "react";
 
 export const Route = createFileRoute("/scheduled")({
-  head: () => ({ meta: [{ title: "Scheduled — HerRide" }, { name: "description", content: "Schedule rides ahead." }] }),
+  head: () => ({ meta: [{ title: "Scheduled — HeriRide" }, { name: "description", content: "Schedule rides ahead." }] }),
   component: Scheduled,
 });
 
@@ -25,7 +25,7 @@ function Scheduled() {
             <CheckCircle2 className="w-10 h-10" />
           </div>
           <h2 className="font-display text-2xl font-semibold mb-2">Ride Scheduled!</h2>
-          <p className="text-muted-foreground mb-8">Your HerRide has been confirmed for Tomorrow at 08:00 AM.</p>
+          <p className="text-muted-foreground mb-8">Your HeriRide has been confirmed for Tomorrow at 08:00 AM.</p>
           <button onClick={() => { setScheduledSuccess(false); setIsScheduling(false); }} className="w-full py-4 rounded-full bg-primary text-primary-foreground font-semibold shadow-glow">
             Done
           </button>

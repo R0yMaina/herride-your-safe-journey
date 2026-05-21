@@ -5,7 +5,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Circle, MapPin, Lock, Sparkles, Users, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/book")({
-  head: () => ({ meta: [{ title: "Book a ride — HerRide" }, { name: "description", content: "Choose your ride." }] }),
+  head: () => ({ meta: [{ title: "Book a ride — HeriRide" }, { name: "description", content: "Choose your ride." }] }),
   component: Book,
 });
 

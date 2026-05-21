@@ -5,7 +5,7 @@ import { MapCanvas } from "@/components/MapCanvas";
 import { Search, Home as HomeIcon, Briefcase, Heart, ShieldAlert, GraduationCap, ChevronRight, Menu } from "lucide-react";
 
 export const Route = createFileRoute("/home")({
-  head: () => ({ meta: [{ title: "Home — HerRide" }, { name: "description", content: "Book your safe ride." }] }),
+  head: () => ({ meta: [{ title: "Home — HeriRide" }, { name: "description", content: "Book your safe ride." }] }),
   component: Home,
 });
 

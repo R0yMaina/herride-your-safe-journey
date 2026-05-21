@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { Check, Crown } from "lucide-react";
 
 export const Route = createFileRoute("/subscriptions")({
-  head: () => ({ meta: [{ title: "Plans — HerRide" }, { name: "description", content: "Affordable monthly plans." }] }),
+  head: () => ({ meta: [{ title: "Plans — HeriRide" }, { name: "description", content: "Affordable monthly plans." }] }),
   component: Subs,
 });
 

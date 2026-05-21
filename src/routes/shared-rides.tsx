@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { BadgeCheck, Users } from "lucide-react";
 
 export const Route = createFileRoute("/shared-rides")({
-  head: () => ({ meta: [{ title: "HerShare — HerRide" }, { name: "description", content: "Split fares with verified women." }] }),
+  head: () => ({ meta: [{ title: "HerShare — HeriRide" }, { name: "description", content: "Split fares with verified women." }] }),
   component: Shared,
 });
 

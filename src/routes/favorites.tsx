@@ -5,7 +5,7 @@ import { BottomTabBar } from "@/components/BottomTabBar";
 import { Heart, Star } from "lucide-react";
 
 export const Route = createFileRoute("/favorites")({
-  head: () => ({ meta: [{ title: "Favorites — HerRide" }, { name: "description", content: "Your saved drivers." }] }),
+  head: () => ({ meta: [{ title: "Favorites — HeriRide" }, { name: "description", content: "Your saved drivers." }] }),
   component: Favorites,
 });
 

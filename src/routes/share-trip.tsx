@@ -5,7 +5,7 @@ import { Check, Copy, Link2 } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/share-trip")({
-  head: () => ({ meta: [{ title: "Share trip — HerRide" }, { name: "description", content: "Share your live trip with trusted contacts." }] }),
+  head: () => ({ meta: [{ title: "Share trip — HeriRide" }, { name: "description", content: "Share your live trip with trusted contacts." }] }),
   component: ShareTrip,
 });
 
@@ -28,7 +28,7 @@ function ShareTrip() {
             <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/30 blur-2xl" />
             <div className="relative">
               <div className="text-xs font-semibold uppercase tracking-wider">Live trip link</div>
-              <div className="font-display text-lg mt-1">herride.app/t/sofia-8a2</div>
+              <div className="font-display text-lg mt-1">heriride.app/t/sofia-8a2</div>
               <div className="text-xs mt-1 opacity-70">Expires when your trip ends</div>
               <div className="flex gap-2 mt-4">
                 <button className="flex-1 bg-noir text-white rounded-full py-2.5 text-xs font-semibold inline-flex items-center justify-center gap-1.5"><Copy className="w-3.5 h-3.5" /> Copy link</button>

@@ -4,7 +4,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { GraduationCap, Sparkles, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/student")({
-  head: () => ({ meta: [{ title: "Student — HerRide" }, { name: "description", content: "20% off for verified students." }] }),
+  head: () => ({ meta: [{ title: "Student — HeriRide" }, { name: "description", content: "20% off for verified students." }] }),
   component: Student,
 });
 

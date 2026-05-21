@@ -5,7 +5,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { MessageCircle, Share2, ShieldAlert, Phone, Star } from "lucide-react";
 
 export const Route = createFileRoute("/trip")({
-  head: () => ({ meta: [{ title: "Live trip — HerRide" }, { name: "description", content: "Track your ride in real time." }] }),
+  head: () => ({ meta: [{ title: "Live trip — HeriRide" }, { name: "description", content: "Track your ride in real time." }] }),
   component: Trip,
 });
 

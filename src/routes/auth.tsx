@@ -1,13 +1,14 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { ShieldCheck, Sparkles, Phone } from "lucide-react";
 import { useState } from "react";
+import { HeriRideLogo } from "@/components/HeriRideLogo";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Sign in — HerRide" },
-      { name: "description", content: "Sign in to HerRide. Verified women only." },
+      { title: "Sign in — HeriRide" },
+      { name: "description", content: "Sign in to HeriRide. Verified women only." },
     ],
   }),
   component: Auth,
@@ -15,6 +16,14 @@ export const Route = createFileRoute("/auth")({
 
 function Auth() {
   const [mode, setMode] = useState<"login" | "signup">("login");
+  const navigate = useNavigate();
+
+  const handleAuth = () => {
+    // In a real app, this would verify the code/create user
+    // For now, we go to onboarding as requested
+    navigate({ to: "/onboarding" });
+  };
+
   return (
     <PhoneFrame>
       <div className="relative min-h-full flex flex-col">
@@ -22,10 +31,13 @@ function Auth() {
           <div className="absolute inset-0 bg-noir/30" />
           <div className="absolute -bottom-12 -right-12 w-64 h-64 rounded-full bg-primary-glow/40 blur-3xl" />
           <div className="relative z-10 h-full flex flex-col justify-end p-6">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-noir/40 backdrop-blur text-white px-3 py-1.5 rounded-full w-fit">
-              <ShieldCheck className="w-3.5 h-3.5" /> Verified Women Only
-            </span>
-            <h1 className="font-display text-4xl font-semibold text-noir mt-3">Welcome to HerRide</h1>
+            <div className="flex items-center justify-between">
+              <span className="inline-flex items-center gap-1.5 text-xs font-semibold bg-noir/40 backdrop-blur text-white px-3 py-1.5 rounded-full w-fit">
+                <ShieldCheck className="w-3.5 h-3.5" /> Verified Women Only
+              </span>
+              <HeriRideLogo size={50} showBackground={false} className="opacity-90 filter drop-shadow-sm" />
+            </div>
+            <h1 className="font-display text-4xl font-semibold text-noir mt-3">Welcome to HeriRide</h1>
             <p className="text-noir/70 text-sm mt-1">Your trusted ride home.</p>
           </div>
         </div>
@@ -50,7 +62,10 @@ function Auth() {
               <Field label="Full name" placeholder="Jane Doe" />
             )}
             <Field label="Phone number" placeholder="+1 (555) 010-4242" icon={<Phone className="w-4 h-4" />} />
-            <button className="mt-2 w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold shadow-glow">
+            <button 
+              onClick={handleAuth}
+              className="mt-2 w-full py-3.5 rounded-full bg-primary text-primary-foreground font-semibold shadow-glow"
+            >
               Send verification code
             </button>
             <p className="text-[11px] text-muted-foreground mt-3 text-center leading-relaxed">
@@ -72,7 +87,7 @@ function Auth() {
             ))}
           </div>
 
-          <Link to="/home" className="block text-center text-xs text-primary mt-6 mb-8 font-semibold">
+          <Link to="/onboarding" className="block text-center text-xs text-primary mt-6 mb-8 font-semibold">
             Skip to demo →
           </Link>
         </div>
