@@ -187,13 +187,19 @@ function Auth() {
   );
 }
 
-function Field({ label, placeholder, icon }: { label: string; placeholder: string; icon?: React.ReactNode }) {
+function Field({ label, placeholder, icon, value, onChange, type = "text" }: { label: string; placeholder: string; icon?: React.ReactNode; value?: string; onChange?: (v: string) => void; type?: string }) {
   return (
     <label className="block mb-3">
       <span className="text-xs text-muted-foreground font-medium">{label}</span>
       <div className="mt-1.5 flex items-center gap-2 bg-secondary border border-border rounded-2xl px-4 py-3">
         {icon && <span className="text-muted-foreground">{icon}</span>}
-        <input className="bg-transparent outline-none text-sm flex-1 placeholder:text-muted-foreground" placeholder={placeholder} />
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange?.(e.target.value)}
+          className="bg-transparent outline-none text-sm flex-1 placeholder:text-muted-foreground"
+          placeholder={placeholder}
+        />
       </div>
     </label>
   );
