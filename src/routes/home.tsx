@@ -3,6 +3,10 @@ import { PhoneFrame } from "@/components/PhoneFrame";
 import { BottomTabBar } from "@/components/BottomTabBar";
 import { MapCanvas } from "@/components/MapCanvas";
 import { Search, Home as HomeIcon, Briefcase, Heart, ShieldAlert, GraduationCap, ChevronRight, Menu } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/useSession";
+import { DEFAULT_PICKUP, getCurrentCoords } from "@/lib/geo";
 
 export const Route = createFileRoute("/home")({
   head: () => ({ meta: [{ title: "Home — HeriRide" }, { name: "description", content: "Book your safe ride." }] }),
@@ -10,6 +14,39 @@ export const Route = createFileRoute("/home")({
 });
 
 function Home() {
+  const { user } = useSession();
+  const [name, setName] = useState<string>("there");
+  const [nearby, setNearby] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.full_name) setName(data.full_name.split(" ")[0]);
+      });
+  }, [user]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const c = await getCurrentCoords().catch(() => DEFAULT_PICKUP);
+      const { data } = await supabase.rpc("nearest_available_drivers", {
+        _lat: c.lat,
+        _lng: c.lng,
+        _radius_km: 8,
+        _limit: 20,
+      });
+      if (!cancelled) setNearby(data?.length ?? 0);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <PhoneFrame>
       <div className="relative min-h-full">
@@ -22,7 +59,8 @@ function Home() {
             <Menu className="w-5 h-5" />
           </button>
           <div className="px-3 py-1.5 rounded-full bg-card/90 backdrop-blur border border-border text-xs font-semibold">
-            <span className="text-primary">●</span> Female-only zone
+            <span className="text-primary">●</span>{" "}
+            {nearby === null ? "Scanning…" : `${nearby} verified driver${nearby === 1 ? "" : "s"} nearby`}
           </div>
           <Link to="/sos" className="w-11 h-11 rounded-full bg-destructive/20 backdrop-blur border border-destructive/40 flex items-center justify-center">
             <ShieldAlert className="w-5 h-5 text-destructive" />
@@ -38,7 +76,9 @@ function Home() {
           <div className="bg-card/95 backdrop-blur-xl border border-border rounded-3xl p-5 shadow-soft">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="text-xs text-muted-foreground">Good evening, Sofia</p>
+                <p className="text-xs text-muted-foreground">
+                  {user ? `Good evening, ${name}` : "Welcome to HeriRide"}
+                </p>
                 <h2 className="font-display text-xl font-semibold">Where to tonight?</h2>
               </div>
               <div className="text-right">
