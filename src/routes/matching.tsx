@@ -1,15 +1,63 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { MapCanvas } from "@/components/MapCanvas";
 import { ShieldCheck, BadgeCheck, Venus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { z } from "zod";
+
+const searchSchema = z.object({ rideId: z.string().uuid().optional() });
 
 export const Route = createFileRoute("/matching")({
   head: () => ({ meta: [{ title: "Matching — HeriRide" }, { name: "description", content: "Matching you with a verified female driver." }] }),
+  validateSearch: (s) => searchSchema.parse(s),
   component: Matching,
 });
 
 function Matching() {
+  const { rideId } = Route.useSearch();
+  const navigate = useNavigate();
+  const [status, setStatus] = useState<string>("requested");
+
+  useEffect(() => {
+    if (!rideId) return;
+    let cancelled = false;
+
+    const check = (s: string, driverId: string | null) => {
+      setStatus(s);
+      if (driverId && (s === "accepted" || s === "matched" || s === "arrived" || s === "in_progress")) {
+        navigate({ to: "/trip", search: { rideId } as never });
+      }
+    };
+
+    supabase
+      .from("rides")
+      .select("status, driver_id")
+      .eq("id", rideId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!cancelled && data) check(data.status, data.driver_id);
+      });
+
+    const channel = supabase
+      .channel(`ride:${rideId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "rides", filter: `id=eq.${rideId}` },
+        (payload) => {
+          const r = payload.new as { status: string; driver_id: string | null };
+          check(r.status, r.driver_id);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      cancelled = true;
+      supabase.removeChannel(channel);
+    };
+  }, [rideId, navigate]);
+
   return (
     <PhoneFrame>
       <div className="relative min-h-full flex flex-col">
@@ -37,7 +85,11 @@ function Matching() {
 
           <h1 className="font-display text-2xl font-semibold mt-8 text-center">Finding your driver</h1>
           <p className="text-sm text-muted-foreground mt-2 text-center max-w-xs">
-            Matching you with a verified female driver near Campus Library.
+            {rideId
+              ? status === "requested"
+                ? "Pinging verified female drivers near you…"
+                : `Ride ${status.replace("_", " ")}`
+              : "No active ride. Book one to start matching."}
           </p>
 
           <div className="grid grid-cols-3 gap-2 mt-8 w-full max-w-sm">
@@ -55,9 +107,19 @@ function Matching() {
         </div>
 
         <div className="relative z-10 p-4">
-          <Link to="/trip" className="block w-full text-center py-3.5 rounded-full bg-card border border-border text-sm font-semibold">
-            Skip to live trip →
-          </Link>
+          {rideId ? (
+            <Link
+              to="/trip"
+              search={{ rideId } as never}
+              className="block w-full text-center py-3.5 rounded-full bg-card border border-border text-sm font-semibold"
+            >
+              View live trip →
+            </Link>
+          ) : (
+            <Link to="/book" className="block w-full text-center py-3.5 rounded-full bg-card border border-border text-sm font-semibold">
+              Book a ride →
+            </Link>
+          )}
         </div>
       </div>
     </PhoneFrame>
