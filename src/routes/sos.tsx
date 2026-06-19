@@ -1,22 +1,62 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { motion, AnimatePresence } from "framer-motion";
 import { PhoneFrame } from "@/components/PhoneFrame";
 import { AppHeader } from "@/components/AppHeader";
 import { Phone, Share2, Users, ShieldAlert, CheckCircle2, X } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSession } from "@/hooks/useSession";
+import { getCurrentCoords } from "@/lib/geo";
+import { toast } from "sonner";
+import { z } from "zod";
+
+const searchSchema = z.object({ rideId: z.string().uuid().optional() });
 
 export const Route = createFileRoute("/sos")({
   head: () => ({ meta: [{ title: "Emergency — HeriRide" }, { name: "description", content: "SOS support, always on." }] }),
+  validateSearch: (s) => searchSchema.parse(s),
   component: SOS,
 });
 
 function SOS() {
+  const { rideId } = Route.useSearch();
+  const { user } = useSession();
   const [holdProgress, setHoldProgress] = useState(0);
   const [isAlerted, setIsAlerted] = useState(false);
   const [isHolding, setIsHolding] = useState(false);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const [alertId, setAlertId] = useState<string | null>(null);
+  const [alertStatus, setAlertStatus] = useState<string>("active");
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const startTimeRef = useRef<number>(0);
   const HOLD_DURATION = 3000; // 3 seconds
+
+  const fireAlert = async () => {
+    if (!user) {
+      toast.error("Sign in to trigger SOS.");
+      return;
+    }
+    const coords = await getCurrentCoords().catch(() => null);
+    const { data, error } = await supabase
+      .from("sos_alerts")
+      .insert({
+        user_id: user.id,
+        ride_id: rideId ?? null,
+        lat: coords?.lat ?? null,
+        lng: coords?.lng ?? null,
+        status: "active",
+        notes: "Hold-to-alert triggered from mobile app",
+      })
+      .select("id, status")
+      .single();
+    if (error) {
+      toast.error(error.message);
+      setIsAlerted(false);
+      setHoldProgress(0);
+      return;
+    }
+    setAlertId(data.id);
+    setAlertStatus(data.status);
+  };
 
   const startHolding = () => {
     if (isAlerted) return;
@@ -32,6 +72,7 @@ function SOS() {
         clearInterval(timerRef.current!);
         setIsAlerted(true);
         setIsHolding(false);
+        void fireAlert();
       }
     }, 16);
   };
@@ -47,6 +88,34 @@ function SOS() {
       if (timerRef.current) clearInterval(timerRef.current);
     };
   }, []);
+
+  // Subscribe to safety-team status updates on the alert
+  useEffect(() => {
+    if (!alertId) return;
+    const chan = supabase
+      .channel(`sos:${alertId}`)
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "sos_alerts", filter: `id=eq.${alertId}` },
+        (payload) => {
+          const r = payload.new as { status: string };
+          setAlertStatus(r.status);
+        },
+      )
+      .subscribe();
+    return () => {
+      supabase.removeChannel(chan);
+    };
+  }, [alertId]);
+
+  const cancelAlert = async () => {
+    if (alertId) {
+      await supabase.from("sos_alerts").update({ status: "false_alarm", resolved_at: new Date().toISOString() }).eq("id", alertId);
+    }
+    setIsAlerted(false);
+    setAlertId(null);
+    setHoldProgress(0);
+  };
 
   return (
     <PhoneFrame>
@@ -132,29 +201,35 @@ function SOS() {
                 </div>
                 <h2 className="font-display text-3xl font-semibold mb-2">Help is on the way</h2>
                 <p className="text-muted-foreground mb-8 px-4">
-                  Emergency contacts notified. HeriRide Safety Team is currently viewing your live location and audio stream.
+                  Alert dispatched to the HeriRide Safety Team. They are reviewing your live location now.
                 </p>
                 
                 <div className="bg-noir/40 backdrop-blur rounded-3xl p-6 w-full max-w-sm border border-white/10 space-y-4">
                   <div className="flex items-center gap-3">
                     <div className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                    <span className="text-xs font-semibold uppercase tracking-wider">Live Stream Active</span>
+                    <span className="text-xs font-semibold uppercase tracking-wider">
+                      Status: {alertStatus.replace("_", " ")}
+                    </span>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="bg-white/5 rounded-2xl p-3">
-                      <div className="text-[10px] uppercase text-muted-foreground mb-1">Police</div>
-                      <div className="text-sm font-semibold text-green-500">Dispatched</div>
+                      <div className="text-[10px] uppercase text-muted-foreground mb-1">Alert ID</div>
+                      <div className="text-sm font-semibold text-green-500">
+                        {alertId ? alertId.slice(0, 8) : "—"}
+                      </div>
                     </div>
                     <div className="bg-white/5 rounded-2xl p-3">
-                      <div className="text-[10px] uppercase text-muted-foreground mb-1">Response</div>
-                      <div className="text-sm font-semibold">2m 45s</div>
+                      <div className="text-[10px] uppercase text-muted-foreground mb-1">Ride</div>
+                      <div className="text-sm font-semibold">
+                        {rideId ? rideId.slice(0, 8) : "Off-trip"}
+                      </div>
                     </div>
                   </div>
                   <button 
-                    onClick={() => setIsAlerted(false)}
+                    onClick={cancelAlert}
                     className="w-full py-3 rounded-xl border border-white/10 text-xs font-semibold hover:bg-white/5 transition-colors"
                   >
-                    Cancel Alert (Requires PIN)
+                    Mark as false alarm
                   </button>
                 </div>
               </motion.div>
