@@ -9,96 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as WalletRouteImport } from './routes/wallet'
-import { Route as TripRouteImport } from './routes/trip'
-import { Route as SubscriptionsRouteImport } from './routes/subscriptions'
-import { Route as StudentRouteImport } from './routes/student'
-import { Route as SosRouteImport } from './routes/sos'
-import { Route as SharedRidesRouteImport } from './routes/shared-rides'
-import { Route as ShareTripRouteImport } from './routes/share-trip'
-import { Route as ScheduledRouteImport } from './routes/scheduled'
-import { Route as RatingsRouteImport } from './routes/ratings'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
-import { Route as MatchingRouteImport } from './routes/matching'
-import { Route as HomeRouteImport } from './routes/home'
-import { Route as FavoritesRouteImport } from './routes/favorites'
-import { Route as BookRouteImport } from './routes/book'
-import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppWalletRouteImport } from './routes/_app.wallet'
+import { Route as AppRidesRouteImport } from './routes/_app.rides'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
 
-const WalletRoute = WalletRouteImport.update({
-  id: '/wallet',
-  path: '/wallet',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TripRoute = TripRouteImport.update({
-  id: '/trip',
-  path: '/trip',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SubscriptionsRoute = SubscriptionsRouteImport.update({
-  id: '/subscriptions',
-  path: '/subscriptions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const StudentRoute = StudentRouteImport.update({
-  id: '/student',
-  path: '/student',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SosRoute = SosRouteImport.update({
-  id: '/sos',
-  path: '/sos',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SharedRidesRoute = SharedRidesRouteImport.update({
-  id: '/shared-rides',
-  path: '/shared-rides',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ShareTripRoute = ShareTripRouteImport.update({
-  id: '/share-trip',
-  path: '/share-trip',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ScheduledRoute = ScheduledRouteImport.update({
-  id: '/scheduled',
-  path: '/scheduled',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RatingsRoute = RatingsRouteImport.update({
-  id: '/ratings',
-  path: '/ratings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OnboardingRoute = OnboardingRouteImport.update({
-  id: '/onboarding',
-  path: '/onboarding',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MatchingRoute = MatchingRouteImport.update({
-  id: '/matching',
-  path: '/matching',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeRoute = HomeRouteImport.update({
-  id: '/home',
-  path: '/home',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FavoritesRoute = FavoritesRouteImport.update({
-  id: '/favorites',
-  path: '/favorites',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BookRoute = BookRouteImport.update({
-  id: '/book',
-  path: '/book',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -106,243 +25,77 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppWalletRoute = AppWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRidesRoute = AppRidesRouteImport.update({
+  id: '/rides',
+  path: '/rides',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/book': typeof BookRoute
-  '/favorites': typeof FavoritesRoute
-  '/home': typeof HomeRoute
-  '/matching': typeof MatchingRoute
-  '/onboarding': typeof OnboardingRoute
-  '/ratings': typeof RatingsRoute
-  '/scheduled': typeof ScheduledRoute
-  '/share-trip': typeof ShareTripRoute
-  '/shared-rides': typeof SharedRidesRoute
-  '/sos': typeof SosRoute
-  '/student': typeof StudentRoute
-  '/subscriptions': typeof SubscriptionsRoute
-  '/trip': typeof TripRoute
-  '/wallet': typeof WalletRoute
+  '/home': typeof AppHomeRoute
+  '/profile': typeof AppProfileRoute
+  '/rides': typeof AppRidesRoute
+  '/wallet': typeof AppWalletRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/book': typeof BookRoute
-  '/favorites': typeof FavoritesRoute
-  '/home': typeof HomeRoute
-  '/matching': typeof MatchingRoute
-  '/onboarding': typeof OnboardingRoute
-  '/ratings': typeof RatingsRoute
-  '/scheduled': typeof ScheduledRoute
-  '/share-trip': typeof ShareTripRoute
-  '/shared-rides': typeof SharedRidesRoute
-  '/sos': typeof SosRoute
-  '/student': typeof StudentRoute
-  '/subscriptions': typeof SubscriptionsRoute
-  '/trip': typeof TripRoute
-  '/wallet': typeof WalletRoute
+  '/home': typeof AppHomeRoute
+  '/profile': typeof AppProfileRoute
+  '/rides': typeof AppRidesRoute
+  '/wallet': typeof AppWalletRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/auth': typeof AuthRoute
-  '/book': typeof BookRoute
-  '/favorites': typeof FavoritesRoute
-  '/home': typeof HomeRoute
-  '/matching': typeof MatchingRoute
-  '/onboarding': typeof OnboardingRoute
-  '/ratings': typeof RatingsRoute
-  '/scheduled': typeof ScheduledRoute
-  '/share-trip': typeof ShareTripRoute
-  '/shared-rides': typeof SharedRidesRoute
-  '/sos': typeof SosRoute
-  '/student': typeof StudentRoute
-  '/subscriptions': typeof SubscriptionsRoute
-  '/trip': typeof TripRoute
-  '/wallet': typeof WalletRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_app/home': typeof AppHomeRoute
+  '/_app/profile': typeof AppProfileRoute
+  '/_app/rides': typeof AppRidesRoute
+  '/_app/wallet': typeof AppWalletRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/auth'
-    | '/book'
-    | '/favorites'
-    | '/home'
-    | '/matching'
-    | '/onboarding'
-    | '/ratings'
-    | '/scheduled'
-    | '/share-trip'
-    | '/shared-rides'
-    | '/sos'
-    | '/student'
-    | '/subscriptions'
-    | '/trip'
-    | '/wallet'
+  fullPaths: '/' | '/home' | '/profile' | '/rides' | '/wallet'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/book'
-    | '/favorites'
-    | '/home'
-    | '/matching'
-    | '/onboarding'
-    | '/ratings'
-    | '/scheduled'
-    | '/share-trip'
-    | '/shared-rides'
-    | '/sos'
-    | '/student'
-    | '/subscriptions'
-    | '/trip'
-    | '/wallet'
+  to: '/' | '/home' | '/profile' | '/rides' | '/wallet'
   id:
     | '__root__'
     | '/'
-    | '/auth'
-    | '/book'
-    | '/favorites'
-    | '/home'
-    | '/matching'
-    | '/onboarding'
-    | '/ratings'
-    | '/scheduled'
-    | '/share-trip'
-    | '/shared-rides'
-    | '/sos'
-    | '/student'
-    | '/subscriptions'
-    | '/trip'
-    | '/wallet'
+    | '/_app'
+    | '/_app/home'
+    | '/_app/profile'
+    | '/_app/rides'
+    | '/_app/wallet'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AuthRoute: typeof AuthRoute
-  BookRoute: typeof BookRoute
-  FavoritesRoute: typeof FavoritesRoute
-  HomeRoute: typeof HomeRoute
-  MatchingRoute: typeof MatchingRoute
-  OnboardingRoute: typeof OnboardingRoute
-  RatingsRoute: typeof RatingsRoute
-  ScheduledRoute: typeof ScheduledRoute
-  ShareTripRoute: typeof ShareTripRoute
-  SharedRidesRoute: typeof SharedRidesRoute
-  SosRoute: typeof SosRoute
-  StudentRoute: typeof StudentRoute
-  SubscriptionsRoute: typeof SubscriptionsRoute
-  TripRoute: typeof TripRoute
-  WalletRoute: typeof WalletRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/wallet': {
-      id: '/wallet'
-      path: '/wallet'
-      fullPath: '/wallet'
-      preLoaderRoute: typeof WalletRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/trip': {
-      id: '/trip'
-      path: '/trip'
-      fullPath: '/trip'
-      preLoaderRoute: typeof TripRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/subscriptions': {
-      id: '/subscriptions'
-      path: '/subscriptions'
-      fullPath: '/subscriptions'
-      preLoaderRoute: typeof SubscriptionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/student': {
-      id: '/student'
-      path: '/student'
-      fullPath: '/student'
-      preLoaderRoute: typeof StudentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sos': {
-      id: '/sos'
-      path: '/sos'
-      fullPath: '/sos'
-      preLoaderRoute: typeof SosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/shared-rides': {
-      id: '/shared-rides'
-      path: '/shared-rides'
-      fullPath: '/shared-rides'
-      preLoaderRoute: typeof SharedRidesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/share-trip': {
-      id: '/share-trip'
-      path: '/share-trip'
-      fullPath: '/share-trip'
-      preLoaderRoute: typeof ShareTripRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/scheduled': {
-      id: '/scheduled'
-      path: '/scheduled'
-      fullPath: '/scheduled'
-      preLoaderRoute: typeof ScheduledRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ratings': {
-      id: '/ratings'
-      path: '/ratings'
-      fullPath: '/ratings'
-      preLoaderRoute: typeof RatingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/onboarding': {
-      id: '/onboarding'
-      path: '/onboarding'
-      fullPath: '/onboarding'
-      preLoaderRoute: typeof OnboardingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/matching': {
-      id: '/matching'
-      path: '/matching'
-      fullPath: '/matching'
-      preLoaderRoute: typeof MatchingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home': {
-      id: '/home'
-      path: '/home'
-      fullPath: '/home'
-      preLoaderRoute: typeof HomeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/favorites': {
-      id: '/favorites'
-      path: '/favorites'
-      fullPath: '/favorites'
-      preLoaderRoute: typeof FavoritesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/book': {
-      id: '/book'
-      path: '/book'
-      fullPath: '/book'
-      preLoaderRoute: typeof BookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -352,37 +105,57 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/wallet': {
+      id: '/_app/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AppWalletRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/rides': {
+      id: '/_app/rides'
+      path: '/rides'
+      fullPath: '/rides'
+      preLoaderRoute: typeof AppRidesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppHomeRoute: typeof AppHomeRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppRidesRoute: typeof AppRidesRoute
+  AppWalletRoute: typeof AppWalletRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppHomeRoute: AppHomeRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppRidesRoute: AppRidesRoute,
+  AppWalletRoute: AppWalletRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AuthRoute: AuthRoute,
-  BookRoute: BookRoute,
-  FavoritesRoute: FavoritesRoute,
-  HomeRoute: HomeRoute,
-  MatchingRoute: MatchingRoute,
-  OnboardingRoute: OnboardingRoute,
-  RatingsRoute: RatingsRoute,
-  ScheduledRoute: ScheduledRoute,
-  ShareTripRoute: ShareTripRoute,
-  SharedRidesRoute: SharedRidesRoute,
-  SosRoute: SosRoute,
-  StudentRoute: StudentRoute,
-  SubscriptionsRoute: SubscriptionsRoute,
-  TripRoute: TripRoute,
-  WalletRoute: WalletRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
