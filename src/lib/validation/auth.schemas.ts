@@ -17,7 +17,7 @@ export const phoneSchema = z
 export const signInSchema = z.object({
   email: emailSchema,
   password: z.string().min(1, "Password is required"),
-  rememberMe: z.boolean().default(false),
+  rememberMe: z.boolean(),
 });
 export type SignInInput = z.infer<typeof signInSchema>;
 
