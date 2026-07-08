@@ -1,23 +1,9 @@
 import { motion } from "framer-motion";
-import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { HeRideMark } from "@/components/brand/HeRideMark";
 import { appConfig } from "@/config/app.config";
-import { ROUTES } from "@/constants/routes";
-import { useUIStore } from "@/store/ui.store";
 
+/** Pure presentational splash — routing decisions live in SplashRouter. */
 export function SplashScreen() {
-  const navigate = useNavigate();
-  const setSplashDone = useUIStore((s) => s.setSplashDone);
-
-  useEffect(() => {
-    const id = setTimeout(() => {
-      setSplashDone(true);
-      void navigate({ to: ROUTES.home, replace: true });
-    }, appConfig.splash.minDurationMs);
-    return () => clearTimeout(id);
-  }, [navigate, setSplashDone]);
-
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-noir px-6">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">

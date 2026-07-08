@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { SplashScreen } from "@/features/splash/SplashScreen";
+import { SplashRouter } from "@/features/splash/SplashRouter";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -8,5 +8,5 @@ export const Route = createFileRoute("/")({
       { name: "description", content: "A premium, female-focused ride-hailing platform engineered for safety and trust." },
     ],
   }),
-  component: SplashScreen,
+  component: SplashRouter,
 });

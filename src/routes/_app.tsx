@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { AppShell } from "@/components/layout/AppShell";
-import { AppProviders } from "@/providers/AppProviders";
+import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
@@ -8,10 +8,10 @@ export const Route = createFileRoute("/_app")({
 
 function AppLayout() {
   return (
-    <AppProviders>
+    <ProtectedRoute>
       <AppShell>
         <Outlet />
       </AppShell>
-    </AppProviders>
+    </ProtectedRoute>
   );
 }
