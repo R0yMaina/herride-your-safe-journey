@@ -9,13 +9,47 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WelcomeRouteImport } from './routes/welcome'
+import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
+import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
+import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
+import { Route as AuthSessionExpiredRouteImport } from './routes/auth.session-expired'
+import { Route as AuthResetPasswordRouteImport } from './routes/auth.reset-password'
+import { Route as AuthPhoneRouteImport } from './routes/auth.phone'
+import { Route as AuthPasswordUpdatedRouteImport } from './routes/auth.password-updated'
+import { Route as AuthOtpRouteImport } from './routes/auth.otp'
+import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
+import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AppWalletRouteImport } from './routes/_app.wallet'
 import { Route as AppRidesRouteImport } from './routes/_app.rides'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnauthorizedRoute = UnauthorizedRouteImport.update({
+  id: '/unauthorized',
+  path: '/unauthorized',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -24,6 +58,56 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignUpRoute = AuthSignUpRouteImport.update({
+  id: '/sign-up',
+  path: '/sign-up',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSignInRoute = AuthSignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthSessionExpiredRoute = AuthSessionExpiredRouteImport.update({
+  id: '/session-expired',
+  path: '/session-expired',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPhoneRoute = AuthPhoneRouteImport.update({
+  id: '/phone',
+  path: '/phone',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPasswordUpdatedRoute = AuthPasswordUpdatedRouteImport.update({
+  id: '/password-updated',
+  path: '/password-updated',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthOtpRoute = AuthOtpRouteImport.update({
+  id: '/otp',
+  path: '/otp',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLogoutRoute = AuthLogoutRouteImport.update({
+  id: '/logout',
+  path: '/logout',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRoute,
 } as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
@@ -48,49 +132,175 @@ const AppHomeRoute = AppHomeRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/welcome': typeof WelcomeRoute
   '/home': typeof AppHomeRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
   '/wallet': typeof AppWalletRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/logout': typeof AuthLogoutRoute
+  '/auth/otp': typeof AuthOtpRoute
+  '/auth/password-updated': typeof AuthPasswordUpdatedRoute
+  '/auth/phone': typeof AuthPhoneRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/session-expired': typeof AuthSessionExpiredRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/auth': typeof AuthRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/welcome': typeof WelcomeRoute
   '/home': typeof AppHomeRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
   '/wallet': typeof AppWalletRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/logout': typeof AuthLogoutRoute
+  '/auth/otp': typeof AuthOtpRoute
+  '/auth/password-updated': typeof AuthPasswordUpdatedRoute
+  '/auth/phone': typeof AuthPhoneRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/session-expired': typeof AuthSessionExpiredRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/auth': typeof AuthRouteWithChildren
+  '/onboarding': typeof OnboardingRoute
+  '/unauthorized': typeof UnauthorizedRoute
+  '/welcome': typeof WelcomeRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/rides': typeof AppRidesRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/auth/logout': typeof AuthLogoutRoute
+  '/auth/otp': typeof AuthOtpRoute
+  '/auth/password-updated': typeof AuthPasswordUpdatedRoute
+  '/auth/phone': typeof AuthPhoneRoute
+  '/auth/reset-password': typeof AuthResetPasswordRoute
+  '/auth/session-expired': typeof AuthSessionExpiredRoute
+  '/auth/sign-in': typeof AuthSignInRoute
+  '/auth/sign-up': typeof AuthSignUpRoute
+  '/auth/verify-email': typeof AuthVerifyEmailRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/home' | '/profile' | '/rides' | '/wallet'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/unauthorized'
+    | '/welcome'
+    | '/home'
+    | '/profile'
+    | '/rides'
+    | '/wallet'
+    | '/auth/forgot-password'
+    | '/auth/logout'
+    | '/auth/otp'
+    | '/auth/password-updated'
+    | '/auth/phone'
+    | '/auth/reset-password'
+    | '/auth/session-expired'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
+    | '/auth/verify-email'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/home' | '/profile' | '/rides' | '/wallet'
+  to:
+    | '/'
+    | '/auth'
+    | '/onboarding'
+    | '/unauthorized'
+    | '/welcome'
+    | '/home'
+    | '/profile'
+    | '/rides'
+    | '/wallet'
+    | '/auth/forgot-password'
+    | '/auth/logout'
+    | '/auth/otp'
+    | '/auth/password-updated'
+    | '/auth/phone'
+    | '/auth/reset-password'
+    | '/auth/session-expired'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
+    | '/auth/verify-email'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/auth'
+    | '/onboarding'
+    | '/unauthorized'
+    | '/welcome'
     | '/_app/home'
     | '/_app/profile'
     | '/_app/rides'
     | '/_app/wallet'
+    | '/auth/forgot-password'
+    | '/auth/logout'
+    | '/auth/otp'
+    | '/auth/password-updated'
+    | '/auth/phone'
+    | '/auth/reset-password'
+    | '/auth/session-expired'
+    | '/auth/sign-in'
+    | '/auth/sign-up'
+    | '/auth/verify-email'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
+  OnboardingRoute: typeof OnboardingRoute
+  UnauthorizedRoute: typeof UnauthorizedRoute
+  WelcomeRoute: typeof WelcomeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -104,6 +314,76 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/auth/verify-email': {
+      id: '/auth/verify-email'
+      path: '/verify-email'
+      fullPath: '/auth/verify-email'
+      preLoaderRoute: typeof AuthVerifyEmailRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/sign-up': {
+      id: '/auth/sign-up'
+      path: '/sign-up'
+      fullPath: '/auth/sign-up'
+      preLoaderRoute: typeof AuthSignUpRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/sign-in': {
+      id: '/auth/sign-in'
+      path: '/sign-in'
+      fullPath: '/auth/sign-in'
+      preLoaderRoute: typeof AuthSignInRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/session-expired': {
+      id: '/auth/session-expired'
+      path: '/session-expired'
+      fullPath: '/auth/session-expired'
+      preLoaderRoute: typeof AuthSessionExpiredRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/reset-password': {
+      id: '/auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/auth/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/phone': {
+      id: '/auth/phone'
+      path: '/phone'
+      fullPath: '/auth/phone'
+      preLoaderRoute: typeof AuthPhoneRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/password-updated': {
+      id: '/auth/password-updated'
+      path: '/password-updated'
+      fullPath: '/auth/password-updated'
+      preLoaderRoute: typeof AuthPasswordUpdatedRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/otp': {
+      id: '/auth/otp'
+      path: '/otp'
+      fullPath: '/auth/otp'
+      preLoaderRoute: typeof AuthOtpRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/logout': {
+      id: '/auth/logout'
+      path: '/logout'
+      fullPath: '/auth/logout'
+      preLoaderRoute: typeof AuthLogoutRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/auth/forgot-password': {
+      id: '/auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/auth/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRoute
     }
     '/_app/wallet': {
       id: '/_app/wallet'
@@ -152,9 +432,41 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AuthRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthLogoutRoute: typeof AuthLogoutRoute
+  AuthOtpRoute: typeof AuthOtpRoute
+  AuthPasswordUpdatedRoute: typeof AuthPasswordUpdatedRoute
+  AuthPhoneRoute: typeof AuthPhoneRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
+  AuthSessionExpiredRoute: typeof AuthSessionExpiredRoute
+  AuthSignInRoute: typeof AuthSignInRoute
+  AuthSignUpRoute: typeof AuthSignUpRoute
+  AuthVerifyEmailRoute: typeof AuthVerifyEmailRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthLogoutRoute: AuthLogoutRoute,
+  AuthOtpRoute: AuthOtpRoute,
+  AuthPasswordUpdatedRoute: AuthPasswordUpdatedRoute,
+  AuthPhoneRoute: AuthPhoneRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
+  AuthSessionExpiredRoute: AuthSessionExpiredRoute,
+  AuthSignInRoute: AuthSignInRoute,
+  AuthSignUpRoute: AuthSignUpRoute,
+  AuthVerifyEmailRoute: AuthVerifyEmailRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
+  OnboardingRoute: OnboardingRoute,
+  UnauthorizedRoute: UnauthorizedRoute,
+  WelcomeRoute: WelcomeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

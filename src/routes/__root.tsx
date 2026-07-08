@@ -9,6 +9,9 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ErrorBoundary } from "@/providers/ErrorBoundary";
+import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -117,7 +120,12 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <ErrorBoundary>
+        <ThemeProvider>
+          <Outlet />
+          <Toaster />
+        </ThemeProvider>
+      </ErrorBoundary>
     </QueryClientProvider>
   );
 }
