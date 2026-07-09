@@ -1,13 +1,14 @@
-import { Bell, ShieldCheck } from "lucide-react";
+import { Bell, ShieldCheck, ArrowRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import {
   Container,
   GlassCard,
   IconButton,
   PageHeader,
   ScreenWrapper,
-  SearchBar,
   Section,
 } from "@/components/common";
+import { ROUTES } from "@/constants/routes";
 import { DestinationCard } from "./components/DestinationCard";
 import { RideCategoryList } from "./components/RideCategoryList";
 import { RECENT_DESTINATIONS } from "./data/placeholders";
@@ -27,7 +28,19 @@ export function HomeScreen() {
           }
         />
 
-        <SearchBar aria-label="Search destinations" />
+        <Link
+          to={ROUTES.book}
+          className="group flex items-center justify-between gap-3 rounded-3xl border border-border/60 bg-card/60 px-4 py-4 shadow-soft backdrop-blur-xl transition-colors hover:border-primary/40"
+          aria-label="Book a ride"
+        >
+          <div className="min-w-0">
+            <p className="text-[11px] uppercase tracking-[0.24em] text-primary/80">Book a ride</p>
+            <p className="mt-1 font-display text-base text-foreground">Where to tonight?</p>
+          </div>
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-pink text-primary-foreground shadow-glow transition-transform group-hover:scale-105">
+            <ArrowRight className="h-5 w-5" />
+          </span>
+        </Link>
 
         <GlassCard className="flex items-center gap-3">
           <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary">

@@ -26,9 +26,11 @@ import { Route as AuthOtpRouteImport } from './routes/auth.otp'
 import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AppWalletRouteImport } from './routes/_app.wallet'
+import { Route as AppSearchingRouteImport } from './routes/_app.searching'
 import { Route as AppRidesRouteImport } from './routes/_app.rides'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppBookRouteImport } from './routes/_app.book'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -114,6 +116,11 @@ const AppWalletRoute = AppWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSearchingRoute = AppSearchingRouteImport.update({
+  id: '/searching',
+  path: '/searching',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppRidesRoute = AppRidesRouteImport.update({
   id: '/rides',
   path: '/rides',
@@ -129,6 +136,11 @@ const AppHomeRoute = AppHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBookRoute = AppBookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -136,9 +148,11 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
+  '/book': typeof AppBookRoute
   '/home': typeof AppHomeRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
+  '/searching': typeof AppSearchingRoute
   '/wallet': typeof AppWalletRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
@@ -157,9 +171,11 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
+  '/book': typeof AppBookRoute
   '/home': typeof AppHomeRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
+  '/searching': typeof AppSearchingRoute
   '/wallet': typeof AppWalletRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
@@ -180,9 +196,11 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
+  '/_app/book': typeof AppBookRoute
   '/_app/home': typeof AppHomeRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/rides': typeof AppRidesRoute
+  '/_app/searching': typeof AppSearchingRoute
   '/_app/wallet': typeof AppWalletRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
@@ -203,9 +221,11 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
+    | '/book'
     | '/home'
     | '/profile'
     | '/rides'
+    | '/searching'
     | '/wallet'
     | '/auth/forgot-password'
     | '/auth/logout'
@@ -224,9 +244,11 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
+    | '/book'
     | '/home'
     | '/profile'
     | '/rides'
+    | '/searching'
     | '/wallet'
     | '/auth/forgot-password'
     | '/auth/logout'
@@ -246,9 +268,11 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
+    | '/_app/book'
     | '/_app/home'
     | '/_app/profile'
     | '/_app/rides'
+    | '/_app/searching'
     | '/_app/wallet'
     | '/auth/forgot-password'
     | '/auth/logout'
@@ -392,6 +416,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalletRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/searching': {
+      id: '/_app/searching'
+      path: '/searching'
+      fullPath: '/searching'
+      preLoaderRoute: typeof AppSearchingRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/rides': {
       id: '/_app/rides'
       path: '/rides'
@@ -413,20 +444,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/book': {
+      id: '/_app/book'
+      path: '/book'
+      fullPath: '/book'
+      preLoaderRoute: typeof AppBookRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppBookRoute: typeof AppBookRoute
   AppHomeRoute: typeof AppHomeRoute
   AppProfileRoute: typeof AppProfileRoute
   AppRidesRoute: typeof AppRidesRoute
+  AppSearchingRoute: typeof AppSearchingRoute
   AppWalletRoute: typeof AppWalletRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppBookRoute: AppBookRoute,
   AppHomeRoute: AppHomeRoute,
   AppProfileRoute: AppProfileRoute,
   AppRidesRoute: AppRidesRoute,
+  AppSearchingRoute: AppSearchingRoute,
   AppWalletRoute: AppWalletRoute,
 }
 
