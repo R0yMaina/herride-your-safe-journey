@@ -17,6 +17,8 @@ export const ROUTES = Object.freeze({
   rides: "/rides",
   wallet: "/wallet",
   profile: "/profile",
+  book: "/book",
+  searching: "/searching",
 });
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];
