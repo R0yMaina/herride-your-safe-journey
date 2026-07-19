@@ -1,11 +1,7 @@
 import type { ISODateString } from "./global";
 import type { User } from "./user";
 
-export type AuthStatus =
-  | "loading"
-  | "unauthenticated"
-  | "authenticated"
-  | "session-expired";
+export type AuthStatus = "loading" | "unauthenticated" | "authenticated" | "session-expired";
 
 export interface AuthTokens {
   readonly accessToken: string;

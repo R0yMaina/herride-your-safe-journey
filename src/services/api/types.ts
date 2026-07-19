@@ -7,7 +7,10 @@ export interface RequestOptions {
   readonly retry?: boolean;
 }
 
-export interface ApiResponse<T> { readonly data: T; readonly status: number }
+export interface ApiResponse<T> {
+  readonly data: T;
+  readonly status: number;
+}
 
 export class ApiError extends Error {
   readonly status: number;

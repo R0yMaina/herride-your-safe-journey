@@ -32,7 +32,10 @@ export function LocationStep() {
 
   return (
     <motion.div className="space-y-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <StepHeader title="Where to?" subtitle="Confirm pickup and destination to preview the route." />
+      <StepHeader
+        title="Where to?"
+        subtitle="Confirm pickup and destination to preview the route."
+      />
       <RouteMapPreview route={route} />
       {route && (
         <GlassCard className="flex items-center justify-between text-sm">
@@ -42,7 +45,13 @@ export function LocationStep() {
           </span>
         </GlassCard>
       )}
-      <PlacePicker label="Pickup" kind="pickup" value={pickup} options={SAVED_PICKUPS} onSelect={setPickup} />
+      <PlacePicker
+        label="Pickup"
+        kind="pickup"
+        value={pickup}
+        options={SAVED_PICKUPS}
+        onSelect={setPickup}
+      />
       <PlacePicker
         label="Destination"
         kind="destination"

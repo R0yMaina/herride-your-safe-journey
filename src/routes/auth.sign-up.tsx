@@ -4,5 +4,9 @@ import { SignUpScreen } from "@/features/auth/screens/SignUpScreen";
 
 export const Route = createFileRoute("/auth/sign-up")({
   head: () => ({ meta: [{ title: "Create account · HeRide" }] }),
-  component: () => (<GuestRoute><SignUpScreen /></GuestRoute>),
+  component: () => (
+    <GuestRoute>
+      <SignUpScreen />
+    </GuestRoute>
+  ),
 });

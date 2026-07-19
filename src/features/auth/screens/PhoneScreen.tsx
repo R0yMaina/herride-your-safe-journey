@@ -16,7 +16,11 @@ export function PhoneScreen() {
   const request = useRequestPhoneOtp();
   const setChallenge = usePhoneVerificationStore((s) => s.setChallenge);
 
-  const { register, handleSubmit, formState: { errors } } = useForm<PhoneOnlyInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<PhoneOnlyInput>({
     resolver: zodResolver(phoneOnlySchema),
     defaultValues: { phone: "" },
   });

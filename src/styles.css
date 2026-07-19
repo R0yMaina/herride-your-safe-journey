@@ -52,7 +52,7 @@
   --radius: 1.25rem;
   --background: oklch(0.14 0.015 340);
   --foreground: oklch(0.98 0.005 340);
-  --noir: oklch(0.10 0.012 340);
+  --noir: oklch(0.1 0.012 340);
   --card: oklch(0.18 0.018 340);
   --card-foreground: oklch(0.98 0.005 340);
   --popover: oklch(0.18 0.018 340);
@@ -85,11 +85,16 @@
   --sidebar-accent-foreground: oklch(0.98 0.005 340);
   --sidebar-border: oklch(0.28 0.025 340);
   --sidebar-ring: oklch(0.78 0.12 5);
-  --gradient-pink: linear-gradient(135deg, oklch(0.94 0.04 10), oklch(0.86 0.08 5) 50%, oklch(0.72 0.20 5));
-  --gradient-noir: linear-gradient(180deg, oklch(0.10 0.012 340), oklch(0.18 0.03 340));
+  --gradient-pink: linear-gradient(
+    135deg,
+    oklch(0.94 0.04 10),
+    oklch(0.86 0.08 5) 50%,
+    oklch(0.72 0.2 5)
+  );
+  --gradient-noir: linear-gradient(180deg, oklch(0.1 0.012 340), oklch(0.18 0.03 340));
   --shadow-glow: 0 0 40px oklch(0.78 0.18 5 / 0.45), 0 0 80px oklch(0.78 0.18 5 / 0.2);
   --shadow-soft: 0 20px 50px -20px oklch(0 0 0 / 0.6), 0 4px 12px oklch(0 0 0 / 0.3);
-  
+
   --font-display: "Fraunces", serif;
   --font-sans: "Manrope", sans-serif;
 }
@@ -112,15 +117,36 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-html, body, #root { height: 100%; }
+html,
+body,
+#root {
+  height: 100%;
+}
 
-@utility font-display { font-family: var(--font-display); }
-@utility bg-gradient-pink { background-image: var(--gradient-pink); }
-@utility bg-gradient-noir { background-image: var(--gradient-noir); }
-@utility shadow-glow { box-shadow: var(--shadow-glow); }
-@utility shadow-soft { box-shadow: var(--shadow-soft); }
-@utility text-glow { text-shadow: 0 0 24px oklch(0.78 0.18 5 / 0.7), 0 0 48px oklch(0.78 0.18 5 / 0.35); }
-@utility doodle-glow { filter: drop-shadow(0 0 6px oklch(0.78 0.18 5 / 0.7)) drop-shadow(0 0 12px oklch(0.78 0.18 5 / 0.4)); }
+@utility font-display {
+  font-family: var(--font-display);
+}
+@utility bg-gradient-pink {
+  background-image: var(--gradient-pink);
+}
+@utility bg-gradient-noir {
+  background-image: var(--gradient-noir);
+}
+@utility shadow-glow {
+  box-shadow: var(--shadow-glow);
+}
+@utility shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+@utility text-glow {
+  text-shadow:
+    0 0 24px oklch(0.78 0.18 5 / 0.7),
+    0 0 48px oklch(0.78 0.18 5 / 0.35);
+}
+@utility doodle-glow {
+  filter: drop-shadow(0 0 6px oklch(0.78 0.18 5 / 0.7))
+    drop-shadow(0 0 12px oklch(0.78 0.18 5 / 0.4));
+}
 @utility scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;

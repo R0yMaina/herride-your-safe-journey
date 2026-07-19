@@ -48,7 +48,9 @@ export function HomeScreen() {
           </div>
           <div className="min-w-0">
             <p className="font-display text-base text-foreground">Safety Suite is on</p>
-            <p className="text-xs text-muted-foreground">Live trip share, SOS, and audio guardian ready.</p>
+            <p className="text-xs text-muted-foreground">
+              Live trip share, SOS, and audio guardian ready.
+            </p>
           </div>
         </GlassCard>
 

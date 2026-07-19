@@ -1,13 +1,7 @@
 import { ChevronRight, ShieldCheck, Bell, HelpCircle, LogOut } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ROUTES } from "@/constants/routes";
-import {
-  Container,
-  GlassCard,
-  PageHeader,
-  ScreenWrapper,
-  Section,
-} from "@/components/common";
+import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 
 const MENU = [
   { id: "safety", label: "Safety Suite", Icon: ShieldCheck, to: ROUTES.profile },
@@ -37,11 +31,11 @@ export function ProfileScreen() {
             {MENU.map(({ id, label, Icon, to }) => (
               <Link key={id} to={to}>
                 <GlassCard className="flex items-center gap-4 py-4">
-                <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary">
-                  <Icon className="h-5 w-5" />
-                </div>
-                <span className="flex-1 font-display text-base text-foreground">{label}</span>
-                <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary">
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <span className="flex-1 font-display text-base text-foreground">{label}</span>
+                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 </GlassCard>
               </Link>
             ))}

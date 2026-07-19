@@ -14,7 +14,11 @@ import { ROUTES } from "@/constants/routes";
 export function SignInScreen() {
   const navigate = useNavigate();
   const signIn = useSignIn();
-  const { register, handleSubmit, formState: { errors } } = useForm<SignInInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignInInput>({
     resolver: zodResolver(signInSchema),
     defaultValues: { email: "", password: "", rememberMe: true },
   });

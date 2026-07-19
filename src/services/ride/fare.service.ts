@@ -16,7 +16,16 @@ class MockFareService implements IFareService {
     const surge = 0;
     const discount = 0;
     const total = baseFare + distanceCost + timeCost + bookingFee + surge - discount;
-    return { currency: "KES", baseFare, distanceCost, timeCost, bookingFee, surge, discount, total };
+    return {
+      currency: "KES",
+      baseFare,
+      distanceCost,
+      timeCost,
+      bookingFee,
+      surge,
+      discount,
+      total,
+    };
   }
 }
 

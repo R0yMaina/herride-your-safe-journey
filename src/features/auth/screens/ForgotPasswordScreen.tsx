@@ -13,7 +13,11 @@ import { ROUTES } from "@/constants/routes";
 export function ForgotPasswordScreen() {
   const navigate = useNavigate();
   const forgot = useForgotPassword();
-  const { register, handleSubmit, formState: { errors } } = useForm<ForgotPasswordInput>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordInput>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: "" },
   });

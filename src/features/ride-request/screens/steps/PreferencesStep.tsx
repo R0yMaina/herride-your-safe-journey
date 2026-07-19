@@ -17,7 +17,10 @@ export function PreferencesStep() {
 
   return (
     <motion.div className="space-y-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <StepHeader title="Ride preferences" subtitle="Personalise your experience — we honour every request." />
+      <StepHeader
+        title="Ride preferences"
+        subtitle="Personalise your experience — we honour every request."
+      />
       <PreferenceList
         preferences={RIDE_PREFERENCES}
         selected={preferences}

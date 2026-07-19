@@ -1,7 +1,10 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { logger } from "@/lib/logger";
 
-interface State { hasError: boolean; error: Error | null }
+interface State {
+  hasError: boolean;
+  error: Error | null;
+}
 
 export class ErrorBoundary extends Component<{ fallback?: ReactNode; children: ReactNode }, State> {
   state: State = { hasError: false, error: null };
@@ -11,7 +14,10 @@ export class ErrorBoundary extends Component<{ fallback?: ReactNode; children: R
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    logger.error("boundary.caught", { message: error.message, stack: info.componentStack ?? undefined });
+    logger.error("boundary.caught", {
+      message: error.message,
+      stack: info.componentStack ?? undefined,
+    });
   }
 
   reset = () => this.setState({ hasError: false, error: null });

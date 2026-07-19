@@ -13,9 +13,9 @@ import type {
 import { RIDE_PREFERENCES } from "@/features/ride-request/data/preferences";
 
 const NOTE_MAX = 240;
-const DEFAULT_PREFS: readonly RidePreferenceId[] = RIDE_PREFERENCES
-  .filter((p) => p.available && p.defaultOn)
-  .map((p) => p.id);
+const DEFAULT_PREFS: readonly RidePreferenceId[] = RIDE_PREFERENCES.filter(
+  (p) => p.available && p.defaultOn,
+).map((p) => p.id);
 
 const STEP_ORDER: readonly RideRequestStep[] = [
   "location",
@@ -97,7 +97,9 @@ export const useRideRequestStore = create<RideRequestState>((set, get) => ({
         : [...s.preferences, id],
     })),
   setScheduleMode: (mode) =>
-    set((s) => ({ schedule: { mode, scheduledFor: mode === "now" ? null : s.schedule.scheduledFor } })),
+    set((s) => ({
+      schedule: { mode, scheduledFor: mode === "now" ? null : s.schedule.scheduledFor },
+    })),
   setScheduledFor: (iso) => set((s) => ({ schedule: { ...s.schedule, scheduledFor: iso } })),
   setNote: (text) => set({ note: text.slice(0, NOTE_MAX) }),
   setSubmitting: (submitting) => set({ submitting }),

@@ -40,8 +40,12 @@ export function SearchingDriverScreen() {
     <ScreenWrapper className="pb-40">
       <Container className="flex flex-col items-center gap-8 pt-6 text-center">
         <div className="space-y-2">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">Finding your driver</p>
-          <h1 className="font-display text-3xl text-foreground">Matching you with a verified driver</h1>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
+            Finding your driver
+          </p>
+          <h1 className="font-display text-3xl text-foreground">
+            Matching you with a verified driver
+          </h1>
           <p className="text-sm text-muted-foreground">
             Typical wait time · {formatDuration(etaMin)}
           </p>

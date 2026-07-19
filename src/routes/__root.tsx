@@ -76,17 +76,35 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "HeRide — The safest ride, for her." },
-      { name: "description", content: "HeRide is a premium, female-focused ride-hailing platform engineered for safety, comfort, and trust across Africa." },
+      {
+        name: "description",
+        content:
+          "HeRide is a premium, female-focused ride-hailing platform engineered for safety, comfort, and trust across Africa.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "HeRide — The safest ride, for her." },
-      { property: "og:description", content: "A premium, female-focused ride-hailing platform engineered for safety and trust." },
+      {
+        property: "og:description",
+        content: "A premium, female-focused ride-hailing platform engineered for safety and trust.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "HeRide — The safest ride, for her." },
-      { name: "twitter:description", content: "A premium, female-focused ride-hailing platform engineered for safety and trust." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png" },
+      {
+        name: "twitter:description",
+        content: "A premium, female-focused ride-hailing platform engineered for safety and trust.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png",
+      },
     ],
     links: [
       {

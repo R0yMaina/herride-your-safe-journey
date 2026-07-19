@@ -34,6 +34,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ session: null, status: "unauthenticated" });
   },
   hasRole: (role) => get().session?.user.role === role,
-  hasPermission: (permission) =>
-    get().session?.user.permissions.includes(permission) ?? false,
+  hasPermission: (permission) => get().session?.user.permissions.includes(permission) ?? false,
 }));

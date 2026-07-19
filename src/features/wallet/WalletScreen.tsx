@@ -27,7 +27,9 @@ export function WalletScreen() {
         <GlassCard className="relative overflow-hidden p-6">
           <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary-glow/30 blur-3xl" />
           <p className="text-xs uppercase tracking-[0.28em] text-primary/70">Available</p>
-          <p className="mt-2 font-display text-4xl text-foreground">KES 4,820<span className="text-lg text-muted-foreground">.00</span></p>
+          <p className="mt-2 font-display text-4xl text-foreground">
+            KES 4,820<span className="text-lg text-muted-foreground">.00</span>
+          </p>
           <p className="mt-1 text-xs text-muted-foreground">Includes KES 500 promo credit</p>
         </GlassCard>
 

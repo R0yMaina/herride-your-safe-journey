@@ -6,7 +6,13 @@ interface ConfirmButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   readonly loading?: boolean;
 }
 
-export function ConfirmButton({ loading, className, children, disabled, ...rest }: ConfirmButtonProps) {
+export function ConfirmButton({
+  loading,
+  className,
+  children,
+  disabled,
+  ...rest
+}: ConfirmButtonProps) {
   return (
     <button
       {...rest}

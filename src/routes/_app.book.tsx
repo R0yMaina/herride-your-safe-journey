@@ -5,7 +5,11 @@ export const Route = createFileRoute("/_app/book")({
   head: () => ({
     meta: [
       { title: "Book a ride · HeRide" },
-      { name: "description", content: "Configure your HeRide trip — pickup, destination, ride type, preferences, and fare." },
+      {
+        name: "description",
+        content:
+          "Configure your HeRide trip — pickup, destination, ride type, preferences, and fare.",
+      },
     ],
   }),
   component: BookRideScreen,

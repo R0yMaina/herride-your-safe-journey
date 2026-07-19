@@ -7,7 +7,9 @@ interface NotesFieldProps {
 export function NotesField({ value, max, onChange }: NotesFieldProps) {
   return (
     <label className="block space-y-2">
-      <span className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">Notes for driver</span>
+      <span className="text-[11px] uppercase tracking-[0.24em] text-muted-foreground">
+        Notes for driver
+      </span>
       <div className="rounded-2xl border border-border/60 bg-card/60 p-3 backdrop-blur-xl">
         <textarea
           rows={3}

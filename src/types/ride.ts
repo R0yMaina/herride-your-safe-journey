@@ -88,9 +88,4 @@ export interface RideRequestDraft {
   readonly createdAt: ISODateString;
 }
 
-export type RideRequestStep =
-  | "location"
-  | "vehicle"
-  | "preferences"
-  | "schedule"
-  | "confirm";
+export type RideRequestStep = "location" | "vehicle" | "preferences" | "schedule" | "confirm";
