@@ -12,6 +12,13 @@ import { signUpSchema, type SignUpInput } from "@/lib/validation/auth.schemas";
 import { COUNTRIES } from "../data/countries";
 import { useSignUp } from "../hooks/useAuthMutations";
 import { ROUTES } from "@/constants/routes";
+import { EmailVerificationPendingError } from "@/services/auth";
+
+const GENDERS = [
+  { value: "female", label: "Female" },
+  { value: "male", label: "Male" },
+  { value: "other", label: "Other" },
+] as const;
 
 export function SignUpScreen() {
   const navigate = useNavigate();
@@ -29,6 +36,7 @@ export function SignUpScreen() {
       email: "",
       phone: "",
       country: "KE",
+      gender: "female",
       password: "",
       confirmPassword: "",
       acceptTerms: false as unknown as true,
@@ -44,6 +52,12 @@ export function SignUpScreen() {
       toast.success("Account created");
       void navigate({ to: ROUTES.verifyEmail, replace: true });
     } catch (err) {
+      if (err instanceof EmailVerificationPendingError) {
+        // Account exists; Supabase just wants the email confirmed first.
+        toast.success("Account created — check your inbox to verify your email");
+        void navigate({ to: ROUTES.verifyEmail, replace: true });
+        return;
+      }
       toast.error(err instanceof Error ? err.message : "Registration failed");
     }
   });
@@ -115,6 +129,28 @@ export function SignUpScreen() {
           </select>
           {errors.country?.message && (
             <p className="text-xs text-destructive">{errors.country.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Gender
+          </label>
+          <select
+            {...register("gender")}
+            className="w-full rounded-2xl border border-border/70 bg-card/60 px-4 py-3 text-sm text-foreground shadow-soft backdrop-blur-xl focus:border-primary/60 focus:outline-none"
+          >
+            {GENDERS.map((g) => (
+              <option key={g.value} value={g.value} className="bg-noir">
+                {g.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-muted-foreground">
+            HeRide rides are reserved for women — riding requires a female account.
+          </p>
+          {errors.gender?.message && (
+            <p className="text-xs text-destructive">{errors.gender.message}</p>
           )}
         </div>
 

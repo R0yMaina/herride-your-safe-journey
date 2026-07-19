@@ -9,10 +9,13 @@ export interface AppEnv {
   readonly mode: "development" | "production" | "test";
   readonly appName: string;
   readonly apiBaseUrl: string;
+  /** When true, all services use in-memory mocks instead of Supabase. */
+  readonly useMocks: boolean;
 }
 
 export const env: AppEnv = Object.freeze({
   mode: (import.meta.env.MODE as AppEnv["mode"]) ?? "development",
   appName: readString(import.meta.env.VITE_APP_NAME, "HeRide"),
   apiBaseUrl: readString(import.meta.env.VITE_API_BASE_URL, "/api"),
+  useMocks: readString(import.meta.env.VITE_USE_MOCKS, "false") === "true",
 });

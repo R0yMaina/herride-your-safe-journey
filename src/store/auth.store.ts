@@ -2,6 +2,7 @@ import { create } from "zustand";
 import type { AuthSession, AuthStatus } from "@/types/auth";
 import type { Permission, UserRole } from "@/types/user";
 import { sessionService } from "@/services/auth/session.service";
+import { env } from "@/config/env";
 
 interface AuthState {
   readonly status: AuthStatus;
@@ -19,7 +20,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   session: null,
   hydrateFromStorage: () => {
     const session = sessionService.load();
-    set({ session, status: session ? "authenticated" : "unauthenticated" });
+    if (session) {
+      set({ session, status: "authenticated" });
+      return;
+    }
+    // In real mode Supabase is the source of truth and may still refresh an
+    // expired session — initAuthSync resolves "loading" either way.
+    if (env.useMocks) set({ session: null, status: "unauthenticated" });
   },
   setSession: (session) => {
     sessionService.persist(session);

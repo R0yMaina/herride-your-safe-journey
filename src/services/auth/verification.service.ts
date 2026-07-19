@@ -7,7 +7,7 @@ export interface IVerificationService {
   confirmPhoneOtp(verificationId: string, code: string): Promise<void>;
 }
 
-class MockVerificationService implements IVerificationService {
+export class MockVerificationService implements IVerificationService {
   async sendEmailLink(_email: string) {
     await delay(400);
   }
@@ -23,5 +23,3 @@ class MockVerificationService implements IVerificationService {
     if (code === "000000") throw new Error("Invalid code");
   }
 }
-
-export const verificationService: IVerificationService = new MockVerificationService();

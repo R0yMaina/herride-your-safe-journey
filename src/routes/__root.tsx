@@ -8,10 +8,13 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { useEffect } from "react";
+
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ErrorBoundary } from "@/providers/ErrorBoundary";
 import { Toaster } from "@/components/ui/sonner";
+import { initAuthSync } from "@/services/auth";
 
 function NotFoundComponent() {
   return (
@@ -135,6 +138,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  // Reconcile the auth store with Supabase's persisted session (client only).
+  useEffect(() => {
+    initAuthSync();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

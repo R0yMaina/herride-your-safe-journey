@@ -28,6 +28,9 @@ export const signUpSchema = z
     email: emailSchema,
     phone: phoneSchema,
     country: z.string().trim().min(2, "Select your country"),
+    gender: z.enum(["female", "male", "other"], {
+      errorMap: () => ({ message: "Select your gender" }),
+    }),
     password: PASSWORD_RULES,
     confirmPassword: z.string(),
     acceptTerms: z.literal(true, { errorMap: () => ({ message: "Accept the Terms of Service" }) }),

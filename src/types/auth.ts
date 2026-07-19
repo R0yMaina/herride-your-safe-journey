@@ -21,6 +21,8 @@ export interface SignInPayload {
   readonly rememberMe: boolean;
 }
 
+export type Gender = "female" | "male" | "other";
+
 export interface SignUpPayload {
   readonly firstName: string;
   readonly lastName: string;
@@ -28,6 +30,8 @@ export interface SignUpPayload {
   readonly phone: string;
   readonly password: string;
   readonly country: string;
+  /** Required by the backend: rides are restricted to female passengers. */
+  readonly gender: Gender;
   readonly acceptTerms: boolean;
   readonly acceptPrivacy: boolean;
 }
