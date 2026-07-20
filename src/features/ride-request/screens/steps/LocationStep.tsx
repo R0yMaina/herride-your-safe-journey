@@ -9,7 +9,10 @@ import { BottomActionBar } from "../../components/BottomActionBar";
 import { ConfirmButton } from "../../components/ConfirmButton";
 import { StepHeader } from "../../components/StepHeader";
 import { SAVED_PICKUPS, POPULAR_DESTINATIONS } from "../../data/saved-places";
+import { useSavedPlaces } from "../../hooks/useSavedPlaces";
 import { formatDistance, formatDuration } from "../../lib/format";
+
+const CURRENT_LOCATION = SAVED_PICKUPS.find((p) => p.id === "p_current") ?? SAVED_PICKUPS[0];
 
 export function LocationStep() {
   const pickup = useRideRequestStore((s) => s.pickup);
@@ -18,11 +21,17 @@ export function LocationStep() {
   const setPickup = useRideRequestStore((s) => s.setPickup);
   const setDestination = useRideRequestStore((s) => s.setDestination);
   const next = useRideRequestStore((s) => s.next);
+  const { data: savedPlaces } = useSavedPlaces();
+
+  // Current location first, then the user's saved places (popular spots as
+  // suggestions until they've saved any).
+  const pickupOptions = [CURRENT_LOCATION, ...(savedPlaces ?? [])];
+  const destinationOptions = [...(savedPlaces ?? []), ...POPULAR_DESTINATIONS];
 
   const [initialised, setInitialised] = useState(false);
   useEffect(() => {
     if (initialised) return;
-    if (!pickup) setPickup(SAVED_PICKUPS[2]);
+    if (!pickup) setPickup(CURRENT_LOCATION);
     setInitialised(true);
   }, [initialised, pickup, setPickup]);
 
@@ -49,14 +58,14 @@ export function LocationStep() {
         label="Pickup"
         kind="pickup"
         value={pickup}
-        options={SAVED_PICKUPS}
+        options={pickupOptions}
         onSelect={setPickup}
       />
       <PlacePicker
         label="Destination"
         kind="destination"
         value={destination}
-        options={POPULAR_DESTINATIONS}
+        options={destinationOptions}
         onSelect={setDestination}
       />
       <BottomActionBar>

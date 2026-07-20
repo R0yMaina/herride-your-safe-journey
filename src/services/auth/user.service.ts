@@ -6,7 +6,7 @@ export interface IUserService {
   updateProfile(patch: Partial<User["profile"]>): Promise<User>;
 }
 
-class MockUserService implements IUserService {
+export class MockUserService implements IUserService {
   async getCurrent(): Promise<User> {
     await delay(200);
     return mockUser();
@@ -17,5 +17,3 @@ class MockUserService implements IUserService {
     return { ...base, profile: { ...base.profile, ...patch } };
   }
 }
-
-export const userService: IUserService = new MockUserService();

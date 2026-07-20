@@ -277,6 +277,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      saved_places: {
+        Row: {
+          address: string | null;
+          created_at: string;
+          id: string;
+          label: string;
+          lat: number;
+          lng: number;
+          user_id: string;
+        };
+        Insert: {
+          address?: string | null;
+          created_at?: string;
+          id?: string;
+          label: string;
+          lat: number;
+          lng: number;
+          user_id: string;
+        };
+        Update: {
+          address?: string | null;
+          created_at?: string;
+          id?: string;
+          label?: string;
+          lat?: number;
+          lng?: number;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       sos_alerts: {
         Row: {
           created_at: string;
