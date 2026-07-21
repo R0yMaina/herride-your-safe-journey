@@ -19,6 +19,7 @@ export const ROUTES = Object.freeze({
   profile: "/profile",
   book: "/book",
   searching: "/searching",
+  driver: "/driver",
 });
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

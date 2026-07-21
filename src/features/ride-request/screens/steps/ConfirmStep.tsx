@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useRideRequestStore } from "@/store/ride-request.store";
-import { rideRequestService } from "@/services/ride/ride-request.service";
+import { rideRequestService } from "@/services/ride";
 import type { TripSummary } from "@/types/ride";
 import { ROUTES } from "@/constants/routes";
 import { StepHeader } from "../../components/StepHeader";

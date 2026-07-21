@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as DriverRouteImport } from './routes/driver'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -31,6 +32,7 @@ import { Route as AppRidesRouteImport } from './routes/_app.rides'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppBookRouteImport } from './routes/_app.book'
+import { Route as AppTripRideIdRouteImport } from './routes/_app.trip.$rideId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -45,6 +47,11 @@ const UnauthorizedRoute = UnauthorizedRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverRoute = DriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -141,10 +148,16 @@ const AppBookRoute = AppBookRouteImport.update({
   path: '/book',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTripRideIdRoute = AppTripRideIdRouteImport.update({
+  id: '/trip/$rideId',
+  path: '/trip/$rideId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -164,10 +177,12 @@ export interface FileRoutesByFullPath {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -187,12 +202,14 @@ export interface FileRoutesByTo {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -212,12 +229,14 @@ export interface FileRoutesById {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/_app/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -237,10 +256,12 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/trip/$rideId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -260,11 +281,13 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/trip/$rideId'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/auth'
+    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -284,12 +307,14 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/_app/trip/$rideId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  DriverRoute: typeof DriverRoute
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
@@ -316,6 +341,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver': {
+      id: '/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof DriverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -451,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/trip/$rideId': {
+      id: '/_app/trip/$rideId'
+      path: '/trip/$rideId'
+      fullPath: '/trip/$rideId'
+      preLoaderRoute: typeof AppTripRideIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -461,6 +500,7 @@ interface AppRouteChildren {
   AppRidesRoute: typeof AppRidesRoute
   AppSearchingRoute: typeof AppSearchingRoute
   AppWalletRoute: typeof AppWalletRoute
+  AppTripRideIdRoute: typeof AppTripRideIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -470,6 +510,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppRidesRoute: AppRidesRoute,
   AppSearchingRoute: AppSearchingRoute,
   AppWalletRoute: AppWalletRoute,
+  AppTripRideIdRoute: AppTripRideIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -506,6 +547,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  DriverRoute: DriverRoute,
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,

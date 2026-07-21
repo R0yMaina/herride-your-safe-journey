@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { Container, ScreenWrapper } from "@/components/common";
 import { useRideRequestStore } from "@/store/ride-request.store";
-import { rideRequestService } from "@/services/ride/ride-request.service";
+import { rideRequestService, ridesService } from "@/services/ride";
 import { ROUTES } from "@/constants/routes";
 import { SearchingAnimation } from "../components/SearchingAnimation";
 import { SafetyTipsCarousel } from "../components/SafetyTipsCarousel";
@@ -21,6 +21,24 @@ export function SearchingDriverScreen() {
       void navigate({ to: ROUTES.book, replace: true });
     }
   }, [draft, navigate]);
+
+  // Watch the real ride: as soon as a driver claims it (status leaves
+  // "requested"), move the passenger to the live trip screen.
+  useEffect(() => {
+    if (!draft) return;
+    const rideId = draft.id;
+    const goToTrip = () => {
+      reset();
+      void navigate({ to: "/trip/$rideId", params: { rideId }, replace: true });
+    };
+    void ridesService.getById(rideId).then((r) => {
+      if (r && r.status !== "requested") goToTrip();
+    });
+    const sub = ridesService.subscribe(rideId, (r) => {
+      if (r.status !== "requested") goToTrip();
+    });
+    return () => sub.unsubscribe();
+  }, [draft, navigate, reset]);
 
   useEffect(() => {
     const id = setInterval(() => setSeconds((s) => s + 1), 1000);
