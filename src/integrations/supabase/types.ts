@@ -437,6 +437,81 @@ export type Database = {
         };
         Relationships: [];
       };
+      wallets: {
+        Row: { balance: number; currency: string; updated_at: string; user_id: string };
+        Insert: { balance?: number; currency?: string; updated_at?: string; user_id: string };
+        Update: { balance?: number; currency?: string; updated_at?: string; user_id?: string };
+        Relationships: [];
+      };
+      transactions: {
+        Row: {
+          amount: number;
+          balance_after: number | null;
+          created_at: string;
+          description: string | null;
+          id: string;
+          ride_id: string | null;
+          status: Database["public"]["Enums"]["transaction_status"];
+          type: Database["public"]["Enums"]["transaction_type"];
+          user_id: string;
+        };
+        Insert: {
+          amount: number;
+          balance_after?: number | null;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          ride_id?: string | null;
+          status?: Database["public"]["Enums"]["transaction_status"];
+          type: Database["public"]["Enums"]["transaction_type"];
+          user_id: string;
+        };
+        Update: {
+          amount?: number;
+          balance_after?: number | null;
+          created_at?: string;
+          description?: string | null;
+          id?: string;
+          ride_id?: string | null;
+          status?: Database["public"]["Enums"]["transaction_status"];
+          type?: Database["public"]["Enums"]["transaction_type"];
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      notifications: {
+        Row: {
+          body: string | null;
+          created_at: string;
+          id: string;
+          read_at: string | null;
+          ride_id: string | null;
+          title: string;
+          type: string;
+          user_id: string;
+        };
+        Insert: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          read_at?: string | null;
+          ride_id?: string | null;
+          title: string;
+          type: string;
+          user_id: string;
+        };
+        Update: {
+          body?: string | null;
+          created_at?: string;
+          id?: string;
+          read_at?: string | null;
+          ride_id?: string | null;
+          title?: string;
+          type?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -503,6 +578,28 @@ export type Database = {
           vehicle_plate: string;
         }[];
       };
+      complete_ride: {
+        Args: { _ride_id: string; _commission?: number };
+        Returns: Database["public"]["Tables"]["rides"]["Row"];
+      };
+      wallet_topup: {
+        Args: { _amount: number };
+        Returns: Database["public"]["Tables"]["wallets"]["Row"];
+      };
+      raise_sos: {
+        Args: { _ride_id: string; _lat?: number; _lng?: number; _notes?: string };
+        Returns: Database["public"]["Tables"]["sos_alerts"]["Row"];
+      };
+      get_shared_trip: {
+        Args: { _token: string };
+        Returns: {
+          status: Database["public"]["Enums"]["ride_status"];
+          pickup_address: string | null;
+          drop_address: string | null;
+          has_driver: boolean;
+          expires_at: string;
+        }[];
+      };
     };
     Enums: {
       app_role: "passenger" | "driver" | "admin";
@@ -517,6 +614,8 @@ export type Database = {
         | "completed"
         | "cancelled";
       sos_status: "active" | "acknowledged" | "resolved" | "false_alarm";
+      transaction_type: "ride_payment" | "ride_payout" | "topup" | "refund" | "commission";
+      transaction_status: "pending" | "completed" | "failed";
     };
     CompositeTypes: {
       [_ in never]: never;

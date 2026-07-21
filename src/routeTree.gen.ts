@@ -16,6 +16,7 @@ import { Route as DriverRouteImport } from './routes/driver'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
@@ -66,6 +67,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/share/$token': typeof ShareTokenRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesByTo {
@@ -202,6 +209,7 @@ export interface FileRoutesByTo {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/share/$token': typeof ShareTokenRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesById {
@@ -229,6 +237,7 @@ export interface FileRoutesById {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/share/$token': typeof ShareTokenRoute
   '/_app/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRouteTypes {
@@ -256,6 +265,7 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/share/$token'
     | '/trip/$rideId'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -281,6 +291,7 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/share/$token'
     | '/trip/$rideId'
   id:
     | '__root__'
@@ -307,6 +318,7 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/share/$token'
     | '/_app/trip/$rideId'
   fileRoutesById: FileRoutesById
 }
@@ -318,6 +330,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
+  ShareTokenRoute: typeof ShareTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -369,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/verify-email': {
@@ -551,6 +571,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,
+  ShareTokenRoute: ShareTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

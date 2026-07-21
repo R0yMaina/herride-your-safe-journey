@@ -1,4 +1,6 @@
-import { CreditCard, Plus } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Plus, Wallet as WalletIcon } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   Container,
   EmptyState,
@@ -8,17 +10,77 @@ import {
   ScreenWrapper,
   Section,
 } from "@/components/common";
+import { walletService, type WalletTransaction } from "@/services/wallet";
+import { formatCurrency } from "@/features/ride-request/lib/format";
+
+const TYPE_LABEL: Record<string, string> = {
+  ride_payment: "Ride payment",
+  ride_payout: "Ride payout",
+  topup: "Top-up",
+  refund: "Refund",
+  commission: "Commission",
+};
+
+function TxRow({ tx }: { tx: WalletTransaction }) {
+  const credit = tx.amount >= 0;
+  const when = new Date(tx.createdAt).toLocaleString("en-KE", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  return (
+    <GlassCard className="flex items-center gap-4">
+      <div
+        className={`grid h-10 w-10 place-items-center rounded-2xl ${
+          credit ? "bg-primary/15 text-primary" : "bg-card/60 text-muted-foreground"
+        }`}
+      >
+        {credit ? <ArrowDownLeft className="h-5 w-5" /> : <ArrowUpRight className="h-5 w-5" />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-display text-base text-foreground">
+          {tx.description ?? TYPE_LABEL[tx.type] ?? tx.type}
+        </p>
+        <p className="text-xs text-muted-foreground">{when}</p>
+      </div>
+      <span className={`text-sm font-semibold ${credit ? "text-primary" : "text-foreground"}`}>
+        {credit ? "+" : "−"}
+        {formatCurrency(Math.abs(tx.amount))}
+      </span>
+    </GlassCard>
+  );
+}
 
 export function WalletScreen() {
+  const queryClient = useQueryClient();
+  const { data: wallet } = useQuery({
+    queryKey: ["wallet", "balance"],
+    queryFn: () => walletService.getBalance(),
+  });
+  const { data: txns, isLoading } = useQuery({
+    queryKey: ["wallet", "transactions"],
+    queryFn: () => walletService.listTransactions(),
+  });
+
+  const topUp = useMutation({
+    mutationFn: () => walletService.topUp(1000),
+    onSuccess: () => {
+      toast.success("Added KES 1,000");
+      void queryClient.invalidateQueries({ queryKey: ["wallet"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Top-up failed"),
+  });
+
   return (
     <ScreenWrapper>
       <Container className="space-y-6">
         <PageHeader
           eyebrow="Balance"
           title="Wallet"
-          subtitle="Manage cards, promos, and ride credits."
+          subtitle="Ride credits and payouts."
           action={
-            <IconButton aria-label="Add payment method">
+            <IconButton aria-label="Top up" onClick={() => topUp.mutate()}>
               <Plus className="h-5 w-5" />
             </IconButton>
           }
@@ -28,28 +90,34 @@ export function WalletScreen() {
           <div className="absolute -right-10 -top-10 h-40 w-40 rounded-full bg-primary-glow/30 blur-3xl" />
           <p className="text-xs uppercase tracking-[0.28em] text-primary/70">Available</p>
           <p className="mt-2 font-display text-4xl text-foreground">
-            KES 4,820<span className="text-lg text-muted-foreground">.00</span>
+            {formatCurrency(wallet?.balance ?? 0)}
           </p>
-          <p className="mt-1 text-xs text-muted-foreground">Includes KES 500 promo credit</p>
+          <button
+            type="button"
+            onClick={() => topUp.mutate()}
+            disabled={topUp.isPending}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-pink px-4 py-2 text-sm font-semibold text-noir disabled:opacity-60"
+          >
+            <Plus className="h-4 w-4" /> {topUp.isPending ? "Adding…" : "Add KES 1,000"}
+          </button>
         </GlassCard>
 
-        <Section title="Payment methods">
-          <GlassCard className="flex items-center gap-4">
-            <div className="grid h-11 w-11 place-items-center rounded-2xl bg-primary/15 text-primary">
-              <CreditCard className="h-5 w-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="font-display text-base text-foreground">Visa •• 4421</p>
-              <p className="text-xs text-muted-foreground">Expires 08/29 · Default</p>
-            </div>
-          </GlassCard>
-        </Section>
-
         <Section title="Recent activity">
-          <EmptyState
-            title="No activity yet"
-            description="Your ride receipts and top-ups will appear here."
-          />
+          {isLoading ? (
+            <GlassCard className="py-4 text-sm text-muted-foreground">Loading…</GlassCard>
+          ) : (txns?.length ?? 0) === 0 ? (
+            <EmptyState
+              icon={<WalletIcon className="h-6 w-6" />}
+              title="No activity yet"
+              description="Ride receipts and top-ups will appear here."
+            />
+          ) : (
+            <div className="space-y-3">
+              {txns?.map((tx) => (
+                <TxRow key={tx.id} tx={tx} />
+              ))}
+            </div>
+          )}
         </Section>
       </Container>
     </ScreenWrapper>

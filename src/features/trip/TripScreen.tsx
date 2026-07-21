@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Car, Phone, ShieldAlert, Star, X } from "lucide-react";
+import { Car, Share2, ShieldAlert, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { useRide } from "./hooks/useRide";
 import { StatusTimeline } from "./components/StatusTimeline";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService } from "@/services/ride";
+import { safetyService } from "@/services/safety";
 import { ROUTES } from "@/constants/routes";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 
@@ -28,6 +29,28 @@ export function TripScreen({ rideId }: { rideId: string }) {
       void navigate({ to: ROUTES.home, replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not cancel");
+    }
+  };
+
+  const raiseSos = async () => {
+    try {
+      await safetyService.raiseSos(rideId);
+      toast.success("SOS raised — your emergency alert is active");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not raise SOS");
+    }
+  };
+
+  const shareTrip = async () => {
+    try {
+      const link = await safetyService.shareTrip(rideId);
+      const shared = await navigator.clipboard?.writeText(link.url).then(
+        () => true,
+        () => false,
+      );
+      toast.success(shared ? "Trip link copied to clipboard" : `Share link: ${link.url}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not create share link");
     }
   };
 
@@ -128,19 +151,17 @@ export function TripScreen({ rideId }: { rideId: string }) {
               <button
                 type="button"
                 className="flex items-center justify-center gap-2 rounded-2xl bg-destructive/15 py-3 text-sm font-semibold text-destructive"
-                onClick={() => toast("SOS wired in a later phase")}
+                onClick={raiseSos}
               >
                 <ShieldAlert className="h-4 w-4" /> Emergency SOS
               </button>
-              {driver && (
-                <button
-                  type="button"
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-border/70 py-3 text-sm text-foreground"
-                  onClick={() => toast("Contact driver coming soon")}
-                >
-                  <Phone className="h-4 w-4" /> Contact driver
-                </button>
-              )}
+              <button
+                type="button"
+                className="flex items-center justify-center gap-2 rounded-2xl border border-border/70 py-3 text-sm text-foreground"
+                onClick={shareTrip}
+              >
+                <Share2 className="h-4 w-4" /> Share trip
+              </button>
             </>
           )}
           {cancellable && (

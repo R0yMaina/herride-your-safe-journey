@@ -14,13 +14,6 @@ async function currentUserId(): Promise<string> {
   return user.id;
 }
 
-/** DB columns stamped when a ride enters a given status. */
-const STATUS_TIMESTAMP: Partial<Record<RideStatus, string>> = {
-  accepted: "accepted_at",
-  in_progress: "started_at",
-  completed: "completed_at",
-};
-
 export class SupabaseDriverService implements IDriverService {
   async goOnline(ping: DriverLocationPing): Promise<void> {
     const userId = await currentUserId();
@@ -118,14 +111,19 @@ export class SupabaseDriverService implements IDriverService {
       throw new Error(`Illegal transition: ${from} → ${next}`);
     }
 
-    const update: Database["public"]["Tables"]["rides"]["Update"] = { status: next };
-    const stampColumn = STATUS_TIMESTAMP[next];
-    if (stampColumn === "accepted_at") update.accepted_at = new Date().toISOString();
-    if (stampColumn === "started_at") update.started_at = new Date().toISOString();
-    if (stampColumn === "completed_at") update.completed_at = new Date().toISOString();
-    if (next === "completed" && current.fare_estimate !== null) {
-      update.fare_final = current.fare_estimate;
+    // Completion settles money (passenger debit + driver payout + tx pair) and
+    // must be atomic, so it runs entirely inside the complete_ride RPC.
+    if (next === "completed") {
+      const { data, error } = await supabase.rpc("complete_ride", { _ride_id: rideId });
+      if (error) throw new Error(error.message);
+      return mapRideRow(data as never);
     }
+
+    // "completed" is handled above via complete_ride; here only non-terminal
+    // transitions remain.
+    const update: Database["public"]["Tables"]["rides"]["Update"] = { status: next };
+    if (next === "accepted") update.accepted_at = new Date().toISOString();
+    if (next === "in_progress") update.started_at = new Date().toISOString();
 
     const { data, error } = await supabase
       .from("rides")
