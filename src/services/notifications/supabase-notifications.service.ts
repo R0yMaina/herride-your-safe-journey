@@ -1,3 +1,4 @@
+import type { RealtimeChannel } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type {
   AppNotification,
@@ -41,15 +42,31 @@ export class SupabaseNotificationsService implements INotificationsService {
   }
 
   subscribe(onChange: () => void): NotificationSubscription {
-    const channel = supabase
-      .channel("notifications")
-      .on("postgres_changes", { event: "*", schema: "public", table: "notifications" }, () =>
-        onChange(),
-      )
-      .subscribe();
+    // RLS already restricts delivered rows to the signed-in user; the
+    // user_id filter additionally keeps other users' events from being
+    // fanned out to this socket at all.
+    let channel: RealtimeChannel | null = null;
+    let cancelled = false;
+    void supabase.auth.getUser().then(({ data: { user } }) => {
+      if (cancelled || !user) return;
+      channel = supabase
+        .channel(`notifications:${user.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${user.id}`,
+          },
+          () => onChange(),
+        )
+        .subscribe();
+    });
     return {
       unsubscribe: () => {
-        void supabase.removeChannel(channel);
+        cancelled = true;
+        if (channel) void supabase.removeChannel(channel);
       },
     };
   }

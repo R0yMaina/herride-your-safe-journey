@@ -13,11 +13,6 @@ export function BookRideScreen() {
   const step = useRideRequestStore((s) => s.step);
   const setStep = useRideRequestStore((s) => s.setStep);
 
-  // Ensure we always land on the first step when the flow is entered fresh.
-  useEffect(() => {
-    if (step === "confirm") return; // preserve going back from confirm
-  }, [step]);
-
   useEffect(() => {
     return () => {
       // On unmount reset to the first step so re-entry starts at location.

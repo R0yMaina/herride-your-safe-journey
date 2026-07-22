@@ -30,3 +30,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# NOTE: .env is intentionally tracked — it holds ONLY publishable
+# client-side keys (Supabase publishable key, Maps browser key) that
+# ship in the JS bundle anyway. Real secrets go in *.local files,
+# which are ignored above. Restrict the Maps key by domain in Google
+# Cloud Console rather than treating it as a secret.

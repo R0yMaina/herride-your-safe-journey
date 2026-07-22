@@ -10,6 +10,8 @@ import {
 
 import { useEffect } from "react";
 
+import { MotionConfig } from "framer-motion";
+
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ErrorBoundary } from "@/providers/ErrorBoundary";
@@ -110,6 +112,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Manrope:wght@400..800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -148,7 +156,9 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
         <ThemeProvider>
-          <Outlet />
+          <MotionConfig reducedMotion="user">
+            <Outlet />
+          </MotionConfig>
           <Toaster />
         </ThemeProvider>
       </ErrorBoundary>
