@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { Map as MapIcon } from "lucide-react";
 import { GlassCard } from "@/components/common";
 import { useRideRequestStore } from "@/store/ride-request.store";
 import { useRouteEstimate } from "../../hooks/useRouteEstimate";
 import { PlacePicker } from "../../components/PlacePicker";
 import { AddressAutocomplete } from "../../components/AddressAutocomplete";
+import { MapLocationPicker } from "../../components/MapLocationPicker";
 import { RouteMapPreview } from "../../components/RouteMapPreview";
 import { isGoogleMapsEnabled } from "@/services/maps/google-loader";
 import { BottomActionBar } from "../../components/BottomActionBar";
@@ -30,6 +32,7 @@ export function LocationStep() {
   const pickupOptions = [CURRENT_LOCATION, ...(savedPlaces ?? [])];
   const destinationOptions = [...(savedPlaces ?? []), ...POPULAR_DESTINATIONS];
   const googleMaps = isGoogleMapsEnabled();
+  const [mapPicker, setMapPicker] = useState<"pickup" | "destination" | null>(null);
 
   const [initialised, setInitialised] = useState(false);
   useEffect(() => {
@@ -60,8 +63,18 @@ export function LocationStep() {
       {googleMaps && (
         <AddressAutocomplete label="Pickup" kind="pickup" value={pickup} onSelect={setPickup} />
       )}
+      <button
+        type="button"
+        onClick={() => setMapPicker("pickup")}
+        className="flex w-full items-center gap-3 rounded-2xl border border-border/60 bg-card/60 px-4 py-3 text-left text-sm text-foreground backdrop-blur-xl hover:border-primary/60"
+      >
+        <MapIcon className="h-4 w-4 text-primary" />
+        <span className="min-w-0 flex-1 truncate">
+          {pickup ? `Pickup: ${pickup.label}` : "Set pickup on the map"}
+        </span>
+      </button>
       <PlacePicker
-        label={googleMaps ? "Saved pickups" : "Pickup"}
+        label="Saved pickups"
         kind="pickup"
         value={pickup}
         options={pickupOptions}
@@ -75,8 +88,18 @@ export function LocationStep() {
           onSelect={setDestination}
         />
       )}
+      <button
+        type="button"
+        onClick={() => setMapPicker("destination")}
+        className="flex w-full items-center gap-3 rounded-2xl border border-border/60 bg-card/60 px-4 py-3 text-left text-sm text-foreground backdrop-blur-xl hover:border-primary/60"
+      >
+        <MapIcon className="h-4 w-4 text-primary" />
+        <span className="min-w-0 flex-1 truncate">
+          {destination ? `Destination: ${destination.label}` : "Set destination on the map"}
+        </span>
+      </button>
       <PlacePicker
-        label={googleMaps ? "Saved destinations" : "Destination"}
+        label="Saved destinations"
         kind="destination"
         value={destination}
         options={destinationOptions}
@@ -87,6 +110,17 @@ export function LocationStep() {
           {canContinue ? "Continue" : "Choose a destination"}
         </ConfirmButton>
       </BottomActionBar>
+
+      {mapPicker && (
+        <MapLocationPicker
+          title={mapPicker === "pickup" ? "Set pickup" : "Set destination"}
+          initial={
+            (mapPicker === "pickup" ? pickup : destination)?.coords ?? pickup?.coords ?? null
+          }
+          onSelect={mapPicker === "pickup" ? setPickup : setDestination}
+          onClose={() => setMapPicker(null)}
+        />
+      )}
     </motion.div>
   );
 }

@@ -114,6 +114,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
             destination={ride.destination}
             driver={driverLocation}
             phase={ride.status === "in_progress" ? "on_trip" : "to_pickup"}
+            trackUser
           />
         )}
 

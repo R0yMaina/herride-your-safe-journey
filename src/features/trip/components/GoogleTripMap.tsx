@@ -15,14 +15,8 @@ interface GoogleTripMapProps {
   readonly className?: string;
 }
 
-/** Dark map styling to match the HeRide aesthetic. */
-const DARK_STYLE: google.maps.MapTypeStyle[] = [
-  { elementType: "geometry", stylers: [{ color: "#171114" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#b79aa4" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#0e0809" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#2a1e23" }] },
-  { featureType: "road", elementType: "labels.text.fill", stylers: [{ color: "#8a6f79" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0b1620" }] },
+/** Clean light map styling — readable, with POI/transit clutter hidden. */
+const LIGHT_STYLE: google.maps.MapTypeStyle[] = [
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
 ];
@@ -148,8 +142,8 @@ export function GoogleTripMap({
           zoom: 13,
           disableDefaultUI: true,
           gestureHandling: "greedy",
-          styles: DARK_STYLE,
-          backgroundColor: "#0e0809",
+          styles: LIGHT_STYLE,
+          backgroundColor: "#e8e4de",
         });
         const renderer = new g.maps.DirectionsRenderer({
           map,

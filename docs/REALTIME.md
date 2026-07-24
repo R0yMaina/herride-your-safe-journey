@@ -63,7 +63,12 @@ engine from `VITE_MAP_PROVIDER`:
   API + Directions API + Places API enabled**, billing on, and the app's
   domains added to the key's HTTP-referrer allowlist.
 
-Both engines take the same props and are driven by the same
+All maps use a **light, readable** street basemap (CARTO Voyager). The trip
+map can show the viewer's own **live GPS position** (`trackUser`), and the
+booking flow includes a **map location picker** (`MapLocationPicker`):
+pan/tap to drop a pin, **search** any address (free keyless Photon geocoder),
+or jump to your live location — the chosen point is reverse-geocoded to an
+address. Both engines take the same props and are driven by the same
 `useDriverLocation` stream. If Google is selected but its key is rejected at
 render time (bad referrer, billing, quota — Google's `gm_authFailure`), the
 map **auto-falls back to Leaflet**, so users never see Google's error card.

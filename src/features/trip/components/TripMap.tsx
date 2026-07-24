@@ -13,6 +13,7 @@ interface TripMapProps {
   readonly destination: GeoPoint;
   readonly driver: (GeoPoint & { readonly heading?: number | null }) | null;
   readonly phase: TripMapPhase;
+  readonly trackUser?: boolean;
   readonly className?: string;
 }
 
@@ -37,7 +38,7 @@ export function TripMap(props: TripMapProps) {
     <div className="relative">
       <GoogleTripMap {...props} onEta={setEta} />
       {eta && (
-        <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-noir/85 px-3 py-1.5 text-xs font-semibold text-foreground shadow-soft backdrop-blur">
+        <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-noir shadow-soft backdrop-blur">
           <span className="text-primary">{eta.text}</span>
           {eta.distanceText ? ` · ${eta.distanceText}` : ""}
         </div>

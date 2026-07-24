@@ -4,6 +4,7 @@ import type * as Leaflet from "leaflet";
 import type { GeoPoint } from "@/types/ride";
 import { haversineKm } from "@/lib/geo";
 import { fetchRoadRoute } from "@/services/maps/osrm";
+import { LIGHT_TILES } from "@/services/maps/tiles";
 import { cn } from "@/lib/utils";
 
 export type TripMapPhase = "to_pickup" | "on_trip";
@@ -14,6 +15,8 @@ interface LiveTripMapProps {
   /** The driver's live position, or null before one is assigned/streaming. */
   readonly driver: (GeoPoint & { readonly heading?: number | null }) | null;
   readonly phase: TripMapPhase;
+  /** Track and show the viewer's own live GPS position (blue dot). */
+  readonly trackUser?: boolean;
   readonly className?: string;
 }
 
@@ -36,16 +39,26 @@ function markerIcon(
       iconAnchor: [17, 17],
     });
   }
-  const color = kind === "pickup" ? "#ff6fa5" : "#f7a8c4";
+  const color = kind === "pickup" ? "#ff2e88" : "#c026d3";
   const inner =
     kind === "pickup"
-      ? `<div style="width:12px;height:12px;border-radius:50%;background:${color};box-shadow:0 0 0 4px rgba(255,111,165,.25)"></div>`
-      : `<div style="width:14px;height:14px;border-radius:50%;border:3px solid ${color};background:#1a0f14"></div>`;
+      ? `<div style="width:12px;height:12px;border-radius:50%;background:${color};box-shadow:0 0 0 4px rgba(255,46,136,.22),0 1px 4px rgba(0,0,0,.4)"></div>`
+      : `<div style="width:14px;height:14px;border-radius:50%;border:3px solid ${color};background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`;
   return L.divIcon({
     className: "heride-marker",
     html: `<div style="display:grid;place-items:center;width:22px;height:22px">${inner}</div>`,
     iconSize: [22, 22],
     iconAnchor: [11, 11],
+  });
+}
+
+/** Pulsing blue dot for the user's own live position. */
+function userIcon(L: typeof Leaflet) {
+  return L.divIcon({
+    className: "heride-user",
+    html: `<div style="width:18px;height:18px;border-radius:50%;background:#2f74ff;border:3px solid #fff;box-shadow:0 0 0 6px rgba(47,116,255,.20),0 1px 5px rgba(0,0,0,.4)"></div>`,
+    iconSize: [18, 18],
+    iconAnchor: [9, 9],
   });
 }
 
@@ -55,11 +68,13 @@ interface MapState {
   pickupM: Leaflet.Marker;
   destM: Leaflet.Marker;
   driverM: Leaflet.Marker | null;
+  userM: Leaflet.Marker | null;
   line: Leaflet.Polyline;
   lastRouteAt: number;
   lastOrigin: GeoPoint | null;
   lastPhase: TripMapPhase | null;
   routeSeq: number;
+  watchId: number | null;
 }
 
 const fmtEta = (min: number) => (min < 1 ? "1 min" : `${Math.round(min)} min`);
@@ -76,7 +91,14 @@ const fmtKm = (km: number) => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toF
  * Client-only (Leaflet touches window): the library is imported inside an
  * effect so it never runs during SSR. Free dark CARTO/OSM tiles — no API key.
  */
-export function LiveTripMap({ pickup, destination, driver, phase, className }: LiveTripMapProps) {
+export function LiveTripMap({
+  pickup,
+  destination,
+  driver,
+  phase,
+  trackUser = false,
+  className,
+}: LiveTripMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const stateRef = useRef<MapState | null>(null);
   const propsRef = useRef({ pickup, destination, driver, phase });
@@ -148,17 +170,13 @@ export function LiveTripMap({ pickup, destination, driver, phase, className }: L
         attributionControl: true,
         dragging: true,
       }).setView([pk.lat, pk.lng], 13);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-        subdomains: "abcd",
-        maxZoom: 19,
-        attribution: "&copy; OpenStreetMap &copy; CARTO",
-      }).addTo(map);
+      L.tileLayer(LIGHT_TILES.url, { ...LIGHT_TILES.options }).addTo(map);
       const pickupM = L.marker([pk.lat, pk.lng], { icon: markerIcon(L, "pickup") }).addTo(map);
       const destM = L.marker([dest.lat, dest.lng], { icon: markerIcon(L, "dest") }).addTo(map);
       const line = L.polyline([], {
-        color: "#ff6fa5",
-        weight: 4,
-        opacity: 0.9,
+        color: "#ff2e88",
+        weight: 5,
+        opacity: 0.95,
         lineJoin: "round",
       }).addTo(map);
       stateRef.current = {
@@ -167,17 +185,39 @@ export function LiveTripMap({ pickup, destination, driver, phase, className }: L
         pickupM,
         destM,
         driverM: null,
+        userM: null,
         line,
         lastRouteAt: 0,
         lastOrigin: null,
         lastPhase: null,
         routeSeq: 0,
+        watchId: null,
       };
+
+      // Live-track the viewer's own position when requested.
+      if (trackUser && typeof navigator !== "undefined" && navigator.geolocation) {
+        stateRef.current.watchId = navigator.geolocation.watchPosition(
+          (pos) => {
+            const s = stateRef.current;
+            if (!s) return;
+            const p: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+            if (!s.userM)
+              s.userM = L.marker(p, { icon: userIcon(L), zIndexOffset: 500 }).addTo(s.map);
+            else s.userM.setLatLng(p);
+          },
+          () => {},
+          { enableHighAccuracy: true, maximumAge: 10000, timeout: 8000 },
+        );
+      }
+
       draw();
     })();
     return () => {
       cancelled = true;
       if (stateRef.current) {
+        if (stateRef.current.watchId !== null && typeof navigator !== "undefined") {
+          navigator.geolocation.clearWatch(stateRef.current.watchId);
+        }
         stateRef.current.map.remove();
         stateRef.current = null;
       }
@@ -201,14 +241,14 @@ export function LiveTripMap({ pickup, destination, driver, phase, className }: L
   return (
     <div
       className={cn(
-        "relative z-0 h-64 w-full overflow-hidden rounded-3xl border border-border/60 bg-noir shadow-soft",
-        "[&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-container]:bg-noir",
+        "relative z-0 h-64 w-full overflow-hidden rounded-3xl border border-border/60 bg-[#e8e4de] shadow-soft",
+        "[&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-container]:bg-[#e8e4de]",
         className,
       )}
     >
       <div ref={containerRef} className="h-full w-full" role="img" aria-label="Live trip map" />
       {eta && (
-        <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-noir/85 px-3 py-1.5 text-xs font-semibold text-foreground shadow-soft backdrop-blur">
+        <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-noir shadow-soft backdrop-blur">
           <span className="text-primary">{eta.text}</span> · {eta.distance}
         </div>
       )}
