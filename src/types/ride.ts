@@ -88,9 +88,68 @@ export interface RideRequestDraft {
   readonly createdAt: ISODateString;
 }
 
-export type RideRequestStep =
-  | "location"
-  | "vehicle"
-  | "preferences"
-  | "schedule"
-  | "confirm";
+export type RideRequestStep = "location" | "vehicle" | "preferences" | "schedule" | "confirm";
+
+/**
+ * Ride lifecycle statuses — mirrors the Postgres `ride_status` enum exactly.
+ * Do NOT add values here without a matching DB migration.
+ */
+export type RideStatus =
+  | "requested"
+  | "matched"
+  | "accepted"
+  | "arrived"
+  | "in_progress"
+  | "completed"
+  | "cancelled";
+
+/**
+ * The single source of truth for legal status changes. Every transition —
+ * driver, passenger, or system — MUST be validated against this map before
+ * writing to the database. Keys are the current status; values are the set of
+ * statuses reachable from it. Terminal states map to an empty array.
+ */
+export const RIDE_STATUS_TRANSITIONS: Readonly<Record<RideStatus, readonly RideStatus[]>> = {
+  requested: ["accepted", "matched", "cancelled"],
+  matched: ["accepted", "cancelled"],
+  accepted: ["arrived", "cancelled"],
+  arrived: ["in_progress", "cancelled"],
+  in_progress: ["completed", "cancelled"],
+  completed: [],
+  cancelled: [],
+};
+
+export function canTransition(from: RideStatus, to: RideStatus): boolean {
+  return RIDE_STATUS_TRANSITIONS[from].includes(to);
+}
+
+/** Statuses in which a ride is still "live" (visible on an active-trip screen). */
+export const ACTIVE_RIDE_STATUSES: readonly RideStatus[] = [
+  "requested",
+  "matched",
+  "accepted",
+  "arrived",
+  "in_progress",
+];
+
+/** A ride row as read back from the database, in app-facing shape. */
+export interface RideRecord {
+  readonly id: ID;
+  readonly passengerId: ID;
+  readonly driverId: ID | null;
+  readonly status: RideStatus;
+  readonly pickup: { readonly lat: number; readonly lng: number; readonly address: string | null };
+  readonly destination: {
+    readonly lat: number;
+    readonly lng: number;
+    readonly address: string | null;
+  };
+  readonly fareEstimate: number | null;
+  readonly fareFinal: number | null;
+  readonly distanceKm: number | null;
+  readonly cancellationReason: string | null;
+  readonly requestedAt: ISODateString;
+  readonly acceptedAt: ISODateString | null;
+  readonly startedAt: ISODateString | null;
+  readonly completedAt: ISODateString | null;
+}

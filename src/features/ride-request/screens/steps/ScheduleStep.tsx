@@ -30,7 +30,10 @@ export function ScheduleStep() {
 
   return (
     <motion.div className="space-y-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <StepHeader title="When are you riding?" subtitle="Ride immediately or reserve a driver in advance." />
+      <StepHeader
+        title="When are you riding?"
+        subtitle="Ride immediately or reserve a driver in advance."
+      />
       <ScheduleSelector
         schedule={schedule}
         earliest={earliest}
@@ -40,7 +43,9 @@ export function ScheduleStep() {
       {schedule.mode === "scheduled" && schedule.scheduledFor && (
         <GlassCard className="text-sm text-foreground">
           Pickup scheduled for
-          <span className="ml-1 font-display text-primary">{formatScheduledFor(schedule.scheduledFor)}</span>
+          <span className="ml-1 font-display text-primary">
+            {formatScheduledFor(schedule.scheduledFor)}
+          </span>
         </GlassCard>
       )}
       {error && <p className="text-xs text-destructive">{error}</p>}

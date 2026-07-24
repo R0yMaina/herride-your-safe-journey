@@ -15,11 +15,7 @@ export function ScreenWrapper({ children, className, withPadding = true }: Scree
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
       transition={{ duration: 0.28, ease: "easeOut" }}
-      className={cn(
-        "min-h-full w-full",
-        withPadding && "pb-32 pt-6",
-        className,
-      )}
+      className={cn("min-h-full w-full", withPadding && "pb-32 pt-6", className)}
     >
       {children}
     </motion.section>

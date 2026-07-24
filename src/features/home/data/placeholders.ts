@@ -21,7 +21,17 @@ export const RECENT_DESTINATIONS: readonly Destination[] = [
 ];
 
 export const RIDE_CATEGORIES: readonly RideCategory[] = [
-  { id: "safe", name: "HeRide Safe", description: "Verified female drivers", priceLabel: "From KES 350" },
-  { id: "share", name: "HeRide Share", description: "Split with women nearby", priceLabel: "From KES 180" },
+  {
+    id: "safe",
+    name: "HeRide Safe",
+    description: "Verified female drivers",
+    priceLabel: "From KES 350",
+  },
+  {
+    id: "share",
+    name: "HeRide Share",
+    description: "Split with women nearby",
+    priceLabel: "From KES 180",
+  },
   { id: "lux", name: "HeRide Lux", description: "Premium comfort", priceLabel: "From KES 780" },
 ];

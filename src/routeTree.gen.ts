@@ -12,9 +12,11 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as DriverRouteImport } from './routes/driver'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
@@ -25,12 +27,14 @@ import { Route as AuthPasswordUpdatedRouteImport } from './routes/auth.password-
 import { Route as AuthOtpRouteImport } from './routes/auth.otp'
 import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AppWalletRouteImport } from './routes/_app.wallet'
 import { Route as AppSearchingRouteImport } from './routes/_app.searching'
 import { Route as AppRidesRouteImport } from './routes/_app.rides'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppBookRouteImport } from './routes/_app.book'
+import { Route as AppTripRideIdRouteImport } from './routes/_app.trip.$rideId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
   id: '/welcome',
@@ -47,6 +51,11 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DriverRoute = DriverRouteImport.update({
+  id: '/driver',
+  path: '/driver',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -59,6 +68,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShareTokenRoute = ShareTokenRouteImport.update({
+  id: '/share/$token',
+  path: '/share/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
@@ -111,6 +125,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AdminFinanceRoute = AdminFinanceRouteImport.update({
+  id: '/admin/finance',
+  path: '/admin/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -141,10 +160,16 @@ const AppBookRoute = AppBookRouteImport.update({
   path: '/book',
   getParentRoute: () => AppRoute,
 } as any)
+const AppTripRideIdRoute = AppTripRideIdRouteImport.update({
+  id: '/trip/$rideId',
+  path: '/trip/$rideId',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -154,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/rides': typeof AppRidesRoute
   '/searching': typeof AppSearchingRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/finance': typeof AdminFinanceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -164,10 +190,13 @@ export interface FileRoutesByFullPath {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
+  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -177,6 +206,7 @@ export interface FileRoutesByTo {
   '/rides': typeof AppRidesRoute
   '/searching': typeof AppSearchingRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/finance': typeof AdminFinanceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -187,12 +217,15 @@ export interface FileRoutesByTo {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
+  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -202,6 +235,7 @@ export interface FileRoutesById {
   '/_app/rides': typeof AppRidesRoute
   '/_app/searching': typeof AppSearchingRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/admin/finance': typeof AdminFinanceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -212,12 +246,15 @@ export interface FileRoutesById {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/share/$token': typeof ShareTokenRoute
+  '/_app/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/auth'
+    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -227,6 +264,7 @@ export interface FileRouteTypes {
     | '/rides'
     | '/searching'
     | '/wallet'
+    | '/admin/finance'
     | '/auth/forgot-password'
     | '/auth/logout'
     | '/auth/otp'
@@ -237,10 +275,13 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/share/$token'
+    | '/trip/$rideId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -250,6 +291,7 @@ export interface FileRouteTypes {
     | '/rides'
     | '/searching'
     | '/wallet'
+    | '/admin/finance'
     | '/auth/forgot-password'
     | '/auth/logout'
     | '/auth/otp'
@@ -260,11 +302,14 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/share/$token'
+    | '/trip/$rideId'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/auth'
+    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -274,6 +319,7 @@ export interface FileRouteTypes {
     | '/_app/rides'
     | '/_app/searching'
     | '/_app/wallet'
+    | '/admin/finance'
     | '/auth/forgot-password'
     | '/auth/logout'
     | '/auth/otp'
@@ -284,15 +330,20 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/share/$token'
+    | '/_app/trip/$rideId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  DriverRoute: typeof DriverRoute
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
+  AdminFinanceRoute: typeof AdminFinanceRoute
+  ShareTokenRoute: typeof ShareTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -318,6 +369,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver': {
+      id: '/driver'
+      path: '/driver'
+      fullPath: '/driver'
+      preLoaderRoute: typeof DriverRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -337,6 +395,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/share/$token': {
+      id: '/share/$token'
+      path: '/share/$token'
+      fullPath: '/share/$token'
+      preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/verify-email': {
@@ -409,6 +474,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/admin/finance': {
+      id: '/admin/finance'
+      path: '/admin/finance'
+      fullPath: '/admin/finance'
+      preLoaderRoute: typeof AdminFinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/wallet': {
       id: '/_app/wallet'
       path: '/wallet'
@@ -451,6 +523,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/trip/$rideId': {
+      id: '/_app/trip/$rideId'
+      path: '/trip/$rideId'
+      fullPath: '/trip/$rideId'
+      preLoaderRoute: typeof AppTripRideIdRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -461,6 +540,7 @@ interface AppRouteChildren {
   AppRidesRoute: typeof AppRidesRoute
   AppSearchingRoute: typeof AppSearchingRoute
   AppWalletRoute: typeof AppWalletRoute
+  AppTripRideIdRoute: typeof AppTripRideIdRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -470,6 +550,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppRidesRoute: AppRidesRoute,
   AppSearchingRoute: AppSearchingRoute,
   AppWalletRoute: AppWalletRoute,
+  AppTripRideIdRoute: AppTripRideIdRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
@@ -506,10 +587,23 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  DriverRoute: DriverRoute,
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,
+  AdminFinanceRoute: AdminFinanceRoute,
+  ShareTokenRoute: ShareTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

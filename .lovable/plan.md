@@ -1,4 +1,3 @@
-
 # HerRide — Premium Mobile App UI
 
 A mobile-first, investor-grade web prototype of a female-only ride-hailing app. Built as a single TanStack Start app where each "screen" is its own route, framed inside a phone mockup on desktop and full-bleed on mobile. Design language: baby pink (#FFC0CB) + blush + deep black + soft glows + feminine doodle accents.

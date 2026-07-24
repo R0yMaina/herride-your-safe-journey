@@ -1,10 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { authService } from "@/services/auth";
 import { useAuthStore } from "@/store/auth.store";
-import type {
-  SignInPayload,
-  SignUpPayload,
-} from "@/types/auth";
+import type { SignInPayload, SignUpPayload } from "@/types/auth";
 
 export function useSignIn() {
   const setSession = useAuthStore((s) => s.setSession);

@@ -8,10 +8,15 @@ import {
   Scripts,
 } from "@tanstack/react-router";
 
+import { useEffect } from "react";
+
+import { MotionConfig } from "framer-motion";
+
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ErrorBoundary } from "@/providers/ErrorBoundary";
 import { Toaster } from "@/components/ui/sonner";
+import { initAuthSync } from "@/services/auth";
 
 function NotFoundComponent() {
   return (
@@ -76,19 +81,43 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "HeRide — The safest ride, for her." },
-      { name: "description", content: "HeRide is a premium, female-focused ride-hailing platform engineered for safety, comfort, and trust across Africa." },
+      {
+        name: "description",
+        content:
+          "HeRide is a premium, female-focused ride-hailing platform engineered for safety, comfort, and trust across Africa.",
+      },
       { name: "author", content: "Lovable" },
       { property: "og:title", content: "HeRide — The safest ride, for her." },
-      { property: "og:description", content: "A premium, female-focused ride-hailing platform engineered for safety and trust." },
+      {
+        property: "og:description",
+        content: "A premium, female-focused ride-hailing platform engineered for safety and trust.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "HeRide — The safest ride, for her." },
-      { name: "twitter:description", content: "A premium, female-focused ride-hailing platform engineered for safety and trust." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png" },
+      {
+        name: "twitter:description",
+        content: "A premium, female-focused ride-hailing platform engineered for safety and trust.",
+      },
+      {
+        property: "og:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4b0e55e4-579d-4c99-8f11-24e46853e044/id-preview-2a2a1035--0688d12f-818f-4381-949e-80841c4fa025.lovable.app-1778927829230.png",
+      },
     ],
     links: [
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=Manrope:wght@400..800&display=swap",
+      },
       {
         rel: "stylesheet",
         href: appCss,
@@ -118,11 +147,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  // Reconcile the auth store with Supabase's persisted session (client only).
+  useEffect(() => {
+    initAuthSync();
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
         <ThemeProvider>
-          <Outlet />
+          <MotionConfig reducedMotion="user">
+            <Outlet />
+          </MotionConfig>
           <Toaster />
         </ThemeProvider>
       </ErrorBoundary>

@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useRideRequestStore } from "@/store/ride-request.store";
-import { rideRequestService } from "@/services/ride/ride-request.service";
+import { rideRequestService } from "@/services/ride";
 import type { TripSummary } from "@/types/ride";
 import { ROUTES } from "@/constants/routes";
 import { StepHeader } from "../../components/StepHeader";
@@ -61,16 +61,30 @@ export function ConfirmStep() {
     return (
       <div className="space-y-5">
         <StepHeader title="Review your ride" />
-        <p className="text-sm text-muted-foreground">Complete previous steps to review your trip.</p>
+        <p className="text-sm text-muted-foreground">
+          Complete previous steps to review your trip.
+        </p>
       </div>
     );
   }
 
-  const summary: TripSummary = { pickup, destination, route, option, fare, preferences, schedule, note };
+  const summary: TripSummary = {
+    pickup,
+    destination,
+    route,
+    option,
+    fare,
+    preferences,
+    schedule,
+    note,
+  };
 
   return (
     <motion.div className="space-y-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-      <StepHeader title="Review your ride" subtitle="Everything looks good? Confirm to find your driver." />
+      <StepHeader
+        title="Review your ride"
+        subtitle="Everything looks good? Confirm to find your driver."
+      />
       <RouteMapPreview route={route} />
       <TripSummaryCard summary={summary} />
       <EmergencyReminder />

@@ -1,17 +1,11 @@
-import { Bell, ShieldCheck, ArrowRight } from "lucide-react";
+import { ShieldCheck, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import {
-  Container,
-  GlassCard,
-  IconButton,
-  PageHeader,
-  ScreenWrapper,
-  Section,
-} from "@/components/common";
+import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { ROUTES } from "@/constants/routes";
 import { DestinationCard } from "./components/DestinationCard";
 import { RideCategoryList } from "./components/RideCategoryList";
 import { RECENT_DESTINATIONS } from "./data/placeholders";
+import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 
 export function HomeScreen() {
   return (
@@ -21,11 +15,7 @@ export function HomeScreen() {
           eyebrow="Good evening"
           title="Where to tonight?"
           subtitle="Verified drivers nearby, ready when you are."
-          action={
-            <IconButton aria-label="Notifications">
-              <Bell className="h-5 w-5" />
-            </IconButton>
-          }
+          action={<NotificationBell />}
         />
 
         <Link
@@ -48,7 +38,9 @@ export function HomeScreen() {
           </div>
           <div className="min-w-0">
             <p className="font-display text-base text-foreground">Safety Suite is on</p>
-            <p className="text-xs text-muted-foreground">Live trip share, SOS, and audio guardian ready.</p>
+            <p className="text-xs text-muted-foreground">
+              Live trip share, SOS, and audio guardian ready.
+            </p>
           </div>
         </GlassCard>
 

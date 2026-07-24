@@ -37,8 +37,12 @@ export function PlacePicker({ label, kind, value, options, onSelect }: PlacePick
                 <Icon className="h-4 w-4" />
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate font-display text-sm text-foreground">{place.label}</span>
-                <span className="block truncate text-xs text-muted-foreground">{place.address}</span>
+                <span className="block truncate font-display text-sm text-foreground">
+                  {place.label}
+                </span>
+                <span className="block truncate text-xs text-muted-foreground">
+                  {place.address}
+                </span>
               </span>
             </button>
           );

@@ -2,12 +2,7 @@ import { MapPin, Circle, Clock, Route } from "lucide-react";
 import { GlassCard } from "@/components/common";
 import type { TripSummary } from "@/types/ride";
 import { RIDE_PREFERENCES } from "../data/preferences";
-import {
-  formatCurrency,
-  formatDistance,
-  formatDuration,
-  formatScheduledFor,
-} from "../lib/format";
+import { formatCurrency, formatDistance, formatDuration, formatScheduledFor } from "../lib/format";
 
 interface TripSummaryCardProps {
   readonly summary: TripSummary;
@@ -33,8 +28,12 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
             <MapPin className="h-4 w-4" />
           </span>
           <div className="min-w-0">
-            <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">Destination</p>
-            <p className="truncate font-display text-sm text-foreground">{summary.destination.label}</p>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+              Destination
+            </p>
+            <p className="truncate font-display text-sm text-foreground">
+              {summary.destination.label}
+            </p>
             <p className="truncate text-xs text-muted-foreground">{summary.destination.address}</p>
           </div>
         </div>
@@ -44,18 +43,22 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
         <div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Distance</p>
           <p className="mt-1 flex items-center justify-center gap-1 text-sm text-foreground">
-            <Route className="h-3.5 w-3.5 text-primary" /> {formatDistance(summary.route.distanceKm)}
+            <Route className="h-3.5 w-3.5 text-primary" />{" "}
+            {formatDistance(summary.route.distanceKm)}
           </p>
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Duration</p>
           <p className="mt-1 flex items-center justify-center gap-1 text-sm text-foreground">
-            <Clock className="h-3.5 w-3.5 text-primary" /> {formatDuration(summary.route.durationMin)}
+            <Clock className="h-3.5 w-3.5 text-primary" />{" "}
+            {formatDuration(summary.route.durationMin)}
           </p>
         </div>
         <div>
           <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Ride</p>
-          <p className="mt-1 text-sm text-foreground">{summary.option.name.replace("HeRide ", "")}</p>
+          <p className="mt-1 text-sm text-foreground">
+            {summary.option.name.replace("HeRide ", "")}
+          </p>
         </div>
       </div>
 
@@ -73,7 +76,10 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
       {prefs.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
           {prefs.map((p) => (
-            <span key={p.id} className="rounded-full bg-primary/15 px-3 py-1 text-[11px] text-primary">
+            <span
+              key={p.id}
+              className="rounded-full bg-primary/15 px-3 py-1 text-[11px] text-primary"
+            >
               {p.label}
             </span>
           ))}
@@ -81,7 +87,9 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
       )}
 
       <div className="flex items-center justify-between border-t border-border/60 pt-3">
-        <span className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Estimated fare</span>
+        <span className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+          Estimated fare
+        </span>
         <span className="font-display text-2xl text-primary">
           {formatCurrency(summary.fare.total, summary.fare.currency)}
         </span>

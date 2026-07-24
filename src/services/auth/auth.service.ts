@@ -22,7 +22,7 @@ export interface IAuthService {
   signOut(): Promise<void>;
 }
 
-class MockAuthService implements IAuthService {
+export class MockAuthService implements IAuthService {
   async signIn({ email, rememberMe }: SignInPayload): Promise<AuthSession> {
     await delay();
     const tokens = mockTokens();
@@ -82,5 +82,3 @@ class MockAuthService implements IAuthService {
     tokenService.clear();
   }
 }
-
-export const authService: IAuthService = new MockAuthService();

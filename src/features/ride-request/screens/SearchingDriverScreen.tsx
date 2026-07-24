@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { Container, ScreenWrapper } from "@/components/common";
 import { useRideRequestStore } from "@/store/ride-request.store";
-import { rideRequestService } from "@/services/ride/ride-request.service";
+import { rideRequestService, ridesService } from "@/services/ride";
 import { ROUTES } from "@/constants/routes";
 import { SearchingAnimation } from "../components/SearchingAnimation";
 import { SafetyTipsCarousel } from "../components/SafetyTipsCarousel";
@@ -21,6 +21,24 @@ export function SearchingDriverScreen() {
       void navigate({ to: ROUTES.book, replace: true });
     }
   }, [draft, navigate]);
+
+  // Watch the real ride: as soon as a driver claims it (status leaves
+  // "requested"), move the passenger to the live trip screen.
+  useEffect(() => {
+    if (!draft) return;
+    const rideId = draft.id;
+    const goToTrip = () => {
+      reset();
+      void navigate({ to: "/trip/$rideId", params: { rideId }, replace: true });
+    };
+    void ridesService.getById(rideId).then((r) => {
+      if (r && r.status !== "requested") goToTrip();
+    });
+    const sub = ridesService.subscribe(rideId, (r) => {
+      if (r.status !== "requested") goToTrip();
+    });
+    return () => sub.unsubscribe();
+  }, [draft, navigate, reset]);
 
   useEffect(() => {
     const id = setInterval(() => setSeconds((s) => s + 1), 1000);
@@ -40,8 +58,12 @@ export function SearchingDriverScreen() {
     <ScreenWrapper className="pb-40">
       <Container className="flex flex-col items-center gap-8 pt-6 text-center">
         <div className="space-y-2">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">Finding your driver</p>
-          <h1 className="font-display text-3xl text-foreground">Matching you with a verified driver</h1>
+          <p className="text-[11px] uppercase tracking-[0.3em] text-primary/80">
+            Finding your driver
+          </p>
+          <h1 className="font-display text-3xl text-foreground">
+            Matching you with a verified driver
+          </h1>
           <p className="text-sm text-muted-foreground">
             Typical wait time · {formatDuration(etaMin)}
           </p>

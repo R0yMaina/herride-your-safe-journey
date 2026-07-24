@@ -22,7 +22,12 @@ function toTimeInput(iso: string | null): string {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-export function ScheduleSelector({ schedule, earliest, onModeChange, onDateTimeChange }: ScheduleSelectorProps) {
+export function ScheduleSelector({
+  schedule,
+  earliest,
+  onModeChange,
+  onDateTimeChange,
+}: ScheduleSelectorProps) {
   const date = toDateInput(schedule.scheduledFor) || toDateInput(earliest.toISOString());
   const time = toTimeInput(schedule.scheduledFor) || toTimeInput(earliest.toISOString());
 
@@ -34,7 +39,11 @@ export function ScheduleSelector({ schedule, earliest, onModeChange, onDateTimeC
 
   return (
     <div className="space-y-4">
-      <div role="tablist" aria-label="Ride timing" className="grid grid-cols-2 gap-2 rounded-2xl border border-border/60 bg-card/60 p-1 backdrop-blur-xl">
+      <div
+        role="tablist"
+        aria-label="Ride timing"
+        className="grid grid-cols-2 gap-2 rounded-2xl border border-border/60 bg-card/60 p-1 backdrop-blur-xl"
+      >
         {(["now", "scheduled"] as const).map((mode) => {
           const active = schedule.mode === mode;
           const Icon = mode === "now" ? Zap : Calendar;
@@ -47,7 +56,9 @@ export function ScheduleSelector({ schedule, earliest, onModeChange, onDateTimeC
               onClick={() => onModeChange(mode)}
               className={cn(
                 "flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm transition-colors",
-                active ? "bg-primary text-primary-foreground shadow-glow" : "text-muted-foreground hover:text-foreground",
+                active
+                  ? "bg-primary text-primary-foreground shadow-glow"
+                  : "text-muted-foreground hover:text-foreground",
               )}
             >
               <Icon className="h-4 w-4" />

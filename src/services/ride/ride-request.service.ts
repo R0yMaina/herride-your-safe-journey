@@ -5,7 +5,7 @@ export interface IRideRequestService {
   cancel(requestId: string): Promise<void>;
 }
 
-class MockRideRequestService implements IRideRequestService {
+export class MockRideRequestService implements IRideRequestService {
   async submit(summary: TripSummary): Promise<RideRequestDraft> {
     await new Promise<void>((r) => setTimeout(r, 500));
     return { id: crypto.randomUUID(), summary, createdAt: new Date().toISOString() };
@@ -14,5 +14,3 @@ class MockRideRequestService implements IRideRequestService {
     await new Promise<void>((r) => setTimeout(r, 250));
   }
 }
-
-export const rideRequestService: IRideRequestService = new MockRideRequestService();
