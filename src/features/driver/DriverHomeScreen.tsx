@@ -8,6 +8,7 @@ import { rideRankingStrategy, type RankedRide } from "@/services/dispatch";
 import { canTransition, type RideRecord, type RideStatus } from "@/types/ride";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm } from "@/lib/geo";
+import { LiveTripMap } from "@/features/trip/components/LiveTripMap";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -176,6 +177,13 @@ export function DriverHomeScreen() {
 
         {activeRide ? (
           <Section title="Active trip">
+            <LiveTripMap
+              pickup={activeRide.pickup}
+              destination={activeRide.destination}
+              driver={position}
+              phase={activeRide.status === "in_progress" ? "on_trip" : "to_pickup"}
+              className="mb-3"
+            />
             <GlassCard className="space-y-3">
               <div>
                 <p className="text-sm text-foreground">{activeRide.pickup.address ?? "Pickup"}</p>
