@@ -17,6 +17,8 @@ CREATE POLICY "Drivers own insert" ON public.drivers
 --   * a driver may update their OWN row but NOT change verification_status
 --   * an admin may update anything (approve/suspend/reject)
 DROP POLICY IF EXISTS "Drivers own update" ON public.drivers;
+DROP POLICY IF EXISTS "Drivers admin update" ON public.drivers;
+DROP POLICY IF EXISTS "Drivers self update non-status" ON public.drivers;
 CREATE POLICY "Drivers admin update" ON public.drivers
   FOR UPDATE TO authenticated
   USING (public.has_role(auth.uid(), 'admin'))
