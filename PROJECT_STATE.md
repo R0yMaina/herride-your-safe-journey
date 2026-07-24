@@ -24,6 +24,14 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 - **Dispatch (Phase 7)** — pluggable ranking strategy (nearest-first),
   driver-position streaming to the passenger, passenger-cancel sync to the
   driver screen, busy-driver semantics, stale-request expiry.
+- **Pricing Engine (Phase 7.5)** — `src/services/pricing/`: one centralized,
+  config-driven, strategy-based fare calculator. `computeFare` is now a thin
+  adapter over it (v1 parity preserved). No module computes prices directly.
+- **Financial ecosystem (Phase 8)** — `src/services/{payments,payouts,finance}/`:
+  payment-provider abstraction (cash/wallet live; M-Pesa/card = declared
+  providers pending credentials), driver payouts, admin financial summary.
+  Immutable ledger + platform_ledger + payment_intents + payouts + refund
+  architecture in the DB. Admin dashboard at `/admin/finance`.
 
 ## SQL scripts — application status
 
@@ -35,6 +43,7 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 | phase5-hardening.sql | ⏳ user must run |
 | phase6-audit-hardening.sql | ⏳ user must run (token-enumeration fix) |
 | phase7-dispatch.sql | ⏳ user must run (busy drivers, location RLS, expiry) |
+| phase8-financials.sql | ⏳ user must run (immutable ledger, payouts, refunds, admin summary) |
 | seed.sql | optional |
 
 ## Known gaps / deliberate v1 scope
