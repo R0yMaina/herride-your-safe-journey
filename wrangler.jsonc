@@ -3,5 +3,8 @@
   "name": "herride-your-safe-journey",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": false
+  }
   "main": "src/server.ts",
 }
