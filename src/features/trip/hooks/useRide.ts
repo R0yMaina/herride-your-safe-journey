@@ -32,9 +32,21 @@ export function useRide(rideId: string | undefined): UseRideResult {
     const sub = ridesService.subscribe(rideId, (updated) => {
       if (active) setRide(updated);
     });
+
+    // Missed-event recovery: realtime events dropped while the tab was
+    // backgrounded (mobile browsers suspend sockets) are reconciled with a
+    // fresh read the moment the user returns.
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        void ridesService.getById(rideId).then((r) => active && r && setRide(r));
+      }
+    };
+    document.addEventListener("visibilitychange", onVisible);
+
     return () => {
       active = false;
       sub.unsubscribe();
+      document.removeEventListener("visibilitychange", onVisible);
     };
   }, [rideId]);
 

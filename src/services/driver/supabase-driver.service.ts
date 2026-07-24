@@ -3,7 +3,12 @@ import { canTransition, type RideRecord, type RideStatus } from "@/types/ride";
 import type { RideSubscription } from "@/services/ride/rides.service";
 import type { Database } from "@/integrations/supabase/types";
 import { mapRideRow } from "@/services/ride/ride-mapper";
-import type { DriverLocationPing, IDriverService, PublicDriver } from "./driver.service";
+import type {
+  DriverLiveLocation,
+  DriverLocationPing,
+  IDriverService,
+  PublicDriver,
+} from "./driver.service";
 
 async function currentUserId(): Promise<string> {
   const {
@@ -133,6 +138,56 @@ export class SupabaseDriverService implements IDriverService {
       .single();
     if (error) throw new Error(error.message);
     return mapRideRow(data);
+  }
+
+  async getDriverLocation(driverUserId: string): Promise<DriverLiveLocation | null> {
+    const { data, error } = await supabase
+      .from("driver_locations")
+      .select("lat, lng, heading, updated_at")
+      .eq("driver_user_id", driverUserId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!data) return null;
+    return { lat: data.lat, lng: data.lng, heading: data.heading, updatedAt: data.updated_at };
+  }
+
+  subscribeDriverLocation(
+    driverUserId: string,
+    onChange: (location: DriverLiveLocation) => void,
+  ): RideSubscription {
+    // One channel per driver, filtered server-side so only that driver's
+    // pings reach this socket. RLS additionally gates what rows are visible.
+    const channel = supabase
+      .channel(`driver-location:${driverUserId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "UPDATE",
+          schema: "public",
+          table: "driver_locations",
+          filter: `driver_user_id=eq.${driverUserId}`,
+        },
+        (payload) => {
+          const row = payload.new as {
+            lat: number;
+            lng: number;
+            heading: number | null;
+            updated_at: string;
+          };
+          onChange({
+            lat: row.lat,
+            lng: row.lng,
+            heading: row.heading,
+            updatedAt: row.updated_at,
+          });
+        },
+      )
+      .subscribe();
+    return {
+      unsubscribe: () => {
+        void supabase.removeChannel(channel);
+      },
+    };
   }
 
   async getPublicDriver(userId: string): Promise<PublicDriver | null> {

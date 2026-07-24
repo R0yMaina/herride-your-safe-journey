@@ -9,6 +9,7 @@ export const driverService: IDriverService = env.useMocks
 export type {
   IDriverService,
   DriverLocationPing,
+  DriverLiveLocation,
   PublicDriver,
   NearbyDriver,
 } from "./driver.service";

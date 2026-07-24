@@ -2,9 +2,12 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, MapPin, Navigation, Power } from "lucide-react";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
-import { driverService } from "@/services/driver";
+import { driverService, type DriverLocationPing } from "@/services/driver";
+import { ridesService } from "@/services/ride";
+import { rideRankingStrategy, type RankedRide } from "@/services/dispatch";
 import { canTransition, type RideRecord, type RideStatus } from "@/types/ride";
 import { formatCurrency } from "@/features/ride-request/lib/format";
+import { formatDistanceKm } from "@/lib/geo";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -20,6 +23,7 @@ export function DriverHomeScreen() {
   const [busy, setBusy] = useState(false);
   const [openRides, setOpenRides] = useState<readonly RideRecord[]>([]);
   const [activeRide, setActiveRide] = useState<RideRecord | null>(null);
+  const [position, setPosition] = useState<DriverLocationPing | null>(null);
   const pingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refreshOpen = useCallback(async () => {
@@ -48,16 +52,35 @@ export function DriverHomeScreen() {
     if (!online) return;
     const tick = async () => {
       try {
-        await driverService.pingLocation(await getCurrentPing());
+        const ping = await getCurrentPing();
+        setPosition(ping);
+        await driverService.pingLocation(ping);
       } catch {
         /* ignore */
       }
     };
+    void tick();
     pingTimer.current = setInterval(tick, PING_MS);
     return () => {
       if (pingTimer.current) clearInterval(pingTimer.current);
     };
   }, [online]);
+
+  // Live sync of the active trip: if the passenger cancels, the driver is
+  // released back to the open pool immediately instead of driving to a
+  // dead pickup.
+  useEffect(() => {
+    if (!activeRide) return;
+    const sub = ridesService.subscribe(activeRide.id, (updated) => {
+      if (updated.status === "cancelled") {
+        toast.warning("The passenger cancelled this ride");
+        setActiveRide(null);
+      } else {
+        setActiveRide(updated);
+      }
+    });
+    return () => sub.unsubscribe();
+  }, [activeRide?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const toggleOnline = async () => {
     setBusy(true);
@@ -67,7 +90,9 @@ export function DriverHomeScreen() {
         setOnline(false);
         setOpenRides([]);
       } else {
-        await driverService.goOnline(await getCurrentPing());
+        const ping = await getCurrentPing();
+        await driverService.goOnline(ping);
+        setPosition(ping);
         setOnline(true);
         toast.success("You're online");
       }
@@ -116,6 +141,12 @@ export function DriverHomeScreen() {
   };
 
   const step = activeRide ? NEXT_LABEL[activeRide.status] : undefined;
+
+  // Present the pool closest-pickup-first. Ranking is a pluggable strategy
+  // (see services/dispatch) — claiming stays atomic regardless of order.
+  const rankedRides: readonly RankedRide[] = rideRankingStrategy.rank(openRides, {
+    driverPosition: position,
+  });
 
   return (
     <ScreenWrapper>
@@ -176,12 +207,21 @@ export function DriverHomeScreen() {
               </GlassCard>
             ) : (
               <div className="space-y-3">
-                {openRides.map((ride) => (
+                {rankedRides.map(({ ride, distanceKm }) => (
                   <GlassCard key={ride.id} className="space-y-2">
-                    <p className="text-sm text-foreground">{ride.pickup.address ?? "Pickup"}</p>
-                    <p className="text-sm text-foreground">
-                      → {ride.destination.address ?? "Destination"}
-                    </p>
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="text-sm text-foreground">{ride.pickup.address ?? "Pickup"}</p>
+                        <p className="text-sm text-foreground">
+                          → {ride.destination.address ?? "Destination"}
+                        </p>
+                      </div>
+                      {distanceKm !== null && (
+                        <span className="shrink-0 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                          {formatDistanceKm(distanceKm)} away
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-semibold text-primary">
                         {formatCurrency(ride.fareEstimate ?? 0)}

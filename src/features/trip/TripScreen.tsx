@@ -1,20 +1,27 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Car, Share2, ShieldAlert, Star, X } from "lucide-react";
+import { Car, Navigation, Share2, ShieldAlert, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { useRide } from "./hooks/useRide";
+import { useDriverLocation } from "./hooks/useDriverLocation";
 import { StatusTimeline } from "./components/StatusTimeline";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService } from "@/services/ride";
 import { safetyService } from "@/services/safety";
 import { ROUTES } from "@/constants/routes";
 import { formatCurrency } from "@/features/ride-request/lib/format";
+import { formatDistanceKm, haversineKm } from "@/lib/geo";
+
+const LIVE_LOCATION_STATUSES = ["accepted", "arrived", "in_progress"];
 
 export function TripScreen({ rideId }: { rideId: string }) {
   const { ride, loading, error } = useRide(rideId);
   const navigate = useNavigate();
   const [driver, setDriver] = useState<PublicDriver | null>(null);
+  const streamLocation =
+    ride?.driverId && LIVE_LOCATION_STATUSES.includes(ride.status) ? ride.driverId : null;
+  const driverLocation = useDriverLocation(streamLocation);
 
   useEffect(() => {
     if (ride?.driverId) {
@@ -125,6 +132,30 @@ export function TripScreen({ rideId }: { rideId: string }) {
             <span className="flex items-center gap-1 text-sm text-foreground">
               <Star className="h-4 w-4 fill-primary text-primary" /> {driver.rating.toFixed(1)}
             </span>
+          </GlassCard>
+        )}
+
+        {driverLocation && ride.status !== "in_progress" && (
+          <GlassCard className="flex items-center gap-3">
+            <Navigation className="h-4 w-4 shrink-0 text-primary" />
+            <p className="text-sm text-foreground">
+              Driver is{" "}
+              <span className="font-semibold text-primary">
+                {formatDistanceKm(haversineKm(driverLocation, ride.pickup))}
+              </span>{" "}
+              from your pickup
+            </p>
+          </GlassCard>
+        )}
+        {driverLocation && ride.status === "in_progress" && (
+          <GlassCard className="flex items-center gap-3">
+            <Navigation className="h-4 w-4 shrink-0 text-primary" />
+            <p className="text-sm text-foreground">
+              <span className="font-semibold text-primary">
+                {formatDistanceKm(haversineKm(driverLocation, ride.destination))}
+              </span>{" "}
+              to your destination
+            </p>
           </GlassCard>
         )}
 

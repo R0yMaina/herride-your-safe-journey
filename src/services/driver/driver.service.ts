@@ -25,6 +25,14 @@ export interface NearbyDriver {
   readonly plate: string | null;
 }
 
+/** A driver's last known position, as streamed to their passenger. */
+export interface DriverLiveLocation {
+  readonly lat: number;
+  readonly lng: number;
+  readonly heading: number | null;
+  readonly updatedAt: string;
+}
+
 /**
  * Driver-side dispatch: availability, location, the open-ride pool, atomic
  * claiming, and lifecycle transitions. Interface-first so screens stay
@@ -43,6 +51,13 @@ export interface IDriverService {
   /** Advance a ride the driver owns to the next legal status. */
   transition(rideId: string, next: RideStatus): Promise<RideRecord>;
   getPublicDriver(userId: string): Promise<PublicDriver | null>;
+  /** Last known position of a driver (passenger-side; RLS-gated). */
+  getDriverLocation(driverUserId: string): Promise<DriverLiveLocation | null>;
+  /** Live GPS stream of one driver, for the passenger's active trip. */
+  subscribeDriverLocation(
+    driverUserId: string,
+    onChange: (location: DriverLiveLocation) => void,
+  ): RideSubscription;
 }
 
 const delay = (ms = 250) => new Promise<void>((r) => setTimeout(r, ms));
@@ -82,5 +97,12 @@ export class MockDriverService implements IDriverService {
   async getPublicDriver(): Promise<PublicDriver | null> {
     await delay();
     return null;
+  }
+  async getDriverLocation(): Promise<DriverLiveLocation | null> {
+    await delay(50);
+    return null;
+  }
+  subscribeDriverLocation(): RideSubscription {
+    return { unsubscribe: () => {} };
   }
 }
