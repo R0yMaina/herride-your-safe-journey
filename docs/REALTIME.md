@@ -51,8 +51,11 @@ driver's position **only** while sharing an active ride with them.
 The trip/driver screens render a live map via `TripMap`, which selects an
 engine from `VITE_MAP_PROVIDER`:
 
-- **`leaflet`** (default) — free CARTO/OSM dark tiles, no API key, straight
-  route line. Always works.
+- **`leaflet`** (default) — free CARTO/OSM dark tiles, no API key.
+  **Road-following routes + ETA** via the free OSRM routing service
+  (`router.project-osrm.org`, keyless); falls back to a straight line if
+  routing is momentarily unavailable, so the map always works. For production
+  scale, self-host OSRM or swap in a keyed routing provider.
 - **`google`** — Google Maps with road-following routes (Directions API) and
   live ETA, plus Places address autocomplete in the booking flow. Requires
   `VITE_GOOGLE_MAPS_API_KEY` (or the existing

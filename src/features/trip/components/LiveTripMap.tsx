@@ -1,7 +1,9 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
 import type { GeoPoint } from "@/types/ride";
+import { haversineKm } from "@/lib/geo";
+import { fetchRoadRoute } from "@/services/maps/osrm";
 import { cn } from "@/lib/utils";
 
 export type TripMapPhase = "to_pickup" | "on_trip";
@@ -54,13 +56,22 @@ interface MapState {
   destM: Leaflet.Marker;
   driverM: Leaflet.Marker | null;
   line: Leaflet.Polyline;
+  lastRouteAt: number;
+  lastOrigin: GeoPoint | null;
+  lastPhase: TripMapPhase | null;
+  routeSeq: number;
 }
+
+const fmtEta = (min: number) => (min < 1 ? "1 min" : `${Math.round(min)} min`);
+const fmtKm = (km: number) => (km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`);
 
 /**
  * Real interactive map showing the trip live: pickup, destination, and the
- * driver's streaming position. While the driver is en route the line runs
- * driver → pickup; once the trip starts it runs driver → destination. The map
- * auto-fits to keep every relevant point in view as the driver moves.
+ * driver's streaming position. The route line FOLLOWS THE ROADS (fetched from
+ * the free OSRM service) and shows live distance + ETA; if routing is briefly
+ * unavailable it falls back to a straight line so the map always works. While
+ * the driver is en route the line runs driver → pickup; once the trip starts
+ * it runs driver → destination. Auto-fits as the driver moves.
  *
  * Client-only (Leaflet touches window): the library is imported inside an
  * effect so it never runs during SSR. Free dark CARTO/OSM tiles — no API key.
@@ -68,9 +79,9 @@ interface MapState {
 export function LiveTripMap({ pickup, destination, driver, phase, className }: LiveTripMapProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const stateRef = useRef<MapState | null>(null);
-  // Latest props for the stable draw() to read, avoiding stale closures.
   const propsRef = useRef({ pickup, destination, driver, phase });
   propsRef.current = { pickup, destination, driver, phase };
+  const [eta, setEta] = useState<{ text: string; distance: string } | null>(null);
 
   function draw() {
     const s = stateRef.current;
@@ -89,18 +100,33 @@ export function LiveTripMap({ pickup, destination, driver, phase, className }: L
       }
     }
 
+    const origin = drv ?? pk;
     const target = ph === "on_trip" ? dest : pk;
-    s.line.setLatLngs(
-      drv
-        ? [
-            [drv.lat, drv.lng],
-            [target.lat, target.lng],
-          ]
-        : [
-            [pk.lat, pk.lng],
-            [dest.lat, dest.lng],
-          ],
-    );
+
+    // Straight line immediately (instant feedback / fallback), dashed.
+    s.line.setLatLngs([
+      [origin.lat, origin.lng],
+      [target.lat, target.lng],
+    ]);
+    s.line.setStyle({ dashArray: "6 8" });
+
+    // Fetch the road-following route, throttled: only when the origin moves
+    // >120m, the target (phase) changes, or >20s elapsed — keeps requests low.
+    const now = Date.now();
+    const moved = !s.lastOrigin || haversineKm(s.lastOrigin, origin) > 0.12;
+    if (moved || s.lastPhase !== ph || now - s.lastRouteAt > 20_000) {
+      s.lastRouteAt = now;
+      s.lastOrigin = origin;
+      s.lastPhase = ph;
+      const seq = ++s.routeSeq;
+      void fetchRoadRoute(origin, target).then((route) => {
+        const cur = stateRef.current;
+        if (!cur || seq !== cur.routeSeq || !route) return;
+        cur.line.setLatLngs(route.coordinates.map((c) => [c.lat, c.lng]));
+        cur.line.setStyle({ dashArray: undefined });
+        setEta({ text: fmtEta(route.durationMin), distance: fmtKm(route.distanceKm) });
+      });
+    }
 
     const pts: Leaflet.LatLngExpression[] = [
       [pk.lat, pk.lng],
@@ -131,11 +157,22 @@ export function LiveTripMap({ pickup, destination, driver, phase, className }: L
       const destM = L.marker([dest.lat, dest.lng], { icon: markerIcon(L, "dest") }).addTo(map);
       const line = L.polyline([], {
         color: "#ff6fa5",
-        weight: 3,
-        opacity: 0.85,
-        dashArray: "6 8",
+        weight: 4,
+        opacity: 0.9,
+        lineJoin: "round",
       }).addTo(map);
-      stateRef.current = { map, L, pickupM, destM, driverM: null, line };
+      stateRef.current = {
+        map,
+        L,
+        pickupM,
+        destM,
+        driverM: null,
+        line,
+        lastRouteAt: 0,
+        lastOrigin: null,
+        lastPhase: null,
+        routeSeq: 0,
+      };
       draw();
     })();
     return () => {
@@ -163,14 +200,18 @@ export function LiveTripMap({ pickup, destination, driver, phase, className }: L
 
   return (
     <div
-      ref={containerRef}
       className={cn(
         "relative z-0 h-64 w-full overflow-hidden rounded-3xl border border-border/60 bg-noir shadow-soft",
         "[&_.leaflet-container]:h-full [&_.leaflet-container]:w-full [&_.leaflet-container]:bg-noir",
         className,
       )}
-      role="img"
-      aria-label="Live trip map"
-    />
+    >
+      <div ref={containerRef} className="h-full w-full" role="img" aria-label="Live trip map" />
+      {eta && (
+        <div className="pointer-events-none absolute left-3 top-3 rounded-full bg-noir/85 px-3 py-1.5 text-xs font-semibold text-foreground shadow-soft backdrop-blur">
+          <span className="text-primary">{eta.text}</span> · {eta.distance}
+        </div>
+      )}
+    </div>
   );
 }
