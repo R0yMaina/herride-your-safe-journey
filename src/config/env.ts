@@ -37,6 +37,17 @@ export interface FinanceEnv {
   readonly commissionRate: number;
 }
 
+export type MapProvider = "leaflet" | "google";
+
+/** Map/geo configuration. `provider` selects the map engine; Google unlocks
+ * road-following routes (Directions) and address autocomplete (Places), and
+ * requires a billing-enabled, referrer-restricted key. Defaults to the
+ * key-free Leaflet engine so the app works with no setup. */
+export interface MapEnv {
+  readonly provider: MapProvider;
+  readonly googleApiKey: string;
+}
+
 export interface AppEnv {
   readonly mode: "development" | "production" | "test";
   readonly appName: string;
@@ -45,6 +56,7 @@ export interface AppEnv {
   readonly useMocks: boolean;
   readonly pricing: PricingEnv;
   readonly finance: FinanceEnv;
+  readonly map: MapEnv;
 }
 
 export const env: AppEnv = Object.freeze({
@@ -67,5 +79,14 @@ export const env: AppEnv = Object.freeze({
   }),
   finance: Object.freeze({
     commissionRate: readNumber(import.meta.env.VITE_COMMISSION_RATE, 0.2),
+  }),
+  map: Object.freeze({
+    provider: (readString(import.meta.env.VITE_MAP_PROVIDER, "leaflet") === "google"
+      ? "google"
+      : "leaflet") as MapProvider,
+    googleApiKey: readString(
+      import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
+        import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
+    ),
   }),
 });

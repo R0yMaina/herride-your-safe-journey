@@ -4,7 +4,9 @@ import { GlassCard } from "@/components/common";
 import { useRideRequestStore } from "@/store/ride-request.store";
 import { useRouteEstimate } from "../../hooks/useRouteEstimate";
 import { PlacePicker } from "../../components/PlacePicker";
+import { AddressAutocomplete } from "../../components/AddressAutocomplete";
 import { RouteMapPreview } from "../../components/RouteMapPreview";
+import { isGoogleMapsEnabled } from "@/services/maps/google-loader";
 import { BottomActionBar } from "../../components/BottomActionBar";
 import { ConfirmButton } from "../../components/ConfirmButton";
 import { StepHeader } from "../../components/StepHeader";
@@ -27,6 +29,7 @@ export function LocationStep() {
   // suggestions until they've saved any).
   const pickupOptions = [CURRENT_LOCATION, ...(savedPlaces ?? [])];
   const destinationOptions = [...(savedPlaces ?? []), ...POPULAR_DESTINATIONS];
+  const googleMaps = isGoogleMapsEnabled();
 
   const [initialised, setInitialised] = useState(false);
   useEffect(() => {
@@ -54,15 +57,26 @@ export function LocationStep() {
           </span>
         </GlassCard>
       )}
+      {googleMaps && (
+        <AddressAutocomplete label="Pickup" kind="pickup" value={pickup} onSelect={setPickup} />
+      )}
       <PlacePicker
-        label="Pickup"
+        label={googleMaps ? "Saved pickups" : "Pickup"}
         kind="pickup"
         value={pickup}
         options={pickupOptions}
         onSelect={setPickup}
       />
+      {googleMaps && (
+        <AddressAutocomplete
+          label="Destination"
+          kind="destination"
+          value={destination}
+          onSelect={setDestination}
+        />
+      )}
       <PlacePicker
-        label="Destination"
+        label={googleMaps ? "Saved destinations" : "Destination"}
         kind="destination"
         value={destination}
         options={destinationOptions}

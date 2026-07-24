@@ -6,7 +6,7 @@ import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/comp
 import { useRide } from "./hooks/useRide";
 import { useDriverLocation } from "./hooks/useDriverLocation";
 import { StatusTimeline } from "./components/StatusTimeline";
-import { LiveTripMap } from "./components/LiveTripMap";
+import { TripMap } from "./components/TripMap";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService } from "@/services/ride";
 import { safetyService } from "@/services/safety";
@@ -109,7 +109,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
         />
 
         {!cancelled && (
-          <LiveTripMap
+          <TripMap
             pickup={ride.pickup}
             destination={ride.destination}
             driver={driverLocation}

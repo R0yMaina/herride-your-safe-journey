@@ -8,7 +8,7 @@ import { rideRankingStrategy, type RankedRide } from "@/services/dispatch";
 import { canTransition, type RideRecord, type RideStatus } from "@/types/ride";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm } from "@/lib/geo";
-import { LiveTripMap } from "@/features/trip/components/LiveTripMap";
+import { TripMap } from "@/features/trip/components/TripMap";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -177,7 +177,7 @@ export function DriverHomeScreen() {
 
         {activeRide ? (
           <Section title="Active trip">
-            <LiveTripMap
+            <TripMap
               pickup={activeRide.pickup}
               destination={activeRide.destination}
               driver={position}

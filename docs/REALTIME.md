@@ -46,6 +46,25 @@ driver's position **only** while sharing an active ride with them.
   correctness — `claim_ride`'s row-level `WHERE status='requested' AND
   driver_id IS NULL` does.
 
+## Maps
+
+The trip/driver screens render a live map via `TripMap`, which selects an
+engine from `VITE_MAP_PROVIDER`:
+
+- **`leaflet`** (default) — free CARTO/OSM dark tiles, no API key, straight
+  route line. Always works.
+- **`google`** — Google Maps with road-following routes (Directions API) and
+  live ETA, plus Places address autocomplete in the booking flow. Requires
+  `VITE_GOOGLE_MAPS_API_KEY` (or the existing
+  `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY`) with **Maps JavaScript
+  API + Directions API + Places API enabled**, billing on, and the app's
+  domains added to the key's HTTP-referrer allowlist.
+
+Both engines take the same props and are driven by the same
+`useDriverLocation` stream. If Google is selected but its key is rejected at
+render time (bad referrer, billing, quota — Google's `gm_authFailure`), the
+map **auto-falls back to Leaflet**, so users never see Google's error card.
+
 ## Scaling notes
 
 Realtime fan-out is handled by Supabase's infrastructure; the client tier is
