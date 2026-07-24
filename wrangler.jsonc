@@ -6,5 +6,5 @@
   "observability": {
     "enabled": false
   }
-  "main": "src/server.ts",
+  "main" "src/server.ts",
 }
