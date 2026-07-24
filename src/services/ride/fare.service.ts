@@ -1,25 +1,40 @@
 import type { FareEstimate, RideOption, RouteEstimate } from "@/types/ride";
+import { pricingService } from "@/services/pricing";
+import type { FareBreakdown } from "@/services/pricing";
 
 export interface IFareService {
   estimate(route: RouteEstimate, option: RideOption): Promise<FareEstimate>;
 }
 
-const round = (n: number) => Math.round(n / 10) * 10;
+/** Adapts the engine's FareBreakdown to the UI-facing FareEstimate shape. */
+export function toFareEstimate(b: FareBreakdown): FareEstimate {
+  return {
+    currency: b.currency,
+    baseFare: b.baseFare,
+    distanceCost: b.distanceCost,
+    timeCost: b.timeCost,
+    bookingFee: b.bookingFee,
+    surge: b.surge,
+    discount: b.discount,
+    total: b.passengerTotal,
+  };
+}
 
 /**
- * v1 pricing — the single source of truth for fares. Pure and deterministic
- * so it can be unit-tested and, if ever moved server-side, ported verbatim.
- * base 180×mult + 55/km×mult + 8/min×mult + 50 booking fee, KES, rounded to 10.
+ * v1 fare estimate. This is now a thin adapter over the centralized Pricing
+ * Engine (`@/services/pricing`) — the engine is the single source of truth, so
+ * there is exactly one fare formula on the platform. Kept pure and
+ * deterministic; the signature is unchanged so existing callers are untouched.
  */
 export function computeFare(route: RouteEstimate, option: RideOption): FareEstimate {
-  const baseFare = round(180 * option.baseMultiplier);
-  const distanceCost = round(route.distanceKm * 55 * option.baseMultiplier);
-  const timeCost = round(route.durationMin * 8 * option.baseMultiplier);
-  const bookingFee = 50;
-  const surge = 0;
-  const discount = 0;
-  const total = baseFare + distanceCost + timeCost + bookingFee + surge - discount;
-  return { currency: "KES", baseFare, distanceCost, timeCost, bookingFee, surge, discount, total };
+  return toFareEstimate(
+    pricingService.quote({
+      distanceKm: route.distanceKm,
+      durationMin: route.durationMin,
+      category: option.id,
+      categoryMultiplier: option.baseMultiplier,
+    }),
+  );
 }
 
 class MockFareService implements IFareService {
