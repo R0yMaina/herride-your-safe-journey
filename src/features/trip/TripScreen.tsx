@@ -6,6 +6,7 @@ import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/comp
 import { useRide } from "./hooks/useRide";
 import { useDriverLocation } from "./hooks/useDriverLocation";
 import { StatusTimeline } from "./components/StatusTimeline";
+import { LiveTripMap } from "./components/LiveTripMap";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService } from "@/services/ride";
 import { safetyService } from "@/services/safety";
@@ -106,6 +107,15 @@ export function TripScreen({ rideId }: { rideId: string }) {
                   : "On your way"
           }
         />
+
+        {!cancelled && (
+          <LiveTripMap
+            pickup={ride.pickup}
+            destination={ride.destination}
+            driver={driverLocation}
+            phase={ride.status === "in_progress" ? "on_trip" : "to_pickup"}
+          />
+        )}
 
         <GlassCard className="space-y-1">
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Route</p>
