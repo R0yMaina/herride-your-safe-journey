@@ -11,6 +11,8 @@ import {
   Section,
 } from "@/components/common";
 import { walletService, type WalletTransaction } from "@/services/wallet";
+import { payoutService } from "@/services/payouts";
+import { useAuthStore } from "@/store/auth.store";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 
 const TYPE_LABEL: Record<string, string> = {
@@ -19,7 +21,53 @@ const TYPE_LABEL: Record<string, string> = {
   topup: "Top-up",
   refund: "Refund",
   commission: "Commission",
+  withdrawal: "Payout",
+  adjustment: "Adjustment",
 };
+
+function DriverPayoutPanel() {
+  const queryClient = useQueryClient();
+  const { data: summary } = useQuery({
+    queryKey: ["payouts", "summary"],
+    queryFn: () => payoutService.getSummary(),
+  });
+  const cashOut = useMutation({
+    mutationFn: () => payoutService.requestPayout(summary?.available ?? 0, "mpesa"),
+    onSuccess: () => {
+      toast.success("Payout requested");
+      void queryClient.invalidateQueries({ queryKey: ["payouts"] });
+      void queryClient.invalidateQueries({ queryKey: ["wallet"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Payout failed"),
+  });
+  const available = summary?.available ?? 0;
+  return (
+    <Section title="Driver payouts">
+      <GlassCard className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">Available</p>
+            <p className="font-display text-xl text-foreground">{formatCurrency(available)}</p>
+          </div>
+          {(summary?.pending ?? 0) > 0 && (
+            <p className="text-xs text-muted-foreground">
+              {formatCurrency(summary?.pending ?? 0)} pending
+            </p>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => cashOut.mutate()}
+          disabled={cashOut.isPending || available <= 0}
+          className="inline-flex items-center gap-2 rounded-full bg-gradient-pink px-4 py-2 text-sm font-semibold text-noir disabled:opacity-50"
+        >
+          <ArrowUpRight className="h-4 w-4" />
+          {cashOut.isPending ? "Requesting…" : "Cash out to M-Pesa"}
+        </button>
+      </GlassCard>
+    </Section>
+  );
+}
 
 function TxRow({ tx }: { tx: WalletTransaction }) {
   const credit = tx.amount >= 0;
@@ -54,6 +102,7 @@ function TxRow({ tx }: { tx: WalletTransaction }) {
 
 export function WalletScreen() {
   const queryClient = useQueryClient();
+  const isDriver = useAuthStore((s) => s.hasRole("driver"));
   const { data: wallet } = useQuery({
     queryKey: ["wallet", "balance"],
     queryFn: () => walletService.getBalance(),
@@ -101,6 +150,8 @@ export function WalletScreen() {
             <Plus className="h-4 w-4" /> {topUp.isPending ? "Adding…" : "Add KES 1,000"}
           </button>
         </GlassCard>
+
+        {isDriver && <DriverPayoutPanel />}
 
         <Section title="Recent activity">
           {isLoading ? (

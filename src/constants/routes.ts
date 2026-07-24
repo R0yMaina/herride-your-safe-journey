@@ -20,6 +20,7 @@ export const ROUTES = Object.freeze({
   book: "/book",
   searching: "/searching",
   driver: "/driver",
+  adminFinance: "/admin/finance",
 });
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

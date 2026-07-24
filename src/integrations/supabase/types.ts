@@ -450,6 +450,9 @@ export type Database = {
           created_at: string;
           description: string | null;
           id: string;
+          idempotency_key: string | null;
+          metadata: Json;
+          reference: string | null;
           ride_id: string | null;
           status: Database["public"]["Enums"]["transaction_status"];
           type: Database["public"]["Enums"]["transaction_type"];
@@ -461,6 +464,9 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
+          idempotency_key?: string | null;
+          metadata?: Json;
+          reference?: string | null;
           ride_id?: string | null;
           status?: Database["public"]["Enums"]["transaction_status"];
           type: Database["public"]["Enums"]["transaction_type"];
@@ -472,10 +478,111 @@ export type Database = {
           created_at?: string;
           description?: string | null;
           id?: string;
+          idempotency_key?: string | null;
+          metadata?: Json;
+          reference?: string | null;
           ride_id?: string | null;
           status?: Database["public"]["Enums"]["transaction_status"];
           type?: Database["public"]["Enums"]["transaction_type"];
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      payment_intents: {
+        Row: {
+          amount: number;
+          created_at: string;
+          currency: string;
+          id: string;
+          idempotency_key: string | null;
+          metadata: Json;
+          method: Database["public"]["Enums"]["payment_method"];
+          passenger_id: string;
+          provider: string | null;
+          provider_ref: string | null;
+          ride_id: string | null;
+          status: Database["public"]["Enums"]["payment_status"];
+          updated_at: string;
+        };
+        Insert: {
+          amount: number;
+          created_at?: string;
+          currency?: string;
+          id?: string;
+          idempotency_key?: string | null;
+          metadata?: Json;
+          method: Database["public"]["Enums"]["payment_method"];
+          passenger_id: string;
+          provider?: string | null;
+          provider_ref?: string | null;
+          ride_id?: string | null;
+          status?: Database["public"]["Enums"]["payment_status"];
+          updated_at?: string;
+        };
+        Update: {
+          amount?: number;
+          currency?: string;
+          metadata?: Json;
+          provider?: string | null;
+          provider_ref?: string | null;
+          status?: Database["public"]["Enums"]["payment_status"];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      payouts: {
+        Row: {
+          amount: number;
+          destination: string | null;
+          driver_user_id: string;
+          id: string;
+          method: Database["public"]["Enums"]["payment_method"];
+          processed_at: string | null;
+          reference: string | null;
+          requested_at: string;
+          status: Database["public"]["Enums"]["payout_status"];
+        };
+        Insert: {
+          amount: number;
+          destination?: string | null;
+          driver_user_id: string;
+          id?: string;
+          method?: Database["public"]["Enums"]["payment_method"];
+          processed_at?: string | null;
+          reference?: string | null;
+          requested_at?: string;
+          status?: Database["public"]["Enums"]["payout_status"];
+        };
+        Update: {
+          processed_at?: string | null;
+          reference?: string | null;
+          status?: Database["public"]["Enums"]["payout_status"];
+        };
+        Relationships: [];
+      };
+      platform_ledger: {
+        Row: {
+          commission: number;
+          commission_rate: number;
+          created_at: string;
+          currency: string;
+          driver_payout: number;
+          gross_fare: number;
+          id: string;
+          ride_id: string | null;
+        };
+        Insert: {
+          commission: number;
+          commission_rate: number;
+          created_at?: string;
+          currency?: string;
+          driver_payout: number;
+          gross_fare: number;
+          id?: string;
+          ride_id?: string | null;
+        };
+        Update: {
+          [_ in never]: never;
         };
         Relationships: [];
       };
@@ -586,6 +693,31 @@ export type Database = {
         Args: { _amount: number };
         Returns: Database["public"]["Tables"]["wallets"]["Row"];
       };
+      request_payout: {
+        Args: {
+          _amount: number;
+          _method?: Database["public"]["Enums"]["payment_method"];
+          _destination?: string;
+        };
+        Returns: Database["public"]["Tables"]["payouts"]["Row"];
+      };
+      refund_ride: {
+        Args: { _ride_id: string; _amount: number; _reason?: string };
+        Returns: Database["public"]["Tables"]["transactions"]["Row"];
+      };
+      get_financial_summary: {
+        Args: { _since?: string };
+        Returns: {
+          gross_revenue: number;
+          commission_revenue: number;
+          driver_earnings: number;
+          refunds: number;
+          payouts_paid: number;
+          payouts_pending: number;
+          completed_rides: number;
+          average_fare: number;
+        }[];
+      };
       raise_sos: {
         Args: { _ride_id: string; _lat?: number; _lng?: number; _notes?: string };
         Returns: Database["public"]["Tables"]["sos_alerts"]["Row"];
@@ -614,8 +746,24 @@ export type Database = {
         | "completed"
         | "cancelled";
       sos_status: "active" | "acknowledged" | "resolved" | "false_alarm";
-      transaction_type: "ride_payment" | "ride_payout" | "topup" | "refund" | "commission";
+      transaction_type:
+        | "ride_payment"
+        | "ride_payout"
+        | "topup"
+        | "refund"
+        | "commission"
+        | "withdrawal"
+        | "adjustment";
       transaction_status: "pending" | "completed" | "failed";
+      payment_method: "cash" | "mpesa" | "card" | "wallet";
+      payment_status:
+        | "requires_payment"
+        | "authorized"
+        | "captured"
+        | "failed"
+        | "refunded"
+        | "cancelled";
+      payout_status: "pending" | "processing" | "paid" | "failed";
     };
     CompositeTypes: {
       [_ in never]: never;
