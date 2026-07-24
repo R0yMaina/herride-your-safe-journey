@@ -100,7 +100,10 @@ BEGIN
   RETURN expired;
 END; $$;
 
-REVOKE EXECUTE ON FUNCTION public.expire_stale_ride_requests(int) FROM anon, authenticated;
+-- Revoke from PUBLIC (functions are granted to PUBLIC by default, so
+-- revoking only anon/authenticated would leave it callable). Only the
+-- postgres/service_role and pg_cron job should invoke this.
+REVOKE EXECUTE ON FUNCTION public.expire_stale_ride_requests(int) FROM PUBLIC, anon, authenticated;
 
 -- Schedule it every minute where pg_cron is available (Supabase:
 -- Dashboard -> Database -> Extensions -> enable pg_cron first).
