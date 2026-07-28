@@ -14,9 +14,11 @@ import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DriverIndexRouteImport } from './routes/driver.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as DriverApplyRouteImport } from './routes/driver_.apply'
 import { Route as DriverTripsRouteImport } from './routes/driver.trips'
@@ -67,6 +69,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
@@ -80,6 +87,11 @@ const DriverIndexRoute = DriverIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DriverRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
@@ -157,14 +169,14 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   getParentRoute: () => AuthRoute,
 } as any)
 const AdminFinanceRoute = AdminFinanceRouteImport.update({
-  id: '/admin/finance',
-  path: '/admin/finance',
-  getParentRoute: () => rootRouteImport,
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminDriversRoute = AdminDriversRouteImport.update({
-  id: '/admin/drivers',
-  path: '/admin/drivers',
-  getParentRoute: () => rootRouteImport,
+  id: '/drivers',
+  path: '/drivers',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
@@ -204,6 +216,7 @@ const AppTripRideIdRoute = AppTripRideIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -232,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/driver/trips': typeof DriverTripsRoute
   '/driver/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
+  '/admin/': typeof AdminIndexRoute
   '/driver/': typeof DriverIndexRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
@@ -264,6 +278,7 @@ export interface FileRoutesByTo {
   '/driver/trips': typeof DriverTripsRoute
   '/driver/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
+  '/admin': typeof AdminIndexRoute
   '/driver': typeof DriverIndexRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
@@ -271,6 +286,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
+  '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
   '/onboarding': typeof OnboardingRoute
@@ -299,6 +315,7 @@ export interface FileRoutesById {
   '/driver/trips': typeof DriverTripsRoute
   '/driver_/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
+  '/admin/': typeof AdminIndexRoute
   '/driver/': typeof DriverIndexRoute
   '/_app/trip/$rideId': typeof AppTripRideIdRoute
 }
@@ -306,6 +323,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/auth'
     | '/driver'
     | '/onboarding'
@@ -334,6 +352,7 @@ export interface FileRouteTypes {
     | '/driver/trips'
     | '/driver/apply'
     | '/share/$token'
+    | '/admin/'
     | '/driver/'
     | '/trip/$rideId'
   fileRoutesByTo: FileRoutesByTo
@@ -366,12 +385,14 @@ export interface FileRouteTypes {
     | '/driver/trips'
     | '/driver/apply'
     | '/share/$token'
+    | '/admin'
     | '/driver'
     | '/trip/$rideId'
   id:
     | '__root__'
     | '/'
     | '/_app'
+    | '/admin'
     | '/auth'
     | '/driver'
     | '/onboarding'
@@ -400,6 +421,7 @@ export interface FileRouteTypes {
     | '/driver/trips'
     | '/driver_/apply'
     | '/share/$token'
+    | '/admin/'
     | '/driver/'
     | '/_app/trip/$rideId'
   fileRoutesById: FileRoutesById
@@ -407,13 +429,12 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
+  AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   DriverRoute: typeof DriverRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
-  AdminDriversRoute: typeof AdminDriversRoute
-  AdminFinanceRoute: typeof AdminFinanceRoute
   DriverApplyRoute: typeof DriverApplyRoute
   ShareTokenRoute: typeof ShareTokenRoute
 }
@@ -455,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -475,6 +503,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/driver/'
       preLoaderRoute: typeof DriverIndexRouteImport
       parentRoute: typeof DriverRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/share/$token': {
       id: '/share/$token'
@@ -583,17 +618,17 @@ declare module '@tanstack/react-router' {
     }
     '/admin/finance': {
       id: '/admin/finance'
-      path: '/admin/finance'
+      path: '/finance'
       fullPath: '/admin/finance'
       preLoaderRoute: typeof AdminFinanceRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/drivers': {
       id: '/admin/drivers'
-      path: '/admin/drivers'
+      path: '/drivers'
       fullPath: '/admin/drivers'
       preLoaderRoute: typeof AdminDriversRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/_app/wallet': {
       id: '/_app/wallet'
@@ -669,6 +704,20 @@ const AppRouteChildren: AppRouteChildren = {
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
+interface AdminRouteChildren {
+  AdminDriversRoute: typeof AdminDriversRoute
+  AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminDriversRoute: AdminDriversRoute,
+  AdminFinanceRoute: AdminFinanceRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+
 interface AuthRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLogoutRoute: typeof AuthLogoutRoute
@@ -717,13 +766,12 @@ const DriverRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
+  AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   DriverRoute: DriverRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,
-  AdminDriversRoute: AdminDriversRoute,
-  AdminFinanceRoute: AdminFinanceRoute,
   DriverApplyRoute: DriverApplyRoute,
   ShareTokenRoute: ShareTokenRoute,
 }

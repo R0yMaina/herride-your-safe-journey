@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { AdminFinanceScreen } from "@/features/admin/AdminFinanceScreen";
 
 export const Route = createFileRoute("/admin/finance")({
@@ -9,13 +8,5 @@ export const Route = createFileRoute("/admin/finance")({
       { name: "description", content: "HeRide financial overview for administrators." },
     ],
   }),
-  component: AdminFinanceRoute,
+  component: AdminFinanceScreen,
 });
-
-function AdminFinanceRoute() {
-  return (
-    <ProtectedRoute roles={["admin"]}>
-      <AdminFinanceScreen />
-    </ProtectedRoute>
-  );
-}

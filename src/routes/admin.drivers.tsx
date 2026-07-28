@@ -1,5 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ProtectedRoute } from "@/components/guards/ProtectedRoute";
 import { AdminDriversScreen } from "@/features/admin/AdminDriversScreen";
 
 export const Route = createFileRoute("/admin/drivers")({
@@ -9,13 +8,5 @@ export const Route = createFileRoute("/admin/drivers")({
       { name: "description", content: "Verify HeRide driver applications." },
     ],
   }),
-  component: AdminDriversRoute,
+  component: AdminDriversScreen,
 });
-
-function AdminDriversRoute() {
-  return (
-    <ProtectedRoute roles={["admin"]}>
-      <AdminDriversScreen />
-    </ProtectedRoute>
-  );
-}
