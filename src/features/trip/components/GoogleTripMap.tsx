@@ -24,10 +24,10 @@ const LIGHT_STYLE: google.maps.MapTypeStyle[] = [
 function svgIcon(g: typeof google, kind: "pickup" | "dest" | "driver"): google.maps.Icon {
   const svg =
     kind === "driver"
-      ? `<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='11' fill='%23ff5c9d' stroke='%23ffffff' stroke-opacity='0.5' stroke-width='2'/></svg>`
+      ? `<svg xmlns='http://www.w3.org/2000/svg' width='36' height='36'><circle cx='18' cy='18' r='11' fill='%23c7a76c' stroke='%23141414' stroke-opacity='0.6' stroke-width='2'/></svg>`
       : kind === "pickup"
-        ? `<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><circle cx='11' cy='11' r='6' fill='%23ff6fa5'/></svg>`
-        : `<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><circle cx='11' cy='11' r='6' fill='none' stroke='%23f7a8c4' stroke-width='3'/></svg>`;
+        ? `<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><circle cx='11' cy='11' r='6' fill='%23c7a76c' stroke='%23141414' stroke-opacity='0.5' stroke-width='1.5'/></svg>`
+        : `<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22'><circle cx='11' cy='11' r='6' fill='none' stroke='%238a7040' stroke-width='3'/></svg>`;
   const size = kind === "driver" ? 36 : 22;
   return {
     url: `data:image/svg+xml;utf8,${svg}`,
@@ -149,7 +149,7 @@ export function GoogleTripMap({
           map,
           suppressMarkers: true,
           preserveViewport: true,
-          polylineOptions: { strokeColor: "#ff6fa5", strokeWeight: 4, strokeOpacity: 0.9 },
+          polylineOptions: { strokeColor: "#c7a76c", strokeWeight: 4, strokeOpacity: 0.95 },
         });
         stateRef.current = {
           g,

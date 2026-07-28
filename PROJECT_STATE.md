@@ -44,6 +44,7 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 | phase6-audit-hardening.sql | ⏳ user must run (token-enumeration fix) |
 | phase7-dispatch.sql | ⏳ user must run (busy drivers, location RLS, expiry) |
 | phase8-financials.sql | ⏳ user must run (immutable ledger, payouts, refunds, admin summary) |
+| phase9-pricing-authority.sql | ⏳ user must run (pricing_config, server-side quote_fare, 10% commission) |
 | seed.sql | optional |
 
 ## Known gaps / deliberate v1 scope

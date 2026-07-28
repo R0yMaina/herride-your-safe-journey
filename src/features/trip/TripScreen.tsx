@@ -7,6 +7,7 @@ import { useRide } from "./hooks/useRide";
 import { useDriverLocation } from "./hooks/useDriverLocation";
 import { StatusTimeline } from "./components/StatusTimeline";
 import { TripMap } from "./components/TripMap";
+import { TripReceipt } from "./components/TripReceipt";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService } from "@/services/ride";
 import { safetyService } from "@/services/safety";
@@ -179,12 +180,17 @@ export function TripScreen({ rideId }: { rideId: string }) {
         )}
 
         {completed && (
-          <GlassCard className="space-y-1 text-center">
-            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Fare charged</p>
-            <p className="font-display text-3xl text-foreground">
-              {formatCurrency(ride.fareFinal ?? ride.fareEstimate ?? 0)}
-            </p>
-          </GlassCard>
+          <>
+            <GlassCard className="space-y-1 text-center">
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                Fare charged
+              </p>
+              <p className="font-display text-3xl text-foreground">
+                {formatCurrency(ride.fareFinal ?? ride.fareEstimate ?? 0)}
+              </p>
+            </GlassCard>
+            <TripReceipt rideId={rideId} />
+          </>
         )}
 
         <div className="flex flex-col gap-2">
