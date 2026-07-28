@@ -7,7 +7,7 @@ export function SplashScreen() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-noir px-6">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[420px] w-[420px] rounded-full bg-primary-glow/10 blur-3xl" />
+        <div className="h-[420px] w-[420px] rounded-full bg-ambient-blob blur-3xl" />
       </div>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
