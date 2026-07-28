@@ -1083,6 +1083,20 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["drivers"]["Row"];
       };
+      driver_earnings: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          today: number;
+          week: number;
+          lifetime: number;
+          trips_today: number;
+          trips_week: number;
+          trips_lifetime: number;
+          tips_week: number;
+          commission_week: number;
+          currency: string;
+        }[];
+      };
       start_trip_with_pin: {
         Args: { _ride_id: string; _pin: string };
         Returns: Database["public"]["Tables"]["rides"]["Row"];

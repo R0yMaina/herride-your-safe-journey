@@ -21,6 +21,9 @@ export const ROUTES = Object.freeze({
   searching: "/searching",
   driver: "/driver",
   driverApply: "/driver/apply",
+  driverEarnings: "/driver/earnings",
+  driverTrips: "/driver/trips",
+  driverProfile: "/driver/profile",
   adminFinance: "/admin/finance",
 });
 

@@ -16,8 +16,12 @@ import { Route as DriverRouteImport } from './routes/driver'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DriverIndexRouteImport } from './routes/driver.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
 import { Route as DriverApplyRouteImport } from './routes/driver_.apply'
+import { Route as DriverTripsRouteImport } from './routes/driver.trips'
+import { Route as DriverProfileRouteImport } from './routes/driver.profile'
+import { Route as DriverEarningsRouteImport } from './routes/driver.earnings'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
@@ -71,6 +75,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DriverIndexRoute = DriverIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DriverRoute,
+} as any)
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
@@ -80,6 +89,21 @@ const DriverApplyRoute = DriverApplyRouteImport.update({
   id: '/driver_/apply',
   path: '/driver/apply',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DriverTripsRoute = DriverTripsRouteImport.update({
+  id: '/trips',
+  path: '/trips',
+  getParentRoute: () => DriverRoute,
+} as any)
+const DriverProfileRoute = DriverProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => DriverRoute,
+} as any)
+const DriverEarningsRoute = DriverEarningsRouteImport.update({
+  id: '/earnings',
+  path: '/earnings',
+  getParentRoute: () => DriverRoute,
 } as any)
 const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -175,7 +199,7 @@ const AppTripRideIdRoute = AppTripRideIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
-  '/driver': typeof DriverRoute
+  '/driver': typeof DriverRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -196,14 +220,17 @@ export interface FileRoutesByFullPath {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/driver/earnings': typeof DriverEarningsRoute
+  '/driver/profile': typeof DriverProfileRoute
+  '/driver/trips': typeof DriverTripsRoute
   '/driver/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
+  '/driver/': typeof DriverIndexRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRouteWithChildren
-  '/driver': typeof DriverRoute
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -224,8 +251,12 @@ export interface FileRoutesByTo {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/driver/earnings': typeof DriverEarningsRoute
+  '/driver/profile': typeof DriverProfileRoute
+  '/driver/trips': typeof DriverTripsRoute
   '/driver/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
+  '/driver': typeof DriverIndexRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRoutesById {
@@ -233,7 +264,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
-  '/driver': typeof DriverRoute
+  '/driver': typeof DriverRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -254,8 +285,12 @@ export interface FileRoutesById {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/driver/earnings': typeof DriverEarningsRoute
+  '/driver/profile': typeof DriverProfileRoute
+  '/driver/trips': typeof DriverTripsRoute
   '/driver_/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
+  '/driver/': typeof DriverIndexRoute
   '/_app/trip/$rideId': typeof AppTripRideIdRoute
 }
 export interface FileRouteTypes {
@@ -284,14 +319,17 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/driver/earnings'
+    | '/driver/profile'
+    | '/driver/trips'
     | '/driver/apply'
     | '/share/$token'
+    | '/driver/'
     | '/trip/$rideId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
-    | '/driver'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -312,8 +350,12 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/driver/earnings'
+    | '/driver/profile'
+    | '/driver/trips'
     | '/driver/apply'
     | '/share/$token'
+    | '/driver'
     | '/trip/$rideId'
   id:
     | '__root__'
@@ -341,8 +383,12 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/driver/earnings'
+    | '/driver/profile'
+    | '/driver/trips'
     | '/driver_/apply'
     | '/share/$token'
+    | '/driver/'
     | '/_app/trip/$rideId'
   fileRoutesById: FileRoutesById
 }
@@ -350,7 +396,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
-  DriverRoute: typeof DriverRoute
+  DriverRoute: typeof DriverRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
@@ -410,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/driver/': {
+      id: '/driver/'
+      path: '/'
+      fullPath: '/driver/'
+      preLoaderRoute: typeof DriverIndexRouteImport
+      parentRoute: typeof DriverRoute
+    }
     '/share/$token': {
       id: '/share/$token'
       path: '/share/$token'
@@ -423,6 +476,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/driver/apply'
       preLoaderRoute: typeof DriverApplyRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/driver/trips': {
+      id: '/driver/trips'
+      path: '/trips'
+      fullPath: '/driver/trips'
+      preLoaderRoute: typeof DriverTripsRouteImport
+      parentRoute: typeof DriverRoute
+    }
+    '/driver/profile': {
+      id: '/driver/profile'
+      path: '/profile'
+      fullPath: '/driver/profile'
+      preLoaderRoute: typeof DriverProfileRouteImport
+      parentRoute: typeof DriverRoute
+    }
+    '/driver/earnings': {
+      id: '/driver/earnings'
+      path: '/earnings'
+      fullPath: '/driver/earnings'
+      preLoaderRoute: typeof DriverEarningsRouteImport
+      parentRoute: typeof DriverRoute
     }
     '/auth/verify-email': {
       id: '/auth/verify-email'
@@ -603,11 +677,28 @@ const AuthRouteChildren: AuthRouteChildren = {
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
+interface DriverRouteChildren {
+  DriverEarningsRoute: typeof DriverEarningsRoute
+  DriverProfileRoute: typeof DriverProfileRoute
+  DriverTripsRoute: typeof DriverTripsRoute
+  DriverIndexRoute: typeof DriverIndexRoute
+}
+
+const DriverRouteChildren: DriverRouteChildren = {
+  DriverEarningsRoute: DriverEarningsRoute,
+  DriverProfileRoute: DriverProfileRoute,
+  DriverTripsRoute: DriverTripsRoute,
+  DriverIndexRoute: DriverIndexRoute,
+}
+
+const DriverRouteWithChildren =
+  DriverRoute._addFileChildren(DriverRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
-  DriverRoute: DriverRoute,
+  DriverRoute: DriverRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,
