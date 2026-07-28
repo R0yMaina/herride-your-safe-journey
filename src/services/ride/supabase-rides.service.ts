@@ -20,6 +20,16 @@ export class SupabaseRidesService implements IRidesService {
     return data ? mapRideRow(data) : null;
   }
 
+  async getPickupPin(rideId: string): Promise<string | null> {
+    const { data, error } = await supabase
+      .from("ride_pins")
+      .select("pin")
+      .eq("ride_id", rideId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return data?.pin ?? null;
+  }
+
   subscribe(id: string, onChange: (ride: RideRecord) => void): RideSubscription {
     const channel = supabase
       .channel(`ride:${id}`)

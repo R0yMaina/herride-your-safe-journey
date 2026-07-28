@@ -50,6 +50,11 @@ export interface IDriverService {
   claim(rideId: string): Promise<RideRecord>;
   /** Advance a ride the driver owns to the next legal status. */
   transition(rideId: string, next: RideStatus): Promise<RideRecord>;
+  /**
+   * Start the trip by entering the rider's 4-digit pickup PIN (HerShield).
+   * The DB refuses arrived → in_progress through any other path.
+   */
+  startTripWithPin(rideId: string, pin: string): Promise<RideRecord>;
   getPublicDriver(userId: string): Promise<PublicDriver | null>;
   /** Last known position of a driver (passenger-side; RLS-gated). */
   getDriverLocation(driverUserId: string): Promise<DriverLiveLocation | null>;
@@ -93,6 +98,10 @@ export class MockDriverService implements IDriverService {
   async transition(): Promise<RideRecord> {
     await delay();
     throw new Error("Mock driver cannot transition rides");
+  }
+  async startTripWithPin(): Promise<RideRecord> {
+    await delay();
+    throw new Error("Mock driver cannot start trips");
   }
   async getPublicDriver(): Promise<PublicDriver | null> {
     await delay();

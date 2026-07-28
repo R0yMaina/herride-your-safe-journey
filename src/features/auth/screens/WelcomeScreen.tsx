@@ -1,12 +1,21 @@
 import { motion } from "framer-motion";
-import { Link } from "@tanstack/react-router";
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { Link, useNavigate } from "@tanstack/react-router";
+import { CarFront, ShieldCheck, Sparkles } from "lucide-react";
 import { HeRideMark } from "@/components/brand/HeRideMark";
 import { PrimaryButton } from "../components/PrimaryButton";
+import { setSignupIntent } from "../lib/signup-intent";
 import { ROUTES } from "@/constants/routes";
 import { appConfig } from "@/config/app.config";
 
 export function WelcomeScreen() {
+  const navigate = useNavigate();
+
+  // The two doors: same account system, different first-run experience.
+  const enter = (intent: "passenger" | "driver") => {
+    setSignupIntent(intent);
+    void navigate({ to: ROUTES.signUp });
+  };
+
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-noir">
       <div className="pointer-events-none absolute inset-0">
@@ -69,9 +78,14 @@ export function WelcomeScreen() {
           transition={{ duration: 0.5, delay: 0.3 }}
           className="mt-auto space-y-3 pt-10"
         >
-          <Link to={ROUTES.signUp}>
-            <PrimaryButton>Create account</PrimaryButton>
-          </Link>
+          <PrimaryButton onClick={() => enter("passenger")}>Ride with HeRide</PrimaryButton>
+          <PrimaryButton
+            variant="ghost"
+            leading={<CarFront className="h-4 w-4 text-primary" />}
+            onClick={() => enter("driver")}
+          >
+            Drive with HeRide — earn on your terms
+          </PrimaryButton>
           <Link to={ROUTES.signIn}>
             <PrimaryButton variant="ghost">I already have an account</PrimaryButton>
           </Link>

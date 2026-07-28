@@ -12,7 +12,7 @@ import { RatingSheet } from "./components/RatingSheet";
 import { TripChatSheet } from "./components/TripChatSheet";
 import { useAuth } from "@/hooks/useAuth";
 import { driverService, type PublicDriver } from "@/services/driver";
-import { rideRequestService } from "@/services/ride";
+import { rideRequestService, ridesService } from "@/services/ride";
 import { safetyService } from "@/services/safety";
 import { ROUTES } from "@/constants/routes";
 import { formatCurrency } from "@/features/ride-request/lib/format";
@@ -26,6 +26,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
   const navigate = useNavigate();
   const [driver, setDriver] = useState<PublicDriver | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [pin, setPin] = useState<string | null>(null);
   const streamLocation =
     ride?.driverId && LIVE_LOCATION_STATUSES.includes(ride.status) ? ride.driverId : null;
   const driverLocation = useDriverLocation(streamLocation);
@@ -35,6 +36,18 @@ export function TripScreen({ rideId }: { rideId: string }) {
       void driverService.getPublicDriver(ride.driverId).then(setDriver);
     }
   }, [ride?.driverId]);
+
+  // HerShield pickup PIN — readable by the passenger only (RLS); shown until
+  // the trip starts so she can read it to her driver.
+  const awaitingPickup = ride?.status === "accepted" || ride?.status === "arrived";
+  const isPassenger = user?.id === ride?.passengerId;
+  useEffect(() => {
+    if (!awaitingPickup || !isPassenger) return;
+    void ridesService
+      .getPickupPin(rideId)
+      .then(setPin)
+      .catch(() => {});
+  }, [awaitingPickup, isPassenger, rideId]);
 
   const cancel = async () => {
     try {
@@ -159,6 +172,19 @@ export function TripScreen({ rideId }: { rideId: string }) {
                 <MessageCircle className="h-5 w-5" />
               </button>
             )}
+          </GlassCard>
+        )}
+
+        {pin && awaitingPickup && isPassenger && (
+          <GlassCard className="space-y-1 text-center">
+            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+              Your pickup PIN
+            </p>
+            <p className="font-display text-4xl tracking-[0.35em] text-primary">{pin}</p>
+            <p className="text-xs text-muted-foreground">
+              Only give this code to your driver once you're safely in the right car — the trip
+              can't start without it.
+            </p>
           </GlassCard>
         )}
 

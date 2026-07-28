@@ -328,6 +328,35 @@ export type Database = {
           },
         ];
       };
+      ride_pins: {
+        Row: {
+          created_at: string;
+          failed_attempts: number;
+          pin: string;
+          ride_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          failed_attempts?: number;
+          pin: string;
+          ride_id: string;
+        };
+        Update: {
+          created_at?: string;
+          failed_attempts?: number;
+          pin?: string;
+          ride_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ride_pins_ride_id_fkey";
+            columns: ["ride_id"];
+            isOneToOne: true;
+            referencedRelation: "rides";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       ride_ratings: {
         Row: {
           comment: string | null;
@@ -1027,6 +1056,70 @@ export type Database = {
       redeem_referral: {
         Args: { _code: string };
         Returns: undefined;
+      };
+      apply_as_driver: {
+        Args: {
+          _license_number: string;
+          _national_id: string;
+          _vehicle_make: string;
+          _vehicle_model: string;
+          _vehicle_plate: string;
+          _vehicle_color?: string;
+          _vehicle_year?: number;
+          _selfie_url?: string;
+          _id_document_url?: string;
+        };
+        Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      get_my_driver_application: {
+        Args: Record<PropertyKey, never>;
+        Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      set_driver_status: {
+        Args: {
+          _driver_user_id: string;
+          _status: Database["public"]["Enums"]["driver_verification_status"];
+          _reason?: string;
+        };
+        Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      driver_earnings: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          today: number;
+          week: number;
+          lifetime: number;
+          trips_today: number;
+          trips_week: number;
+          trips_lifetime: number;
+          tips_week: number;
+          commission_week: number;
+          currency: string;
+        }[];
+      };
+      start_trip_with_pin: {
+        Args: { _ride_id: string; _pin: string };
+        Returns: Database["public"]["Tables"]["rides"]["Row"];
+      };
+      list_driver_applications: {
+        Args: { _status?: Database["public"]["Enums"]["driver_verification_status"] };
+        Returns: {
+          user_id: string;
+          full_name: string | null;
+          phone: string | null;
+          license_number: string;
+          national_id: string;
+          vehicle_make: string | null;
+          vehicle_model: string | null;
+          vehicle_plate: string | null;
+          vehicle_color: string | null;
+          vehicle_year: number | null;
+          selfie_url: string | null;
+          id_document_url: string | null;
+          verification_status: Database["public"]["Enums"]["driver_verification_status"];
+          rejection_reason: string | null;
+          applied_at: string;
+        }[];
       };
       get_receipt: {
         Args: { _ride_id: string };

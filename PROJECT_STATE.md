@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-Last updated: 2026-07-28 (Phases 11–14 — ratings/tips, chat, growth, trip flexibility).
+Last updated: 2026-07-28 (Phases 15–16 — driver app, HerShield verification, PWA).
 
 ## Live target
 
@@ -52,6 +52,27 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 - **Trip flexibility (Phase 14)** — scheduled rides persisted
   (`scheduled_for`; drivers see them 30 min before pickup), multi-stop rides
   (`waypoints`, max 2 stops, OSRM multi-leg routing priced into the quote).
+- **Two-door onboarding (Phase 15A)** — welcome screen offers "Ride with
+  HeRide" / "Drive with HeRide". Driver applicants submit licence, national
+  ID, vehicle and identity photos (private `driver-docs` bucket) via
+  `apply_as_driver` (female-only, enforced server-side) and track
+  pending/approved/rejected status. `set_driver_status` v2 grants the driver
+  role on verification and revokes it on rejection/suspension.
+- **Pickup PIN — HerShield layer 2 (Phase 15B)** — `ride_pins` (passenger-
+  readable only) issued on driver assignment; `start_trip_with_pin` is the
+  only path arrived → in_progress for PIN'd rides, enforced by a DB trigger.
+  3+ wrong attempts file a high-severity fraud signal.
+- **Driver app (Phase 15C)** — `/driver` is its own shell with its own nav
+  (Drive · Earnings · Trips · Profile). `driver_earnings` RPC powers
+  today/week/lifetime, trips, tips and commission; cash-out to M-Pesa;
+  trip history; driver profile with verification badge and "Switch to riding".
+- **Verification desk (Phase 15D)** — `/admin/drivers`: pending/verified/
+  rejected/suspended queue, documents opened via short-lived signed URLs,
+  approve/reject-with-reason/suspend, all audited.
+- **PWA (Phase 16)** — installable on any phone: manifest (standalone,
+  violet theme, Book/Drive shortcuts), icon set, iOS home-screen meta, and a
+  network-first service worker (ride data is never served stale) with a
+  branded offline page as the only fallback.
 
 ## SQL scripts — application status
 
@@ -69,8 +90,11 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 | phase11-ratings-tips.sql | ⏳ user must run (ratings, compliments, tips, driver-rating trigger) |
 | phase12-chat.sql | ⏳ user must run (ride_messages + Realtime + policies) |
 | phase13-growth.sql | ⏳ user must run (promo codes, referrals, complete_ride v3 with discount) |
-| phase14-trip-flexibility.sql | ⏳ user must run (scheduled_for, waypoints, release window) |
-| seed.sql | optional |
+| phase14-trip-flexibility.sql | ✅ |
+| phase15-driver-onboarding.sql | ⏳ user must run (apply_as_driver, role grant, docs bucket) |
+| phase15b-pickup-pin.sql | ⏳ user must run (ride_pins, start_trip_with_pin, PIN gate) |
+| phase15c-driver-earnings.sql | ⏳ user must run (driver_earnings RPC) |
+| seed.sql | optional (test accounts for local/staging only) |
 
 ## Known gaps / deliberate v1 scope
 

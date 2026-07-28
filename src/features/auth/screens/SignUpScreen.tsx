@@ -11,6 +11,7 @@ import { PrimaryButton } from "../components/PrimaryButton";
 import { signUpSchema, type SignUpInput } from "@/lib/validation/auth.schemas";
 import { COUNTRIES } from "../data/countries";
 import { useSignUp } from "../hooks/useAuthMutations";
+import { takeSignupIntent } from "../lib/signup-intent";
 import { ROUTES } from "@/constants/routes";
 import { EmailVerificationPendingError } from "@/services/auth";
 
@@ -50,7 +51,13 @@ export function SignUpScreen() {
     try {
       await signUp.mutateAsync(values);
       toast.success("Account created");
-      void navigate({ to: ROUTES.verifyEmail, replace: true });
+      // A live session means no email-confirmation step — send driver
+      // applicants straight to the application form.
+      const intent = takeSignupIntent();
+      void navigate({
+        to: intent === "driver" ? ROUTES.driverApply : ROUTES.verifyEmail,
+        replace: true,
+      });
     } catch (err) {
       if (err instanceof EmailVerificationPendingError) {
         // Account exists; Supabase just wants the email confirmed first.

@@ -10,6 +10,7 @@ import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm } from "@/lib/geo";
 import { TripMap } from "@/features/trip/components/TripMap";
 import { TripChatSheet } from "@/features/trip/components/TripChatSheet";
+import { PinPromptSheet } from "./components/PinPromptSheet";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -26,6 +27,7 @@ export function DriverHomeScreen() {
   const [openRides, setOpenRides] = useState<readonly RideRecord[]>([]);
   const [activeRide, setActiveRide] = useState<RideRecord | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
+  const [pinPrompt, setPinPrompt] = useState(false);
   const [position, setPosition] = useState<DriverLocationPing | null>(null);
   const pingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -125,6 +127,12 @@ export function DriverHomeScreen() {
     if (!activeRide) return;
     const step = NEXT_LABEL[activeRide.status];
     if (!step || !canTransition(activeRide.status, step.to)) return;
+    // Starting the trip requires the rider's pickup PIN (HerShield) — the
+    // DB refuses arrived → in_progress through the plain transition path.
+    if (step.to === "in_progress") {
+      setPinPrompt(true);
+      return;
+    }
     setBusy(true);
     try {
       const updated = await driverService.transition(activeRide.id, step.to);
@@ -138,6 +146,21 @@ export function DriverHomeScreen() {
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not update trip");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const startTrip = async (pin: string) => {
+    if (!activeRide) return;
+    setBusy(true);
+    try {
+      const updated = await driverService.startTripWithPin(activeRide.id, pin);
+      setActiveRide(updated);
+      setPinPrompt(false);
+      toast.success("Trip started — drive safe");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start trip");
     } finally {
       setBusy(false);
     }
@@ -219,6 +242,13 @@ export function DriverHomeScreen() {
                 rideId={activeRide.id}
                 counterpartyName="Your rider"
                 onClose={() => setChatOpen(false)}
+              />
+            )}
+            {pinPrompt && (
+              <PinPromptSheet
+                busy={busy}
+                onSubmit={(pin) => void startTrip(pin)}
+                onClose={() => setPinPrompt(false)}
               />
             )}
           </Section>

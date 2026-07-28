@@ -59,6 +59,19 @@ export function ProfileScreen() {
       Icon: Clock,
       to: ROUTES.rides,
     },
+    // Passengers see the door to the driver side; verified drivers get the
+    // dashboard link in the Driver section instead.
+    ...(user?.role === "driver" || user?.role === "admin"
+      ? []
+      : ([
+          {
+            id: "become-driver",
+            label: "Become a driver",
+            sub: "Verified women only — earn on your terms",
+            Icon: Car,
+            to: ROUTES.driverApply,
+          },
+        ] as const)),
     {
       id: "wallet",
       label: "Wallet & payments",
@@ -165,12 +178,40 @@ export function ProfileScreen() {
                 <div className="grid h-10 w-10 place-items-center rounded-2xl bg-primary/15 text-primary">
                   <Car className="h-5 w-5" />
                 </div>
-                <span className="flex-1 font-display text-base text-foreground">
-                  Driver dashboard
+                <span className="min-w-0 flex-1">
+                  <span className="block font-display text-base text-foreground">
+                    Switch to driving
+                  </span>
+                  <span className="block text-xs text-muted-foreground">
+                    Go online and take trips
+                  </span>
                 </span>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
               </GlassCard>
             </Link>
+          </Section>
+        )}
+
+        {user?.role === "admin" && (
+          <Section title="Admin">
+            <div className="space-y-2">
+              {[
+                {
+                  id: "admin-drivers",
+                  label: "Driver verification",
+                  sub: "Review and approve applications",
+                  Icon: ShieldCheck,
+                  to: ROUTES.adminDrivers,
+                },
+                {
+                  id: "admin-finance",
+                  label: "Finance",
+                  sub: "Revenue, commission & payouts",
+                  Icon: Wallet,
+                  to: ROUTES.adminFinance,
+                },
+              ].map(renderRow)}
+            </div>
           </Section>
         )}
 
