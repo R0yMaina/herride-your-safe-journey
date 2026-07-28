@@ -46,6 +46,8 @@ export type MapProvider = "leaflet" | "google";
 export interface MapEnv {
   readonly provider: MapProvider;
   readonly googleApiKey: string;
+  /** Separate key for the Places API (New). Falls back to the Maps key. */
+  readonly googlePlacesApiKey: string;
 }
 
 export interface AppEnv {
@@ -86,6 +88,11 @@ export const env: AppEnv = Object.freeze({
       : "leaflet") as MapProvider,
     googleApiKey: readString(
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
+        import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
+    ),
+    googlePlacesApiKey: readString(
+      import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
+        import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
         import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
     ),
   }),
