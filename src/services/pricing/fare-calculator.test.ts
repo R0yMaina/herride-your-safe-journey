@@ -45,17 +45,17 @@ describe("Pricing Engine — v1 parity", () => {
 });
 
 describe("Pricing Engine — commission split matches settlement", () => {
-  it("splits 530 into 106 commission + 424 driver earnings (20%)", () => {
+  it("splits 530 into 53 commission + 477 driver earnings at the 10% default", () => {
     const q = pricingService.quote(base);
-    expect(q.platformCommission).toBe(106);
-    expect(q.driverEarnings).toBe(424);
+    expect(q.platformCommission).toBe(53);
+    expect(q.driverEarnings).toBe(477);
     expect(q.platformCommission + q.driverEarnings).toBe(q.passengerTotal);
   });
 
   it("honors a per-quote commission override", () => {
-    const q = pricingService.quote({ ...base, commissionRate: 0.1 });
-    expect(q.platformCommission).toBe(53);
-    expect(q.driverEarnings).toBe(477);
+    const q = pricingService.quote({ ...base, commissionRate: 0.2 });
+    expect(q.platformCommission).toBe(106);
+    expect(q.driverEarnings).toBe(424);
   });
 });
 

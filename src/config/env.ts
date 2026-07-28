@@ -30,9 +30,9 @@ export interface PricingEnv {
   readonly rounding: number; // round component costs to nearest N
 }
 
-/** Commission the platform retains. Default 0.20 mirrors the live
- * complete_ride settlement (driver keeps 80%). Configurable, never hardcoded
- * in the calculator. */
+/** Commission the platform retains (driver keeps the rest). Default 0.10 —
+ * kept in sync with the DB pricing_config, which is the settlement authority.
+ * Configurable, never hardcoded in the calculator. */
 export interface FinanceEnv {
   readonly commissionRate: number;
 }
@@ -78,7 +78,7 @@ export const env: AppEnv = Object.freeze({
     rounding: readNumber(import.meta.env.VITE_PRICING_ROUNDING, 10),
   }),
   finance: Object.freeze({
-    commissionRate: readNumber(import.meta.env.VITE_COMMISSION_RATE, 0.2),
+    commissionRate: readNumber(import.meta.env.VITE_COMMISSION_RATE, 0.1),
   }),
   map: Object.freeze({
     provider: (readString(import.meta.env.VITE_MAP_PROVIDER, "leaflet") === "google"

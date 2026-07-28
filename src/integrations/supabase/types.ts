@@ -212,6 +212,7 @@ export type Database = {
         Row: {
           accepted_at: string | null;
           cancellation_reason: string | null;
+          category_multiplier: number | null;
           completed_at: string | null;
           created_at: string;
           distance_km: number | null;
@@ -219,6 +220,7 @@ export type Database = {
           drop_address: string | null;
           drop_lat: number;
           drop_lng: number;
+          duration_min: number | null;
           fare_estimate: number | null;
           fare_final: number | null;
           id: string;
@@ -234,6 +236,7 @@ export type Database = {
         Insert: {
           accepted_at?: string | null;
           cancellation_reason?: string | null;
+          category_multiplier?: number | null;
           completed_at?: string | null;
           created_at?: string;
           distance_km?: number | null;
@@ -241,6 +244,7 @@ export type Database = {
           drop_address?: string | null;
           drop_lat: number;
           drop_lng: number;
+          duration_min?: number | null;
           fare_estimate?: number | null;
           fare_final?: number | null;
           id?: string;
@@ -256,6 +260,7 @@ export type Database = {
         Update: {
           accepted_at?: string | null;
           cancellation_reason?: string | null;
+          category_multiplier?: number | null;
           completed_at?: string | null;
           created_at?: string;
           distance_km?: number | null;
@@ -263,6 +268,7 @@ export type Database = {
           drop_address?: string | null;
           drop_lat?: number;
           drop_lng?: number;
+          duration_min?: number | null;
           fare_estimate?: number | null;
           fare_final?: number | null;
           id?: string;
@@ -273,6 +279,48 @@ export type Database = {
           requested_at?: string;
           started_at?: string | null;
           status?: Database["public"]["Enums"]["ride_status"];
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      pricing_config: {
+        Row: {
+          base_fare: number;
+          booking_fee: number;
+          commission_rate: number;
+          currency: string;
+          id: string;
+          max_fare: number;
+          min_fare: number;
+          per_km: number;
+          per_min: number;
+          rounding: number;
+          updated_at: string;
+        };
+        Insert: {
+          base_fare?: number;
+          booking_fee?: number;
+          commission_rate?: number;
+          currency?: string;
+          id?: string;
+          max_fare?: number;
+          min_fare?: number;
+          per_km?: number;
+          per_min?: number;
+          rounding?: number;
+          updated_at?: string;
+        };
+        Update: {
+          base_fare?: number;
+          booking_fee?: number;
+          commission_rate?: number;
+          currency?: string;
+          id?: string;
+          max_fare?: number;
+          min_fare?: number;
+          per_km?: number;
+          per_min?: number;
+          rounding?: number;
           updated_at?: string;
         };
         Relationships: [];
@@ -688,6 +736,10 @@ export type Database = {
       complete_ride: {
         Args: { _ride_id: string; _commission?: number };
         Returns: Database["public"]["Tables"]["rides"]["Row"];
+      };
+      quote_fare: {
+        Args: { _distance_km: number; _duration_min: number; _category_multiplier?: number };
+        Returns: number;
       };
       wallet_topup: {
         Args: { _amount: number };

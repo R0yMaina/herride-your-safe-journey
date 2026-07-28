@@ -78,8 +78,10 @@ the type, the map, the trigger, and the DB enum together.
 
 ## Dispatch flow (real-time, as built)
 
-1. Passenger inserts a `rides` row (`status='requested'`); fare comes from
-   the pure client-side `FareService` (v1 pricing source of truth).
+1. Passenger inserts a `rides` row (`status='requested'`); the client shows a
+   quote from the Pricing Engine and stores the pricing **inputs** (distance,
+   duration, tier multiplier) on the row. The client fare is a display
+   estimate only — money is decided by the DB (see Money below).
 2. RLS broadcasts the open pool only to **verified female drivers**
    (`is_verified_female_driver`); the female-only guarantee is a DB trigger
    (`enforce_female_only_ride`), not client logic.
@@ -102,8 +104,17 @@ the type, the map, the trigger, and the DB enum together.
 
 Wallet balances are mutated **only** inside `SECURITY DEFINER` functions
 (`complete_ride`, `wallet_topup`). There are no direct client writes to
-`wallets` or `transactions`, ever. Settlement (passenger debit + 80% driver
-payout + a transaction row for each + ride completion) is one DB transaction.
+`wallets` or `transactions`, ever.
+
+**Server-authoritative fare.** `complete_ride` does **not** trust the client's
+`fare_estimate`. It recomputes the fare with `quote_fare(distance, duration,
+tier_multiplier)` — a Postgres function that mirrors the Pricing Engine's
+formula and reads every rate (including the **10% commission**) from the
+`pricing_config` table. A tampered client price cannot move money.
+Settlement (passenger debit + driver payout at `1 − commission` + a
+transaction row for each + a `platform_ledger` row + ride completion) is one
+DB transaction. `pricing_config` is the settlement rate card and is
+admin-writable; keep its values in sync with the client engine's env config.
 
 ## Database change management
 

@@ -11,11 +11,12 @@ const CANCELLABLE_STATUSES = (
   .map(([from]) => from);
 
 /**
- * Creates real ride rows. The fare estimate is computed client-side by
- * FareService (the v1 pricing source of truth) and stored on the row; a
- * server-side recompute would live in an edge function, which is out of
- * scope for v1. The female-only guarantee is enforced by the DB trigger,
- * not here.
+ * Creates real ride rows. `fare_estimate` is the client-side quote from the
+ * Pricing Engine, shown to the passenger — but the pricing INPUTS
+ * (distance, duration, tier multiplier) are also stored so the database can
+ * independently recompute the authoritative fare at settlement (see
+ * quote_fare / complete_ride). The client estimate never decides money. The
+ * female-only guarantee is enforced by the DB trigger, not here.
  */
 export class SupabaseRideRequestService implements IRideRequestService {
   async submit(summary: TripSummary): Promise<RideRequestDraft> {
@@ -37,6 +38,8 @@ export class SupabaseRideRequestService implements IRideRequestService {
         drop_address: summary.destination.address,
         fare_estimate: summary.fare.total,
         distance_km: summary.route.distanceKm,
+        duration_min: summary.route.durationMin,
+        category_multiplier: summary.option.baseMultiplier,
         status: "requested",
       })
       .select("id, created_at")
