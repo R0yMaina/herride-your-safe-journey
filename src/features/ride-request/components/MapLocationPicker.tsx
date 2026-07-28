@@ -14,6 +14,8 @@ import {
 import type { GeoPoint, Place } from "@/types/ride";
 import { LIGHT_TILES } from "@/services/maps/tiles";
 import { reverseGeocode, searchPlaces, type GeoResult } from "@/services/maps/geocoding";
+import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "@/services/maps/google-loader";
+import { GooglePickMap } from "./GooglePickMap";
 
 interface MapLocationPickerProps {
   readonly title: string;
@@ -289,8 +291,22 @@ function MapPickMode({
   const [address, setAddress] = useState("Move the map to choose a spot");
   const [label, setLabel] = useState("Pinned location");
   const [busy, setBusy] = useState(false);
+  const useGoogle = isGoogleMapsEnabled() && !hasGoogleAuthFailed();
+  const recenterRef = useRef<((p: GeoPoint) => void) | null>(null);
+
+  /** Shared by both engines: turn the new centre into a label + address. */
+  const resolveCenter = (point: GeoPoint) => {
+    setCenter(point);
+    setBusy(true);
+    void reverseGeocode(point).then((r) => {
+      setBusy(false);
+      setAddress(r?.address ?? `${point.lat.toFixed(5)}, ${point.lng.toFixed(5)}`);
+      setLabel(r?.label ?? "Pinned location");
+    });
+  };
 
   useEffect(() => {
+    if (useGoogle) return; // the Google map manages its own lifecycle
     let cancelled = false;
     void (async () => {
       const L = await import("leaflet");
@@ -333,13 +349,14 @@ function MapPickMode({
   }, []);
 
   const useMyLocation = () => {
-    const s = stateRef.current;
-    if (!s || typeof navigator === "undefined" || !navigator.geolocation) return;
+    if (typeof navigator === "undefined" || !navigator.geolocation) return;
     setBusy(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setBusy(false);
-        s.map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+        const point = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        if (useGoogle) recenterRef.current?.(point);
+        else stateRef.current?.map.setView([point.lat, point.lng], 16);
       },
       () => setBusy(false),
       { enableHighAccuracy: true, timeout: 8000 },
@@ -349,12 +366,22 @@ function MapPickMode({
   return (
     <>
       <div className="relative flex-1">
-        <div
-          ref={containerRef}
-          className="h-full w-full"
-          role="application"
-          aria-label="Location picker map"
-        />
+        {useGoogle ? (
+          <GooglePickMap
+            initial={initial ?? NAIROBI}
+            onCenterChange={resolveCenter}
+            onReady={(recenter) => {
+              recenterRef.current = recenter;
+            }}
+          />
+        ) : (
+          <div
+            ref={containerRef}
+            className="h-full w-full"
+            role="application"
+            aria-label="Location picker map"
+          />
+        )}
         <div className="pointer-events-none absolute left-1/2 top-1/2 z-[500] -translate-x-1/2 -translate-y-full">
           <MapPin className="h-9 w-9 fill-primary text-primary drop-shadow-lg" strokeWidth={1.5} />
         </div>
