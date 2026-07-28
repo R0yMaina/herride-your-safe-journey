@@ -9,6 +9,7 @@ import { PasswordInput } from "../components/PasswordInput";
 import { PrimaryButton } from "../components/PrimaryButton";
 import { signInSchema, type SignInInput } from "@/lib/validation/auth.schemas";
 import { useSignIn } from "../hooks/useAuthMutations";
+import { takeSignupIntent } from "../lib/signup-intent";
 import { ROUTES } from "@/constants/routes";
 
 export function SignInScreen() {
@@ -27,7 +28,13 @@ export function SignInScreen() {
     try {
       await signIn.mutateAsync(values);
       toast.success("Welcome back");
-      void navigate({ to: ROUTES.home, replace: true });
+      // Driver applicants (from the "Drive with HeRide" door) land on the
+      // application form the first time they get in.
+      const intent = takeSignupIntent();
+      void navigate({
+        to: intent === "driver" ? ROUTES.driverApply : ROUTES.home,
+        replace: true,
+      });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Sign in failed");
     }

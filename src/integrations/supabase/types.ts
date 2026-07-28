@@ -1028,6 +1028,52 @@ export type Database = {
         Args: { _code: string };
         Returns: undefined;
       };
+      apply_as_driver: {
+        Args: {
+          _license_number: string;
+          _national_id: string;
+          _vehicle_make: string;
+          _vehicle_model: string;
+          _vehicle_plate: string;
+          _vehicle_color?: string;
+          _vehicle_year?: number;
+          _selfie_url?: string;
+          _id_document_url?: string;
+        };
+        Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      get_my_driver_application: {
+        Args: Record<PropertyKey, never>;
+        Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      set_driver_status: {
+        Args: {
+          _driver_user_id: string;
+          _status: Database["public"]["Enums"]["driver_verification_status"];
+          _reason?: string;
+        };
+        Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      list_driver_applications: {
+        Args: { _status?: Database["public"]["Enums"]["driver_verification_status"] };
+        Returns: {
+          user_id: string;
+          full_name: string | null;
+          phone: string | null;
+          license_number: string;
+          national_id: string;
+          vehicle_make: string | null;
+          vehicle_model: string | null;
+          vehicle_plate: string | null;
+          vehicle_color: string | null;
+          vehicle_year: number | null;
+          selfie_url: string | null;
+          id_document_url: string | null;
+          verification_status: Database["public"]["Enums"]["driver_verification_status"];
+          rejection_reason: string | null;
+          applied_at: string;
+        }[];
+      };
       get_receipt: {
         Args: { _ride_id: string };
         Returns: {

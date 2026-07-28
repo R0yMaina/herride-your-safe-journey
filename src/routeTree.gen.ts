@@ -17,6 +17,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as DriverApplyRouteImport } from './routes/driver_.apply'
 import { Route as AuthVerifyEmailRouteImport } from './routes/auth.verify-email'
 import { Route as AuthSignUpRouteImport } from './routes/auth.sign-up'
 import { Route as AuthSignInRouteImport } from './routes/auth.sign-in'
@@ -73,6 +74,11 @@ const IndexRoute = IndexRouteImport.update({
 const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DriverApplyRoute = DriverApplyRouteImport.update({
+  id: '/driver_/apply',
+  path: '/driver/apply',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthVerifyEmailRoute = AuthVerifyEmailRouteImport.update({
@@ -190,6 +196,7 @@ export interface FileRoutesByFullPath {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/driver/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
@@ -217,6 +224,7 @@ export interface FileRoutesByTo {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/driver/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
 }
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/auth/sign-in': typeof AuthSignInRoute
   '/auth/sign-up': typeof AuthSignUpRoute
   '/auth/verify-email': typeof AuthVerifyEmailRoute
+  '/driver_/apply': typeof DriverApplyRoute
   '/share/$token': typeof ShareTokenRoute
   '/_app/trip/$rideId': typeof AppTripRideIdRoute
 }
@@ -275,6 +284,7 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/driver/apply'
     | '/share/$token'
     | '/trip/$rideId'
   fileRoutesByTo: FileRoutesByTo
@@ -302,6 +312,7 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/driver/apply'
     | '/share/$token'
     | '/trip/$rideId'
   id:
@@ -330,6 +341,7 @@ export interface FileRouteTypes {
     | '/auth/sign-in'
     | '/auth/sign-up'
     | '/auth/verify-email'
+    | '/driver_/apply'
     | '/share/$token'
     | '/_app/trip/$rideId'
   fileRoutesById: FileRoutesById
@@ -343,6 +355,7 @@ export interface RootRouteChildren {
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
+  DriverApplyRoute: typeof DriverApplyRoute
   ShareTokenRoute: typeof ShareTokenRoute
 }
 
@@ -402,6 +415,13 @@ declare module '@tanstack/react-router' {
       path: '/share/$token'
       fullPath: '/share/$token'
       preLoaderRoute: typeof ShareTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/driver_/apply': {
+      id: '/driver_/apply'
+      path: '/driver/apply'
+      fullPath: '/driver/apply'
+      preLoaderRoute: typeof DriverApplyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth/verify-email': {
@@ -592,6 +612,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,
   AdminFinanceRoute: AdminFinanceRoute,
+  DriverApplyRoute: DriverApplyRoute,
   ShareTokenRoute: ShareTokenRoute,
 }
 export const routeTree = rootRouteImport

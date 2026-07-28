@@ -59,6 +59,19 @@ export function ProfileScreen() {
       Icon: Clock,
       to: ROUTES.rides,
     },
+    // Passengers see the door to the driver side; verified drivers get the
+    // dashboard link in the Driver section instead.
+    ...(user?.role === "driver" || user?.role === "admin"
+      ? []
+      : ([
+          {
+            id: "become-driver",
+            label: "Become a driver",
+            sub: "Verified women only — earn on your terms",
+            Icon: Car,
+            to: ROUTES.driverApply,
+          },
+        ] as const)),
     {
       id: "wallet",
       label: "Wallet & payments",
