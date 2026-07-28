@@ -33,6 +33,7 @@ import { Route as AuthOtpRouteImport } from './routes/auth.otp'
 import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
+import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
 import { Route as AppWalletRouteImport } from './routes/_app.wallet'
 import { Route as AppSearchingRouteImport } from './routes/_app.searching'
 import { Route as AppRidesRouteImport } from './routes/_app.rides'
@@ -160,6 +161,11 @@ const AdminFinanceRoute = AdminFinanceRouteImport.update({
   path: '/admin/finance',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDriversRoute = AdminDriversRouteImport.update({
+  id: '/admin/drivers',
+  path: '/admin/drivers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/rides': typeof AppRidesRoute
   '/searching': typeof AppSearchingRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
@@ -240,6 +247,7 @@ export interface FileRoutesByTo {
   '/rides': typeof AppRidesRoute
   '/searching': typeof AppSearchingRoute
   '/wallet': typeof AppWalletRoute
+  '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
@@ -274,6 +282,7 @@ export interface FileRoutesById {
   '/_app/rides': typeof AppRidesRoute
   '/_app/searching': typeof AppSearchingRoute
   '/_app/wallet': typeof AppWalletRoute
+  '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
@@ -308,6 +317,7 @@ export interface FileRouteTypes {
     | '/rides'
     | '/searching'
     | '/wallet'
+    | '/admin/drivers'
     | '/admin/finance'
     | '/auth/forgot-password'
     | '/auth/logout'
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/rides'
     | '/searching'
     | '/wallet'
+    | '/admin/drivers'
     | '/admin/finance'
     | '/auth/forgot-password'
     | '/auth/logout'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/_app/rides'
     | '/_app/searching'
     | '/_app/wallet'
+    | '/admin/drivers'
     | '/admin/finance'
     | '/auth/forgot-password'
     | '/auth/logout'
@@ -400,6 +412,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
+  AdminDriversRoute: typeof AdminDriversRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
   DriverApplyRoute: typeof DriverApplyRoute
   ShareTokenRoute: typeof ShareTokenRoute
@@ -575,6 +588,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFinanceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/drivers': {
+      id: '/admin/drivers'
+      path: '/admin/drivers'
+      fullPath: '/admin/drivers'
+      preLoaderRoute: typeof AdminDriversRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/wallet': {
       id: '/_app/wallet'
       path: '/wallet'
@@ -702,6 +722,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,
+  AdminDriversRoute: AdminDriversRoute,
   AdminFinanceRoute: AdminFinanceRoute,
   DriverApplyRoute: DriverApplyRoute,
   ShareTokenRoute: ShareTokenRoute,
