@@ -69,10 +69,10 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 - **Verification desk (Phase 15D)** — `/admin/drivers`: pending/verified/
   rejected/suspended queue, documents opened via short-lived signed URLs,
   approve/reject-with-reason/suspend, all audited.
-- **PWA + demo seed (Phase 16)** — installable (manifest, icons, iOS meta,
-  network-first service worker + branded offline page). `seed-demo.sql`
-  populates a pending application, six rated/tipped trips, wallet float and
-  referral codes so a live pitch never hits an empty state.
+- **PWA (Phase 16)** — installable on any phone: manifest (standalone,
+  violet theme, Book/Drive shortcuts), icon set, iOS home-screen meta, and a
+  network-first service worker (ride data is never served stale) with a
+  branded offline page as the only fallback.
 
 ## SQL scripts — application status
 
@@ -94,8 +94,7 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 | phase15-driver-onboarding.sql | ⏳ user must run (apply_as_driver, role grant, docs bucket) |
 | phase15b-pickup-pin.sql | ⏳ user must run (ride_pins, start_trip_with_pin, PIN gate) |
 | phase15c-driver-earnings.sql | ⏳ user must run (driver_earnings RPC) |
-| seed.sql | optional (demo accounts) |
-| seed-demo.sql | optional (run after seed.sql — fills the pitch demo) |
+| seed.sql | optional (test accounts for local/staging only) |
 
 ## Known gaps / deliberate v1 scope
 
