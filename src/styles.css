@@ -51,60 +51,61 @@
   --font-sans: "Manrope", sans-serif;
 }
 
-/* HeRide — Executive Luxury identity. Graphite surfaces + champagne gold.
-   A calm, premium, trustworthy system (Maybach/Genesis/Nothing), not a
-   pink lifestyle app. All screens inherit these tokens. */
+/* HeRide — Amethyst identity. Near-black base + vivid violet, the colour of
+   women's safety & empowerment. Premium, trustworthy, and high-contrast on a
+   phone (violet reads far better than muted gold). All screens inherit these
+   tokens. */
 :root {
   --radius: 1.25rem;
-  --background: #121212;
+  --background: #121016;
   --foreground: #f8f6f2;
-  --noir: #0e0e0e;
-  --card: #232323;
+  --noir: #14101f;
+  --card: #201c2a;
   --card-foreground: #f8f6f2;
-  --popover: #232323;
+  --popover: #201c2a;
   --popover-foreground: #f8f6f2;
-  --primary: #d6c3a5; /* champagne */
-  --primary-foreground: #141414;
-  --primary-glow: #c7a76c; /* gold */
-  --blush: #e7dbc4;
-  --secondary: #1b1b1b;
+  --primary: #8b5cf6; /* vivid violet */
+  --primary-foreground: #14101f;
+  --primary-glow: #7c3aed; /* deep violet */
+  --blush: #c4b5fd;
+  --secondary: #1a1622;
   --secondary-foreground: #f8f6f2;
-  --muted: #1b1b1b;
-  --muted-foreground: #bdbdbd;
-  --accent: #2c2c2c; /* elevated surface for subtle hovers */
+  --muted: #1a1622;
+  --muted-foreground: #bfb8cc;
+  --accent: #2a2537; /* elevated surface for subtle hovers */
   --accent-foreground: #f8f6f2;
-  --destructive: #b71c1c; /* deep crimson — emergency only */
-  --destructive-foreground: #f8f6f2;
+  --destructive: #e11d48; /* crimson — emergency only */
+  --destructive-foreground: #ffffff;
   --success: #3fae6a;
   --warning: #d4a017;
   --info: #4f8ef7;
-  --border: rgba(255, 255, 255, 0.08);
-  --input: #2c2c2c;
-  --ring: #c7a76c;
-  --chart-1: #c7a76c;
+  --border: rgba(255, 255, 255, 0.09);
+  --input: #2a2537;
+  --ring: #8b5cf6;
+  --chart-1: #8b5cf6;
   --chart-2: #4f8ef7;
   --chart-3: #3fae6a;
-  --chart-4: #d4a017;
-  --chart-5: #bdbdbd;
-  --sidebar: #1b1b1b;
+  --chart-4: #f0c24b;
+  --chart-5: #bfb8cc;
+  --sidebar: #1a1622;
   --sidebar-foreground: #f8f6f2;
-  --sidebar-primary: #d6c3a5;
-  --sidebar-primary-foreground: #141414;
-  --sidebar-accent: #2c2c2c;
+  --sidebar-primary: #8b5cf6;
+  --sidebar-primary-foreground: #14101f;
+  --sidebar-accent: #2a2537;
   --sidebar-accent-foreground: #f8f6f2;
-  --sidebar-border: rgba(255, 255, 255, 0.08);
-  --sidebar-ring: #c7a76c;
-  --gradient-pink: linear-gradient(135deg, #e7dbc4, #d6c3a5 50%, #c7a76c);
-  --gradient-noir: linear-gradient(180deg, #0e0e0e, #1b1b1b);
-  --shadow-glow: 0 0 24px rgba(199, 167, 108, 0.16), 0 0 48px rgba(199, 167, 108, 0.08);
-  --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.7), 0 4px 14px rgba(0, 0, 0, 0.4);
+  --sidebar-border: rgba(255, 255, 255, 0.09);
+  --sidebar-ring: #8b5cf6;
+  --gradient-pink: linear-gradient(135deg, #a78bfa, #8b5cf6 45%, #7c3aed);
+  --gradient-noir: linear-gradient(180deg, #14101f, #1a1622);
+  --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.3), 0 0 60px rgba(124, 58, 237, 0.15);
+  --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.72), 0 4px 14px rgba(0, 0, 0, 0.42);
 
   --font-display: "Playfair Display", serif;
   --font-sans: "Manrope", sans-serif;
 }
 
 .dark {
-  --background: #121212;
+  --background: #121016;
   --foreground: #f8f6f2;
 }
 
@@ -143,10 +144,10 @@ body,
   box-shadow: var(--shadow-soft);
 }
 @utility text-glow {
-  text-shadow: 0 0 18px rgba(199, 167, 108, 0.35);
+  text-shadow: 0 0 20px rgba(139, 92, 246, 0.45);
 }
 @utility doodle-glow {
-  filter: drop-shadow(0 0 4px rgba(199, 167, 108, 0.4));
+  filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
 }
 @utility scrollbar-hide {
   -ms-overflow-style: none;

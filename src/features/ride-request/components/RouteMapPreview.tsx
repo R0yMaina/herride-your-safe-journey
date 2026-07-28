@@ -45,7 +45,7 @@ export function RouteMapPreview({ route, className }: RouteMapPreviewProps) {
       role="img"
       aria-label={route ? "Route preview" : "Route preview placeholder"}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(199,167,108,0.14),transparent_60%),radial-gradient(circle_at_80%_90%,rgba(255,255,255,0.05),transparent_55%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(139,92,246,0.16),transparent_60%),radial-gradient(circle_at_80%_90%,rgba(255,255,255,0.05),transparent_55%)]" />
       <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:24px_24px]" />
       {path ? (
         <svg
@@ -55,8 +55,8 @@ export function RouteMapPreview({ route, className }: RouteMapPreviewProps) {
         >
           <defs>
             <linearGradient id="route-line" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="#e7dbc4" />
-              <stop offset="100%" stopColor="#c7a76c" />
+              <stop offset="0%" stopColor="#a78bfa" />
+              <stop offset="100%" stopColor="#7c3aed" />
             </linearGradient>
           </defs>
           <path
@@ -72,14 +72,14 @@ export function RouteMapPreview({ route, className }: RouteMapPreviewProps) {
             cx={path.start.split(",")[0]}
             cy={path.start.split(",")[1]}
             r="1.6"
-            fill="#e7dbc4"
+            fill="#a78bfa"
             vectorEffect="non-scaling-stroke"
           />
           <circle
             cx={path.end.split(",")[0]}
             cy={path.end.split(",")[1]}
             r="1.6"
-            fill="#c7a76c"
+            fill="#7c3aed"
             vectorEffect="non-scaling-stroke"
           />
         </svg>
