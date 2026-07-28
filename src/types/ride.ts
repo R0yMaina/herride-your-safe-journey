@@ -74,6 +74,8 @@ export interface PassengerNote {
 export interface TripSummary {
   readonly pickup: Place;
   readonly destination: Place;
+  /** Optional intermediate stops (Uber-style multi-stop, max 2). */
+  readonly stops: readonly Place[];
   readonly route: RouteEstimate;
   readonly option: RideOption;
   readonly fare: FareEstimate;

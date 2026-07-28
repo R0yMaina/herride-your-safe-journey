@@ -23,6 +23,20 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
             <p className="truncate text-xs text-muted-foreground">{summary.pickup.address}</p>
           </div>
         </div>
+        {summary.stops.map((stop, i) => (
+          <div key={stop.id} className="flex items-start gap-3">
+            <span className="mt-1 grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-muted-foreground">
+              <Circle className="h-2.5 w-2.5 fill-current" />
+            </span>
+            <div className="min-w-0">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-muted-foreground">
+                Stop {i + 1}
+              </p>
+              <p className="truncate font-display text-sm text-foreground">{stop.label}</p>
+              <p className="truncate text-xs text-muted-foreground">{stop.address}</p>
+            </div>
+          </div>
+        ))}
         <div className="flex items-start gap-3">
           <span className="mt-1 grid h-8 w-8 place-items-center rounded-full bg-primary/20 text-primary">
             <MapPin className="h-4 w-4" />

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { notificationsService } from "@/services/notifications";
+import { showOsNotification } from "../lib/push";
 
 const KEY = ["notifications"] as const;
 
@@ -10,7 +11,8 @@ export function useNotifications() {
 
   // Keep the feed live.
   useEffect(() => {
-    const sub = notificationsService.subscribe(() => {
+    const sub = notificationsService.subscribe((fresh) => {
+      if (fresh) showOsNotification(fresh); // OS alert when the tab is backgrounded
       void queryClient.invalidateQueries({ queryKey: KEY });
     });
     return () => sub.unsubscribe();

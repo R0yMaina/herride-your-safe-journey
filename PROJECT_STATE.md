@@ -1,6 +1,6 @@
 # PROJECT_STATE.md
 
-Last updated: 2026-07-24 (Phase 7 — real-time dispatch).
+Last updated: 2026-07-28 (Phases 11–14 — ratings/tips, chat, growth, trip flexibility).
 
 ## Live target
 
@@ -32,6 +32,26 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
   providers pending credentials), driver payouts, admin financial summary.
   Immutable ledger + platform_ledger + payment_intents + payouts + refund
   architecture in the DB. Admin dashboard at `/admin/finance`.
+- **Pricing authority (Phase 9)** — server-side `quote_fare` + `pricing_config`
+  (10% commission); `complete_ride` recomputes the fare server-side.
+- **Financial completion (Phase 10)** — receipts (`get_receipt`), analytics
+  (`financial_report`, top drivers/customers/routes), immutable `audit_log`,
+  fraud signals, pricing-quote events.
+- **Ratings & tips (Phase 11)** — post-trip 1–5 stars + compliments +
+  optional wallet-funded tip via `submit_rating` (SECURITY DEFINER; tips move
+  wallet→wallet server-side only). Trigger keeps `drivers.rating` in sync.
+  `RatingSheet` on the completed trip screen.
+- **In-ride chat (Phase 12)** — `ride_messages` + Realtime; participants
+  only, live rides only; quick replies; counterparty notification trigger.
+  Chat sheets on both the passenger trip screen and driver active-trip card.
+- **Growth (Phase 13)** — promo codes (`validate_promo`/`apply_promo`,
+  settlement honours the locked-in discount), referral program
+  (`get_referral_code`/`redeem_referral`, both wallets credited on the
+  referee's first completed trip), OS-level notification bridge + enable
+  toggle in Profile. Promo field on Confirm step; Invite & earn on Profile.
+- **Trip flexibility (Phase 14)** — scheduled rides persisted
+  (`scheduled_for`; drivers see them 30 min before pickup), multi-stop rides
+  (`waypoints`, max 2 stops, OSRM multi-leg routing priced into the quote).
 
 ## SQL scripts — application status
 
@@ -44,16 +64,23 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 | phase6-audit-hardening.sql | ⏳ user must run (token-enumeration fix) |
 | phase7-dispatch.sql | ⏳ user must run (busy drivers, location RLS, expiry) |
 | phase8-financials.sql | ⏳ user must run (immutable ledger, payouts, refunds, admin summary) |
-| phase9-pricing-authority.sql | ⏳ user must run (pricing_config, server-side quote_fare, 10% commission) |
+| phase9-pricing-authority.sql | ✅ (verified: quote_fare(4,10,1)=530, commission 0.10) |
+| phase10-financial-completion.sql | ✅ |
+| phase11-ratings-tips.sql | ⏳ user must run (ratings, compliments, tips, driver-rating trigger) |
+| phase12-chat.sql | ⏳ user must run (ride_messages + Realtime + policies) |
+| phase13-growth.sql | ⏳ user must run (promo codes, referrals, complete_ride v3 with discount) |
+| phase14-trip-flexibility.sql | ⏳ user must run (scheduled_for, waypoints, release window) |
 | seed.sql | optional |
 
 ## Known gaps / deliberate v1 scope
 
 - No real payment provider (wallet is credit-based; dev top-up only).
-- No SMS/email/push delivery (in-app notifications only).
-- No map rendering (locations are addresses + coordinates; Maps key exists
-  but should be domain-restricted in Google Cloud Console).
-- Scheduled rides UI exists but is not persisted (no `scheduled_for` column).
+- No SMS/email delivery. OS notifications work while a tab is open (bridge in
+  `features/notifications/lib/push.ts`); true Web Push (VAPID + service
+  worker + edge function) is the upgrade path.
+- In-app voice calls not built — chat covers rider↔driver contact without
+  sharing numbers; masked calling needs a telephony provider (Twilio /
+  Africa's Talking).
 - Admin driver-approval UI not built (`set_driver_status` RPC exists).
 - Cloudflare "Workers Builds" check on PRs fails instantly — misconfigured
   integration on the Cloudflare side, unrelated to the code.

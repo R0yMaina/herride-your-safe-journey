@@ -14,8 +14,12 @@ export interface INotificationsService {
   list(): Promise<readonly AppNotification[]>;
   markRead(id: string): Promise<void>;
   markAllRead(): Promise<void>;
-  /** Live subscription to new notifications for the current user. */
-  subscribe(onChange: () => void): NotificationSubscription;
+  /**
+   * Live subscription to new notifications for the current user. When the
+   * event is a fresh INSERT the new row is passed along so callers can show
+   * an OS-level notification for it.
+   */
+  subscribe(onChange: (fresh?: AppNotification) => void): NotificationSubscription;
 }
 
 const delay = (ms = 200) => new Promise<void>((r) => setTimeout(r, ms));

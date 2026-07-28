@@ -170,33 +170,197 @@ export type Database = {
         };
         Relationships: [];
       };
+      promo_codes: {
+        Row: {
+          active: boolean;
+          code: string;
+          created_at: string;
+          description: string | null;
+          discount_type: string;
+          expires_at: string | null;
+          max_discount: number | null;
+          max_redemptions: number | null;
+          per_user_limit: number;
+          starts_at: string;
+          value: number;
+        };
+        Insert: {
+          active?: boolean;
+          code: string;
+          created_at?: string;
+          description?: string | null;
+          discount_type?: string;
+          expires_at?: string | null;
+          max_discount?: number | null;
+          max_redemptions?: number | null;
+          per_user_limit?: number;
+          starts_at?: string;
+          value: number;
+        };
+        Update: {
+          active?: boolean;
+          code?: string;
+          created_at?: string;
+          description?: string | null;
+          discount_type?: string;
+          expires_at?: string | null;
+          max_discount?: number | null;
+          max_redemptions?: number | null;
+          per_user_limit?: number;
+          starts_at?: string;
+          value?: number;
+        };
+        Relationships: [];
+      };
+      promo_redemptions: {
+        Row: {
+          amount: number;
+          code: string;
+          created_at: string;
+          id: string;
+          ride_id: string;
+          user_id: string;
+        };
+        Insert: {
+          amount: number;
+          code: string;
+          created_at?: string;
+          id?: string;
+          ride_id: string;
+          user_id: string;
+        };
+        Update: {
+          amount?: number;
+          code?: string;
+          created_at?: string;
+          id?: string;
+          ride_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "promo_redemptions_code_fkey";
+            columns: ["code"];
+            isOneToOne: false;
+            referencedRelation: "promo_codes";
+            referencedColumns: ["code"];
+          },
+          {
+            foreignKeyName: "promo_redemptions_ride_id_fkey";
+            columns: ["ride_id"];
+            isOneToOne: true;
+            referencedRelation: "rides";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      referral_codes: {
+        Row: {
+          code: string;
+          created_at: string;
+          user_id: string;
+        };
+        Insert: {
+          code: string;
+          created_at?: string;
+          user_id: string;
+        };
+        Update: {
+          code?: string;
+          created_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      referral_signups: {
+        Row: {
+          created_at: string;
+          credited: boolean;
+          credited_at: string | null;
+          referee_id: string;
+          referrer_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          credited?: boolean;
+          credited_at?: string | null;
+          referee_id: string;
+          referrer_id: string;
+        };
+        Update: {
+          created_at?: string;
+          credited?: boolean;
+          credited_at?: string | null;
+          referee_id?: string;
+          referrer_id?: string;
+        };
+        Relationships: [];
+      };
+      ride_messages: {
+        Row: {
+          body: string;
+          created_at: string;
+          id: string;
+          ride_id: string;
+          sender_id: string;
+        };
+        Insert: {
+          body: string;
+          created_at?: string;
+          id?: string;
+          ride_id: string;
+          sender_id: string;
+        };
+        Update: {
+          body?: string;
+          created_at?: string;
+          id?: string;
+          ride_id?: string;
+          sender_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ride_messages_ride_id_fkey";
+            columns: ["ride_id"];
+            isOneToOne: false;
+            referencedRelation: "rides";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       ride_ratings: {
         Row: {
           comment: string | null;
+          compliments: string[];
           created_at: string;
           id: string;
           ratee_id: string;
           rater_id: string;
           rating: number;
           ride_id: string;
+          tip_amount: number;
         };
         Insert: {
           comment?: string | null;
+          compliments?: string[];
           created_at?: string;
           id?: string;
           ratee_id: string;
           rater_id: string;
           rating: number;
           ride_id: string;
+          tip_amount?: number;
         };
         Update: {
           comment?: string | null;
+          compliments?: string[];
           created_at?: string;
           id?: string;
           ratee_id?: string;
           rater_id?: string;
           rating?: number;
           ride_id?: string;
+          tip_amount?: number;
         };
         Relationships: [
           {
@@ -218,6 +382,7 @@ export type Database = {
           distance_km: number | null;
           driver_id: string | null;
           drop_address: string | null;
+          discount: number;
           drop_lat: number;
           drop_lng: number;
           duration_min: number | null;
@@ -228,10 +393,13 @@ export type Database = {
           pickup_address: string | null;
           pickup_lat: number;
           pickup_lng: number;
+          promo_code: string | null;
           requested_at: string;
+          scheduled_for: string | null;
           started_at: string | null;
           status: Database["public"]["Enums"]["ride_status"];
           updated_at: string;
+          waypoints: Json;
         };
         Insert: {
           accepted_at?: string | null;
@@ -242,6 +410,7 @@ export type Database = {
           distance_km?: number | null;
           driver_id?: string | null;
           drop_address?: string | null;
+          discount?: number;
           drop_lat: number;
           drop_lng: number;
           duration_min?: number | null;
@@ -252,10 +421,13 @@ export type Database = {
           pickup_address?: string | null;
           pickup_lat: number;
           pickup_lng: number;
+          promo_code?: string | null;
           requested_at?: string;
+          scheduled_for?: string | null;
           started_at?: string | null;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
+          waypoints?: Json;
         };
         Update: {
           accepted_at?: string | null;
@@ -266,6 +438,7 @@ export type Database = {
           distance_km?: number | null;
           driver_id?: string | null;
           drop_address?: string | null;
+          discount?: number;
           drop_lat?: number;
           drop_lng?: number;
           duration_min?: number | null;
@@ -276,10 +449,13 @@ export type Database = {
           pickup_address?: string | null;
           pickup_lat?: number;
           pickup_lng?: number;
+          promo_code?: string | null;
           requested_at?: string;
+          scheduled_for?: string | null;
           started_at?: string | null;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
+          waypoints?: Json;
         };
         Relationships: [];
       };
@@ -294,6 +470,7 @@ export type Database = {
           min_fare: number;
           per_km: number;
           per_min: number;
+          referral_reward: number;
           rounding: number;
           updated_at: string;
         };
@@ -307,6 +484,7 @@ export type Database = {
           min_fare?: number;
           per_km?: number;
           per_min?: number;
+          referral_reward?: number;
           rounding?: number;
           updated_at?: string;
         };
@@ -320,6 +498,7 @@ export type Database = {
           min_fare?: number;
           per_km?: number;
           per_min?: number;
+          referral_reward?: number;
           rounding?: number;
           updated_at?: string;
         };
@@ -814,6 +993,40 @@ export type Database = {
       quote_fare: {
         Args: { _distance_km: number; _duration_min: number; _category_multiplier?: number };
         Returns: number;
+      };
+      submit_rating: {
+        Args: {
+          _ride_id: string;
+          _stars: number;
+          _comment?: string;
+          _compliments?: string[];
+          _tip?: number;
+        };
+        Returns: Database["public"]["Tables"]["ride_ratings"]["Row"];
+      };
+      has_rated: {
+        Args: { _ride_id: string };
+        Returns: boolean;
+      };
+      validate_promo: {
+        Args: { _code: string; _subtotal: number };
+        Returns: {
+          code: string;
+          label: string;
+          discount: number;
+        }[];
+      };
+      apply_promo: {
+        Args: { _ride_id: string; _code: string };
+        Returns: number;
+      };
+      get_referral_code: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
+      redeem_referral: {
+        Args: { _code: string };
+        Returns: undefined;
       };
       get_receipt: {
         Args: { _ride_id: string };

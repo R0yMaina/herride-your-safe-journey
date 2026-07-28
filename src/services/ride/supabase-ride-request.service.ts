@@ -40,6 +40,15 @@ export class SupabaseRideRequestService implements IRideRequestService {
         distance_km: summary.route.distanceKm,
         duration_min: summary.route.durationMin,
         category_multiplier: summary.option.baseMultiplier,
+        // Reserved rides carry their pickup time; drivers see them only
+        // inside the 30-minute release window (phase14).
+        scheduled_for: summary.schedule.mode === "scheduled" ? summary.schedule.scheduledFor : null,
+        // Intermediate stops for multi-stop trips (already priced into the route).
+        waypoints: summary.stops.map((s) => ({
+          lat: s.coords.lat,
+          lng: s.coords.lng,
+          address: s.address,
+        })),
         status: "requested",
       })
       .select("id, created_at")

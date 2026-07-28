@@ -16,8 +16,12 @@ export interface RoadRoute {
  * production, self-host OSRM or swap in a keyed routing provider — the caller
  * always falls back to a straight line if this returns null, so nothing breaks.
  */
-export async function fetchRoadRoute(from: GeoPoint, to: GeoPoint): Promise<RoadRoute | null> {
-  const coords = `${from.lng},${from.lat};${to.lng},${to.lat}`;
+export async function fetchRoadRoute(
+  from: GeoPoint,
+  to: GeoPoint,
+  via: readonly GeoPoint[] = [],
+): Promise<RoadRoute | null> {
+  const coords = [from, ...via, to].map((p) => `${p.lng},${p.lat}`).join(";");
   const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
   try {
     const res = await fetch(url);

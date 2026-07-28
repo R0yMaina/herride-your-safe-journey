@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Car, Navigation, Share2, ShieldAlert, Star, X } from "lucide-react";
+import { Car, MessageCircle, Navigation, Share2, ShieldAlert, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { useRide } from "./hooks/useRide";
@@ -8,6 +8,9 @@ import { useDriverLocation } from "./hooks/useDriverLocation";
 import { StatusTimeline } from "./components/StatusTimeline";
 import { TripMap } from "./components/TripMap";
 import { TripReceipt } from "./components/TripReceipt";
+import { RatingSheet } from "./components/RatingSheet";
+import { TripChatSheet } from "./components/TripChatSheet";
+import { useAuth } from "@/hooks/useAuth";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService } from "@/services/ride";
 import { safetyService } from "@/services/safety";
@@ -19,8 +22,10 @@ const LIVE_LOCATION_STATUSES = ["accepted", "arrived", "in_progress"];
 
 export function TripScreen({ rideId }: { rideId: string }) {
   const { ride, loading, error } = useRide(rideId);
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [driver, setDriver] = useState<PublicDriver | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
   const streamLocation =
     ride?.driverId && LIVE_LOCATION_STATUSES.includes(ride.status) ? ride.driverId : null;
   const driverLocation = useDriverLocation(streamLocation);
@@ -144,6 +149,16 @@ export function TripScreen({ rideId }: { rideId: string }) {
             <span className="flex items-center gap-1 text-sm text-foreground">
               <Star className="h-4 w-4 fill-primary text-primary" /> {driver.rating.toFixed(1)}
             </span>
+            {!completed && !cancelled && (
+              <button
+                type="button"
+                onClick={() => setChatOpen(true)}
+                aria-label="Message driver"
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary"
+              >
+                <MessageCircle className="h-5 w-5" />
+              </button>
+            )}
           </GlassCard>
         )}
 
@@ -189,6 +204,11 @@ export function TripScreen({ rideId }: { rideId: string }) {
                 {formatCurrency(ride.fareFinal ?? ride.fareEstimate ?? 0)}
               </p>
             </GlassCard>
+            <RatingSheet
+              rideId={rideId}
+              driverName={driver?.name?.split(" ")[0] ?? null}
+              canTip={user?.id === ride.passengerId}
+            />
             <TripReceipt rideId={rideId} />
           </>
         )}
@@ -231,6 +251,14 @@ export function TripScreen({ rideId }: { rideId: string }) {
             </button>
           )}
         </div>
+
+        {chatOpen && (
+          <TripChatSheet
+            rideId={rideId}
+            counterpartyName={driver?.name ?? "Your driver"}
+            onClose={() => setChatOpen(false)}
+          />
+        )}
       </Container>
     </ScreenWrapper>
   );
