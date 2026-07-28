@@ -44,14 +44,16 @@ export async function searchPlaces(query: string, near?: GeoPoint | null): Promi
   // Search degrades in order: Places (best POI results) -> Geocoder ->
   // Photon. Each step only runs if the one before it returned nothing, so a
   // rejected key or an exhausted quota never leaves the rider without search.
-  try {
-    const { hasPlacesKey, searchPlacesGooglePlaces } = await import("./google-places");
-    if (hasPlacesKey()) {
-      const results = await searchPlacesGooglePlaces(q, near);
-      if (results.length > 0) return results;
+  if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
+    try {
+      const { hasPlacesKey, searchPlacesGooglePlaces } = await import("./google-places");
+      if (hasPlacesKey()) {
+        const results = await searchPlacesGooglePlaces(q, near);
+        if (results.length > 0) return results;
+      }
+    } catch {
+      /* fall through */
     }
-  } catch {
-    /* fall through */
   }
 
   if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
