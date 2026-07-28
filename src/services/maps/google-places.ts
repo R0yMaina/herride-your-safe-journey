@@ -22,8 +22,15 @@ interface PlacesResponse {
   }[];
 }
 
+/**
+ * Latched off after an auth/billing rejection. Without this, a closed billing
+ * account or a bad key would cost a failed round-trip on every keystroke
+ * before the fallback runs.
+ */
+let placesDisabled = false;
+
 export function hasPlacesKey(): boolean {
-  return Boolean(env.map.googlePlacesApiKey);
+  return !placesDisabled && Boolean(env.map.googlePlacesApiKey);
 }
 
 export async function searchPlacesGooglePlaces(
@@ -55,7 +62,12 @@ export async function searchPlacesGooglePlaces(
     },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw new Error(`Places search failed (${res.status})`);
+  if (!res.ok) {
+    // 401/403 = key rejected, API not enabled, or billing closed. Those do
+    // not fix themselves mid-session, so stop asking.
+    if (res.status === 401 || res.status === 403) placesDisabled = true;
+    throw new Error(`Places search failed (${res.status})`);
+  }
 
   const data = (await res.json()) as PlacesResponse;
   return (data.places ?? [])
