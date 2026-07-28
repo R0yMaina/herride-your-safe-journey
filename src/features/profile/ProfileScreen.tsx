@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
 import {
   ChevronRight,
   ShieldCheck,
@@ -17,18 +19,27 @@ import { useAuth } from "@/hooks/useAuth";
 import { walletService } from "@/services/wallet";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { TrustedContactsSection } from "./components/TrustedContactsSection";
+import { InviteEarnCard } from "./components/InviteEarnCard";
+import { pushEnabled, requestPushPermission } from "@/features/notifications/lib/push";
 
 interface Row {
   readonly id: string;
   readonly label: string;
   readonly sub: string;
   readonly Icon: typeof ShieldCheck;
-  readonly to: string;
+  /** Destination route — or use onClick for action rows. */
+  readonly to?: string;
+  readonly onClick?: () => void;
   readonly value?: string;
 }
 
 export function ProfileScreen() {
   const { user } = useAuth();
+  // Read after mount only — Notification API is browser-only (SSR-safe).
+  const [pushOn, setPushOn] = useState(false);
+  useEffect(() => {
+    setPushOn(pushEnabled());
+  }, []);
   const fullName =
     [user?.profile.firstName, user?.profile.lastName].filter(Boolean).join(" ") || "Your account";
   const initial = (user?.profile.firstName?.[0] ?? user?.email?.[0] ?? "H").toUpperCase();
@@ -70,9 +81,19 @@ export function ProfileScreen() {
     {
       id: "notifications",
       label: "Notifications",
-      sub: "Ride, driver & safety alerts",
+      sub: pushOn
+        ? "Device alerts on for ride, driver & safety updates"
+        : "Tap to enable alerts on this device",
       Icon: Bell,
-      to: ROUTES.home,
+      onClick: () => {
+        void requestPushPermission().then((permission) => {
+          setPushOn(permission === "granted");
+          if (permission === "granted") toast.success("Device notifications enabled");
+          else if (permission === "denied")
+            toast.error("Notifications are blocked in your browser settings");
+        });
+      },
+      value: pushOn ? "On" : undefined,
     },
     {
       id: "support",
@@ -90,21 +111,30 @@ export function ProfileScreen() {
     },
   ];
 
-  const renderRow = ({ id, label, sub, Icon, to, value }: Row) => (
-    <Link key={id} to={to}>
+  const renderRow = ({ id, label, sub, Icon, to, onClick, value }: Row) => {
+    const card = (
       <GlassCard className="flex items-center gap-4 py-4">
         <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary">
           <Icon className="h-5 w-5" />
         </div>
-        <span className="min-w-0 flex-1">
+        <span className="min-w-0 flex-1 text-left">
           <span className="block truncate font-display text-base text-foreground">{label}</span>
           <span className="block truncate text-xs text-muted-foreground">{sub}</span>
         </span>
         {value && <span className="shrink-0 text-sm font-semibold text-primary">{value}</span>}
         <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />
       </GlassCard>
-    </Link>
-  );
+    );
+    return to ? (
+      <Link key={id} to={to}>
+        {card}
+      </Link>
+    ) : (
+      <button key={id} type="button" onClick={onClick} className="block w-full">
+        {card}
+      </button>
+    );
+  };
 
   return (
     <ScreenWrapper>
@@ -149,6 +179,8 @@ export function ProfileScreen() {
         </Section>
 
         <TrustedContactsSection />
+
+        <InviteEarnCard />
 
         <Section title="Preferences">
           <div className="space-y-2">{preferences.map(renderRow)}</div>

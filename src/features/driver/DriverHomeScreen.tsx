@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Loader2, MapPin, Navigation, Power } from "lucide-react";
+import { Loader2, MapPin, MessageCircle, Navigation, Power } from "lucide-react";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { driverService, type DriverLocationPing } from "@/services/driver";
 import { ridesService } from "@/services/ride";
@@ -9,6 +9,7 @@ import { canTransition, type RideRecord, type RideStatus } from "@/types/ride";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm } from "@/lib/geo";
 import { TripMap } from "@/features/trip/components/TripMap";
+import { TripChatSheet } from "@/features/trip/components/TripChatSheet";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -24,6 +25,7 @@ export function DriverHomeScreen() {
   const [busy, setBusy] = useState(false);
   const [openRides, setOpenRides] = useState<readonly RideRecord[]>([]);
   const [activeRide, setActiveRide] = useState<RideRecord | null>(null);
+  const [chatOpen, setChatOpen] = useState(false);
   const [position, setPosition] = useState<DriverLocationPing | null>(null);
   const pingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -204,7 +206,21 @@ export function DriverHomeScreen() {
                   <Navigation className="h-4 w-4" /> {step.label}
                 </button>
               )}
+              <button
+                type="button"
+                onClick={() => setChatOpen(true)}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border/70 py-3 text-sm text-foreground"
+              >
+                <MessageCircle className="h-4 w-4" /> Message rider
+              </button>
             </GlassCard>
+            {chatOpen && (
+              <TripChatSheet
+                rideId={activeRide.id}
+                counterpartyName="Your rider"
+                onClose={() => setChatOpen(false)}
+              />
+            )}
           </Section>
         ) : online ? (
           <Section title={`Open requests (${openRides.length})`}>

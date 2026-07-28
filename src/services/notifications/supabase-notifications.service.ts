@@ -41,7 +41,7 @@ export class SupabaseNotificationsService implements INotificationsService {
     if (error) throw new Error(error.message);
   }
 
-  subscribe(onChange: () => void): NotificationSubscription {
+  subscribe(onChange: (fresh?: AppNotification) => void): NotificationSubscription {
     // RLS already restricts delivered rows to the signed-in user; the
     // user_id filter additionally keeps other users' events from being
     // fanned out to this socket at all.
@@ -59,7 +59,30 @@ export class SupabaseNotificationsService implements INotificationsService {
             table: "notifications",
             filter: `user_id=eq.${user.id}`,
           },
-          () => onChange(),
+          (payload) => {
+            if (payload.eventType === "INSERT") {
+              const n = payload.new as {
+                id: string;
+                type: string;
+                title: string;
+                body: string | null;
+                ride_id: string | null;
+                read_at: string | null;
+                created_at: string;
+              };
+              onChange({
+                id: n.id,
+                type: n.type,
+                title: n.title,
+                body: n.body,
+                rideId: n.ride_id,
+                readAt: n.read_at,
+                createdAt: n.created_at,
+              });
+            } else {
+              onChange();
+            }
+          },
         )
         .subscribe();
     });

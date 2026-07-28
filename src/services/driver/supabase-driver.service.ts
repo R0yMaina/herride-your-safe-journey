@@ -72,11 +72,15 @@ export class SupabaseDriverService implements IDriverService {
 
   async listOpenRides(): Promise<readonly RideRecord[]> {
     // RLS lets a verified female driver SELECT rides with status='requested'.
+    // Scheduled rides stay hidden until 30 minutes before pickup (phase14
+    // release window) so the pool only shows work that is actionable now.
+    const releaseBefore = new Date(Date.now() + 30 * 60_000).toISOString();
     const { data, error } = await supabase
       .from("rides")
       .select("*")
       .eq("status", "requested")
       .is("driver_id", null)
+      .or(`scheduled_for.is.null,scheduled_for.lte.${releaseBefore}`)
       .order("requested_at", { ascending: true });
     if (error) throw new Error(error.message);
     return (data ?? []).map(mapRideRow);
