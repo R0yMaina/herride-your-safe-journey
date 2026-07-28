@@ -45,8 +45,8 @@ export function RouteMapPreview({ route, className }: RouteMapPreviewProps) {
       role="img"
       aria-label={route ? "Route preview" : "Route preview placeholder"}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,oklch(0.28_0.03_340/0.7),transparent_60%),radial-gradient(circle_at_80%_90%,oklch(0.22_0.04_5/0.6),transparent_55%)]" />
-      <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(oklch(0.98_0.005_340/0.06)_1px,transparent_1px),linear-gradient(90deg,oklch(0.98_0.005_340/0.06)_1px,transparent_1px)] [background-size:24px_24px]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(199,167,108,0.14),transparent_60%),radial-gradient(circle_at_80%_90%,rgba(255,255,255,0.05),transparent_55%)]" />
+      <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] [background-size:24px_24px]" />
       {path ? (
         <svg
           viewBox="0 0 100 100"
@@ -55,8 +55,8 @@ export function RouteMapPreview({ route, className }: RouteMapPreviewProps) {
         >
           <defs>
             <linearGradient id="route-line" x1="0" x2="1" y1="0" y2="1">
-              <stop offset="0%" stopColor="oklch(0.94 0.04 10)" />
-              <stop offset="100%" stopColor="oklch(0.72 0.20 5)" />
+              <stop offset="0%" stopColor="#e7dbc4" />
+              <stop offset="100%" stopColor="#c7a76c" />
             </linearGradient>
           </defs>
           <path
@@ -72,14 +72,14 @@ export function RouteMapPreview({ route, className }: RouteMapPreviewProps) {
             cx={path.start.split(",")[0]}
             cy={path.start.split(",")[1]}
             r="1.6"
-            fill="oklch(0.94 0.04 10)"
+            fill="#e7dbc4"
             vectorEffect="non-scaling-stroke"
           />
           <circle
             cx={path.end.split(",")[0]}
             cy={path.end.split(",")[1]}
             r="1.6"
-            fill="oklch(0.72 0.20 5)"
+            fill="#c7a76c"
             vectorEffect="non-scaling-stroke"
           />
         </svg>

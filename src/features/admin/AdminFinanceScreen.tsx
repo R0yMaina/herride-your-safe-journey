@@ -96,8 +96,8 @@ export function AdminFinanceScreen() {
               <Wallet className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <p className="text-xs text-muted-foreground">
                 Figures come from the immutable platform ledger and payouts table via the admin-only{" "}
-                <code className="text-rose-300">get_financial_summary</code> function. Refunds are
-                issued through <code className="text-rose-300">refund_ride</code>.
+                <code className="text-primary">get_financial_summary</code> function. Refunds are
+                issued through <code className="text-primary">refund_ride</code>.
               </p>
             </GlassCard>
             <div className="flex items-center gap-2 text-xs text-muted-foreground">

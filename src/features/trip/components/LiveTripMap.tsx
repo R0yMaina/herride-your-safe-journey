@@ -30,20 +30,20 @@ function markerIcon(
     const rot = typeof heading === "number" ? `transform:rotate(${heading}deg);` : "";
     return L.divIcon({
       className: "heride-marker",
-      html: `<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#ff8fbf,#ff5c9d);
-        display:grid;place-items:center;box-shadow:0 0 0 4px rgba(255,111,165,.25),0 6px 16px rgba(0,0,0,.5);${rot}">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1a0f14" stroke-width="2.2"
+      html: `<div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(145deg,#e7dbc4,#c7a76c);
+        display:grid;place-items:center;box-shadow:0 0 0 3px rgba(214,195,165,.3),0 6px 16px rgba(0,0,0,.55);${rot}">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#141414" stroke-width="2.2"
           stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H3v-5l2-5h11l3 5h1v5h-2"/>
           <circle cx="7.5" cy="17" r="1.6"/><circle cx="16.5" cy="17" r="1.6"/></svg></div>`,
       iconSize: [34, 34],
       iconAnchor: [17, 17],
     });
   }
-  const color = kind === "pickup" ? "#ff2e88" : "#c026d3";
+  const color = kind === "pickup" ? "#c7a76c" : "#8a7040";
   const inner =
     kind === "pickup"
-      ? `<div style="width:12px;height:12px;border-radius:50%;background:${color};box-shadow:0 0 0 4px rgba(255,46,136,.22),0 1px 4px rgba(0,0,0,.4)"></div>`
-      : `<div style="width:14px;height:14px;border-radius:50%;border:3px solid ${color};background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>`;
+      ? `<div style="width:12px;height:12px;border-radius:50%;background:${color};box-shadow:0 0 0 4px rgba(199,167,108,.25),0 1px 4px rgba(0,0,0,.5)"></div>`
+      : `<div style="width:14px;height:14px;border-radius:50%;border:3px solid ${color};background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.5)"></div>`;
   return L.divIcon({
     className: "heride-marker",
     html: `<div style="display:grid;place-items:center;width:22px;height:22px">${inner}</div>`,
@@ -174,7 +174,7 @@ export function LiveTripMap({
       const pickupM = L.marker([pk.lat, pk.lng], { icon: markerIcon(L, "pickup") }).addTo(map);
       const destM = L.marker([dest.lat, dest.lng], { icon: markerIcon(L, "dest") }).addTo(map);
       const line = L.polyline([], {
-        color: "#ff2e88",
+        color: "#c7a76c",
         weight: 5,
         opacity: 0.95,
         lineJoin: "round",
