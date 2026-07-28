@@ -325,6 +325,80 @@ export type Database = {
         };
         Relationships: [];
       };
+      audit_log: {
+        Row: {
+          action: string;
+          actor_id: string | null;
+          created_at: string;
+          entity: string;
+          entity_id: string | null;
+          id: string;
+          metadata: Json;
+        };
+        Insert: {
+          action: string;
+          actor_id?: string | null;
+          created_at?: string;
+          entity: string;
+          entity_id?: string | null;
+          id?: string;
+          metadata?: Json;
+        };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
+      fraud_signals: {
+        Row: {
+          created_at: string;
+          id: string;
+          metadata: Json;
+          resolved: boolean;
+          ride_id: string | null;
+          severity: string;
+          signal: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          metadata?: Json;
+          resolved?: boolean;
+          ride_id?: string | null;
+          severity?: string;
+          signal: string;
+          user_id?: string | null;
+        };
+        Update: { resolved?: boolean };
+        Relationships: [];
+      };
+      pricing_quotes: {
+        Row: {
+          category_multiplier: number | null;
+          created_at: string;
+          currency: string;
+          distance_km: number | null;
+          duration_min: number | null;
+          fare_estimate: number | null;
+          id: string;
+          passenger_id: string | null;
+          pricing_version: string;
+          ride_id: string | null;
+        };
+        Insert: {
+          category_multiplier?: number | null;
+          created_at?: string;
+          currency?: string;
+          distance_km?: number | null;
+          duration_min?: number | null;
+          fare_estimate?: number | null;
+          id?: string;
+          passenger_id?: string | null;
+          pricing_version?: string;
+          ride_id?: string | null;
+        };
+        Update: { [_ in never]: never };
+        Relationships: [];
+      };
       saved_places: {
         Row: {
           address: string | null;
@@ -740,6 +814,54 @@ export type Database = {
       quote_fare: {
         Args: { _distance_km: number; _duration_min: number; _category_multiplier?: number };
         Returns: number;
+      };
+      get_receipt: {
+        Args: { _ride_id: string };
+        Returns: {
+          ride_id: string;
+          currency: string;
+          base_fare: number;
+          distance_cost: number;
+          time_cost: number;
+          booking_fee: number;
+          total: number;
+          commission: number;
+          driver_earnings: number;
+          distance_km: number | null;
+          duration_min: number | null;
+          driver_name: string | null;
+          vehicle: string | null;
+          plate: string | null;
+          pickup_address: string | null;
+          drop_address: string | null;
+          completed_at: string | null;
+        }[];
+      };
+      financial_report: {
+        Args: { _bucket?: string; _since?: string };
+        Returns: {
+          period: string;
+          gross_revenue: number;
+          commission_revenue: number;
+          driver_earnings: number;
+          rides: number;
+        }[];
+      };
+      get_top_drivers: {
+        Args: { _since?: string; _limit?: number };
+        Returns: { driver_id: string; name: string | null; rides: number; earnings: number }[];
+      };
+      get_top_customers: {
+        Args: { _since?: string; _limit?: number };
+        Returns: { passenger_id: string; name: string | null; rides: number; spend: number }[];
+      };
+      get_top_routes: {
+        Args: { _since?: string; _limit?: number };
+        Returns: { pickup: string; dropoff: string; rides: number; revenue: number }[];
+      };
+      list_audit_log: {
+        Args: { _limit?: number };
+        Returns: Database["public"]["Tables"]["audit_log"]["Row"][];
       };
       wallet_topup: {
         Args: { _amount: number };

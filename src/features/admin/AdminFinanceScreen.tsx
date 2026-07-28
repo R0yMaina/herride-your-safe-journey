@@ -3,6 +3,8 @@ import { BarChart3, Wallet, TrendingUp, RotateCcw } from "lucide-react";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { financeService, type FinancialSummary } from "@/services/finance";
 import { formatCurrency } from "@/features/ride-request/lib/format";
+import { AdminAnalytics } from "./AdminAnalytics";
+import { AdminAuditLog } from "./AdminAuditLog";
 
 interface Stat {
   readonly label: string;
@@ -103,6 +105,9 @@ export function AdminFinanceScreen() {
             </div>
           </>
         )}
+
+        <AdminAnalytics />
+        <AdminAuditLog />
       </Container>
     </ScreenWrapper>
   );
