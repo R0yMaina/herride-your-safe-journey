@@ -9,7 +9,7 @@ import { BottomNav } from "@/components/navigation/BottomNav";
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-noir">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[380px] bg-gradient-to-b from-primary/20 via-primary/5 to-transparent blur-2xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[380px] bg-gradient-to-b from-primary/10 via-primary/[0.03] to-transparent blur-2xl" />
       <main className="relative z-10 mx-auto w-full max-w-md flex-1 px-0">{children}</main>
       <BottomNav />
     </div>

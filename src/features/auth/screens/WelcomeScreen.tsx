@@ -19,8 +19,8 @@ export function WelcomeScreen() {
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-hidden bg-noir">
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary-glow/25 blur-3xl" />
-        <div className="absolute bottom-0 left-0 h-[320px] w-[320px] rounded-full bg-primary/10 blur-3xl" />
+        <div className="absolute -top-24 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary-glow/12 blur-3xl" />
+        <div className="absolute bottom-0 left-0 h-[320px] w-[320px] rounded-full bg-primary/5 blur-3xl" />
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pb-10 pt-16 text-center">

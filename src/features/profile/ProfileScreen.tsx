@@ -11,10 +11,18 @@ import {
   Car,
   Clock,
   Wallet,
+  Palette,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ROUTES } from "@/constants/routes";
-import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
+import {
+  Container,
+  GlassCard,
+  PageHeader,
+  ScreenWrapper,
+  Section,
+  ThemeToggle,
+} from "@/components/common";
 import { useAuth } from "@/hooks/useAuth";
 import { walletService } from "@/services/wallet";
 import { formatCurrency } from "@/features/ride-request/lib/format";
@@ -217,7 +225,22 @@ export function ProfileScreen() {
         <InviteEarnCard />
 
         <Section title="Preferences">
-          <div className="space-y-2">{preferences.map(renderRow)}</div>
+          <div className="space-y-2">
+            {/* Appearance is a switch, not a destination — rendered inline. */}
+            <GlassCard className="flex items-center gap-4 py-4">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary">
+                <Palette className="h-5 w-5" />
+              </div>
+              <span className="min-w-0 flex-1">
+                <span className="block font-display text-base text-foreground">Appearance</span>
+                <span className="block text-xs text-muted-foreground">
+                  Switch between light and dark
+                </span>
+              </span>
+              <ThemeToggle />
+            </GlassCard>
+            {preferences.map(renderRow)}
+          </div>
         </Section>
       </Container>
     </ScreenWrapper>
