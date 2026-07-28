@@ -57,10 +57,10 @@
    surface, and button gradients darken so white labels stay legible. */
 :root {
   --radius: 1.25rem;
-  --background: #ffffff;
+  --background: #f4f1fb;
   --foreground: #1a1426;
-  --noir: #ffffff;
-  --card: #fbfaff;
+  --noir: #f4f1fb;
+  --card: #ffffff;
   --card-foreground: #1a1426;
   --popover: #ffffff;
   --popover-foreground: #1a1426;
@@ -79,7 +79,7 @@
   --success: #15803d;
   --warning: #b45309;
   --info: #1d4ed8;
-  --border: rgba(26, 20, 38, 0.1);
+  --border: rgba(124, 58, 237, 0.16);
   --input: #ffffff;
   --ring: #7c3aed;
   --chart-1: #7c3aed;
@@ -98,7 +98,7 @@
   --gradient-pink: linear-gradient(135deg, #8b5cf6, #7c3aed 45%, #6d28d9);
   --gradient-noir: linear-gradient(180deg, #ffffff, #f5f2fb);
   --shadow-glow: 0 8px 24px rgba(124, 58, 237, 0.28), 0 2px 8px rgba(124, 58, 237, 0.12);
-  --shadow-soft: 0 12px 32px -12px rgba(26, 20, 38, 0.14), 0 2px 8px rgba(26, 20, 38, 0.06);
+  --shadow-soft: 0 10px 30px -12px rgba(76, 29, 149, 0.18), 0 2px 6px rgba(76, 29, 149, 0.08);
   /* Halos belong on a dark canvas; on white they read as smudges. */
   --text-glow: none;
   --doodle-glow: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.28));
@@ -111,10 +111,10 @@
    the toggle genuinely re-skins the app instead of only flipping the canvas.
    Every value here mirrors a light token above. */
 .dark {
-  --background: #121016;
+  --background: #191527;
   --foreground: #f8f6f2;
-  --noir: #14101f;
-  --card: #201c2a;
+  --noir: #191527;
+  --card: #241f36;
   --card-foreground: #f8f6f2;
   --popover: #201c2a;
   --popover-foreground: #f8f6f2;
@@ -122,19 +122,19 @@
   --primary-foreground: #14101f;
   --primary-glow: #7c3aed;
   --blush: #c4b5fd;
-  --secondary: #1a1622;
+  --secondary: #221d33;
   --secondary-foreground: #f8f6f2;
-  --muted: #1a1622;
+  --muted: #221d33;
   --muted-foreground: #bfb8cc;
-  --accent: #2a2537;
+  --accent: #302a45;
   --accent-foreground: #f8f6f2;
   --destructive: #e11d48;
   --destructive-foreground: #ffffff;
   --success: #3fae6a;
   --warning: #d4a017;
   --info: #4f8ef7;
-  --border: rgba(255, 255, 255, 0.09);
-  --input: #2a2537;
+  --border: rgba(167, 139, 250, 0.18);
+  --input: #302a45;
   --ring: #8b5cf6;
   --chart-1: #8b5cf6;
   --chart-2: #4f8ef7;
@@ -150,7 +150,7 @@
   --sidebar-border: rgba(255, 255, 255, 0.09);
   --sidebar-ring: #8b5cf6;
   --gradient-pink: linear-gradient(135deg, #a78bfa, #8b5cf6 45%, #7c3aed);
-  --gradient-noir: linear-gradient(180deg, #14101f, #1a1622);
+  --gradient-noir: linear-gradient(180deg, #191527, #221d33);
   --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.3), 0 0 60px rgba(124, 58, 237, 0.15);
   --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.72), 0 4px 14px rgba(0, 0, 0, 0.42);
   --text-glow: 0 0 20px rgba(139, 92, 246, 0.45);
