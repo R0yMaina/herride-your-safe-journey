@@ -17,6 +17,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { ErrorBoundary } from "@/providers/ErrorBoundary";
 import { Toaster } from "@/components/ui/sonner";
 import { initAuthSync } from "@/services/auth";
+import { registerServiceWorker } from "@/lib/pwa";
 
 function NotFoundComponent() {
   return (
@@ -79,8 +80,17 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      {
+        name: "viewport",
+        content: "width=device-width, initial-scale=1, viewport-fit=cover",
+      },
       { title: "HeRide — The safest ride, for her." },
+      // Installed-app chrome: violet-on-noir status bar, standalone display.
+      { name: "theme-color", content: "#121016" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "HeRide" },
       {
         name: "description",
         content:
@@ -112,6 +122,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
     ],
     links: [
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "icon", type: "image/svg+xml", href: "/icon.svg" },
+      { rel: "icon", type: "image/png", sizes: "192x192", href: "/icon-192.png" },
+      // iOS ignores manifest icons — it needs this PNG for the home screen.
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -150,6 +165,7 @@ function RootComponent() {
   // Reconcile the auth store with Supabase's persisted session (client only).
   useEffect(() => {
     initAuthSync();
+    registerServiceWorker(); // installability + offline fallback
   }, []);
 
   return (

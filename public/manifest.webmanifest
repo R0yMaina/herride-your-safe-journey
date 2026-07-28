@@ -1,0 +1,53 @@
+{
+  "name": "HeRide — The safest ride, for her.",
+  "short_name": "HeRide",
+  "description": "A premium, female-only ride-hailing platform engineered for safety and trust. Verified women drivers, live trip share, SOS, and pickup PIN on every trip.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#121016",
+  "theme_color": "#121016",
+  "categories": ["travel", "navigation", "lifestyle"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Book a ride",
+      "short_name": "Book",
+      "description": "Set your destination and find a verified female driver",
+      "url": "/book"
+    },
+    {
+      "name": "Drive with HeRide",
+      "short_name": "Drive",
+      "description": "Go online and accept trips",
+      "url": "/driver"
+    }
+  ]
+}
