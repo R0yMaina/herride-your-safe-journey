@@ -57,9 +57,9 @@
    surface, and button gradients darken so white labels stay legible. */
 :root {
   --radius: 1.25rem;
-  --background: #f4f1fb;
+  --background: #ffffff;
   --foreground: #1a1426;
-  --noir: #f4f1fb;
+  --noir: #ffffff;
   --card: #ffffff;
   --card-foreground: #1a1426;
   --popover: #ffffff;
@@ -79,7 +79,7 @@
   --success: #15803d;
   --warning: #b45309;
   --info: #1d4ed8;
-  --border: rgba(124, 58, 237, 0.16);
+  --border: rgba(124, 58, 237, 0.22);
   --input: #ffffff;
   --ring: #7c3aed;
   --chart-1: #7c3aed;
@@ -98,10 +98,19 @@
   --gradient-pink: linear-gradient(135deg, #8b5cf6, #7c3aed 45%, #6d28d9);
   --gradient-noir: linear-gradient(180deg, #ffffff, #f5f2fb);
   --shadow-glow: 0 8px 24px rgba(124, 58, 237, 0.28), 0 2px 8px rgba(124, 58, 237, 0.12);
-  --shadow-soft: 0 10px 30px -12px rgba(76, 29, 149, 0.18), 0 2px 6px rgba(76, 29, 149, 0.08);
+  --shadow-soft: 0 8px 28px -10px rgba(76, 29, 149, 0.20), 0 2px 8px rgba(76, 29, 149, 0.10);
   /* Halos belong on a dark canvas; on white they read as smudges. */
   --text-glow: none;
   --doodle-glow: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.28));
+  /* Ambient chrome. Light keeps the canvas pure white; dark needs the glow
+     for depth, so both live in variables rather than fixed utilities. */
+  --ambient-top: linear-gradient(
+    to bottom,
+    rgba(124, 58, 237, 0.035),
+    rgba(124, 58, 237, 0.008) 45%,
+    transparent
+  );
+  --ambient-blob: rgba(124, 58, 237, 0.05);
 
   --font-display: "Playfair Display", serif;
   --font-sans: "Manrope", sans-serif;
@@ -155,6 +164,13 @@
   --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.72), 0 4px 14px rgba(0, 0, 0, 0.42);
   --text-glow: 0 0 20px rgba(139, 92, 246, 0.45);
   --doodle-glow: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+  --ambient-top: linear-gradient(
+    to bottom,
+    rgba(139, 92, 246, 0.22),
+    rgba(139, 92, 246, 0.06) 45%,
+    transparent
+  );
+  --ambient-blob: rgba(139, 92, 246, 0.22);
 }
 
 @layer base {
@@ -190,6 +206,12 @@ body,
 }
 @utility shadow-soft {
   box-shadow: var(--shadow-soft);
+}
+@utility bg-ambient {
+  background-image: var(--ambient-top);
+}
+@utility bg-ambient-blob {
+  background-color: var(--ambient-blob);
 }
 @utility text-glow {
   text-shadow: var(--text-glow);

@@ -29,7 +29,7 @@ export function AuthLayout({
 }: AuthLayoutProps) {
   return (
     <div className="relative flex min-h-screen w-full flex-col bg-noir">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[480px] bg-gradient-to-b from-primary/10 via-primary/[0.03] to-transparent blur-3xl" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[480px] bg-ambient blur-3xl" />
       <div className="pointer-events-none absolute -bottom-32 left-1/2 h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-primary-glow/20 blur-3xl" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-md flex-1 flex-col px-6 pt-6 pb-10">
