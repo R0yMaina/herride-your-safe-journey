@@ -107,6 +107,15 @@ export class SupabaseDriverService implements IDriverService {
     return mapRideRow(row as never);
   }
 
+  async startTripWithPin(rideId: string, pin: string): Promise<RideRecord> {
+    const { data, error } = await supabase.rpc("start_trip_with_pin", {
+      _ride_id: rideId,
+      _pin: pin.trim(),
+    });
+    if (error) throw new Error(error.message);
+    return mapRideRow(data as never);
+  }
+
   async transition(rideId: string, next: RideStatus): Promise<RideRecord> {
     const { data: current, error: readError } = await supabase
       .from("rides")

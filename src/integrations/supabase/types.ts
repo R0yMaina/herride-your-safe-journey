@@ -328,6 +328,35 @@ export type Database = {
           },
         ];
       };
+      ride_pins: {
+        Row: {
+          created_at: string;
+          failed_attempts: number;
+          pin: string;
+          ride_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          failed_attempts?: number;
+          pin: string;
+          ride_id: string;
+        };
+        Update: {
+          created_at?: string;
+          failed_attempts?: number;
+          pin?: string;
+          ride_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "ride_pins_ride_id_fkey";
+            columns: ["ride_id"];
+            isOneToOne: true;
+            referencedRelation: "rides";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       ride_ratings: {
         Row: {
           comment: string | null;
@@ -1053,6 +1082,10 @@ export type Database = {
           _reason?: string;
         };
         Returns: Database["public"]["Tables"]["drivers"]["Row"];
+      };
+      start_trip_with_pin: {
+        Args: { _ride_id: string; _pin: string };
+        Returns: Database["public"]["Tables"]["rides"]["Row"];
       };
       list_driver_applications: {
         Args: { _status?: Database["public"]["Enums"]["driver_verification_status"] };
