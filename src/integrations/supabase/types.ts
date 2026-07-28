@@ -1083,6 +1083,25 @@ export type Database = {
         };
         Returns: Database["public"]["Tables"]["drivers"]["Row"];
       };
+      admin_overview: {
+        Args: Record<PropertyKey, never>;
+        Returns: {
+          pending_drivers: number;
+          verified_drivers: number;
+          suspended_drivers: number;
+          drivers_online: number;
+          active_rides: number;
+          rides_today: number;
+          completed_today: number;
+          cancelled_today: number;
+          gross_today: number;
+          commission_today: number;
+          open_sos: number;
+          open_fraud_signals: number;
+          passengers_total: number;
+          currency: string;
+        }[];
+      };
       driver_earnings: {
         Args: Record<PropertyKey, never>;
         Returns: {

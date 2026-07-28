@@ -197,18 +197,11 @@ export function ProfileScreen() {
             <div className="space-y-2">
               {[
                 {
-                  id: "admin-drivers",
-                  label: "Driver verification",
-                  sub: "Review and approve applications",
+                  id: "admin-console",
+                  label: "Admin console",
+                  sub: "Platform overview, verification & finance",
                   Icon: ShieldCheck,
-                  to: ROUTES.adminDrivers,
-                },
-                {
-                  id: "admin-finance",
-                  label: "Finance",
-                  sub: "Revenue, commission & payouts",
-                  Icon: Wallet,
-                  to: ROUTES.adminFinance,
+                  to: ROUTES.admin,
                 },
               ].map(renderRow)}
             </div>
