@@ -1,4 +1,5 @@
 import type { GeoPoint } from "@/types/ride";
+import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "./google-loader";
 
 export interface RoadRoute {
   /** Ordered points that follow the road network, for drawing the line. */
@@ -21,6 +22,18 @@ export async function fetchRoadRoute(
   to: GeoPoint,
   via: readonly GeoPoint[] = [],
 ): Promise<RoadRoute | null> {
+  // Google Directions when configured; OSRM stays the fallback so routing —
+  // and therefore fare quoting — never depends on a single provider.
+  if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
+    try {
+      const { fetchRoadRouteGoogle } = await import("./google-routing");
+      const route = await fetchRoadRouteGoogle(from, to, via);
+      if (route) return route;
+    } catch {
+      /* fall through to OSRM */
+    }
+  }
+
   const coords = [from, ...via, to].map((p) => `${p.lng},${p.lat}`).join(";");
   const url = `https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`;
   try {

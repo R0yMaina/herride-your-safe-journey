@@ -1,4 +1,5 @@
 import type { GeoPoint } from "@/types/ride";
+import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "./google-loader";
 
 export interface GeoResult {
   readonly label: string;
@@ -39,6 +40,30 @@ function toResult(f: PhotonFeature): GeoResult {
 export async function searchPlaces(query: string, near?: GeoPoint | null): Promise<GeoResult[]> {
   const q = query.trim();
   if (q.length < 3) return [];
+
+  // Search degrades in order: Places (best POI results) -> Geocoder ->
+  // Photon. Each step only runs if the one before it returned nothing, so a
+  // rejected key or an exhausted quota never leaves the rider without search.
+  try {
+    const { hasPlacesKey, searchPlacesGooglePlaces } = await import("./google-places");
+    if (hasPlacesKey()) {
+      const results = await searchPlacesGooglePlaces(q, near);
+      if (results.length > 0) return results;
+    }
+  } catch {
+    /* fall through */
+  }
+
+  if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
+    try {
+      const { searchPlacesGoogle } = await import("./google-geocoding");
+      const results = await searchPlacesGoogle(q, near);
+      if (results.length > 0) return results;
+    } catch {
+      /* fall through to Photon */
+    }
+  }
+
   const bias = near ? `&lat=${near.lat}&lon=${near.lng}` : "";
   const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=en${bias}`;
   try {
@@ -53,6 +78,15 @@ export async function searchPlaces(query: string, near?: GeoPoint | null): Promi
 
 /** Reverse geocode a point to an address (for tap/drag-to-select on the map). */
 export async function reverseGeocode(point: GeoPoint): Promise<GeoResult | null> {
+  if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
+    try {
+      const { reverseGeocodeGoogle } = await import("./google-geocoding");
+      const result = await reverseGeocodeGoogle(point);
+      if (result) return result;
+    } catch {
+      /* fall through to Photon */
+    }
+  }
   const url = `https://photon.komoot.io/reverse?lat=${point.lat}&lon=${point.lng}`;
   try {
     const res = await fetch(url);

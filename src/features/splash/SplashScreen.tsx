@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { HeRideMark } from "@/components/brand/HeRideMark";
+import { HeRideLockup } from "@/components/brand/HeRideLockup";
 import { appConfig } from "@/config/app.config";
 
 /** Pure presentational splash — routing decisions live in SplashRouter. */
@@ -7,7 +7,7 @@ export function SplashScreen() {
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-noir px-6">
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[420px] w-[420px] rounded-full bg-primary-glow/25 blur-3xl" />
+        <div className="h-[420px] w-[420px] rounded-full bg-primary-glow/10 blur-3xl" />
       </div>
       <motion.div
         initial={{ opacity: 0, y: 16 }}
@@ -15,16 +15,14 @@ export function SplashScreen() {
         transition={{ duration: 0.7, ease: "easeOut" }}
         className="relative z-10 flex flex-col items-center text-center"
       >
+        {/* The full lockup is the brand moment here — cheetah + wordmark. */}
         <motion.div
-          initial={{ scale: 0.85 }}
+          initial={{ scale: 0.9 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 140, delay: 0.1 }}
         >
-          <HeRideMark size={128} />
+          <HeRideLockup size={44} />
         </motion.div>
-        <span className="mt-8 text-[10px] font-medium uppercase tracking-[0.4em] text-primary/80">
-          {appConfig.name}
-        </span>
         <h1 className="mt-2 font-display text-5xl font-semibold text-foreground text-glow">
           {appConfig.tagline}
         </h1>

@@ -51,12 +51,66 @@
   --font-sans: "Manrope", sans-serif;
 }
 
-/* HeRide — Amethyst identity. Near-black base + vivid violet, the colour of
-   women's safety & empowerment. Premium, trustworthy, and high-contrast on a
-   phone (violet reads far better than muted gold). All screens inherit these
-   tokens. */
+/* HeRide — Amethyst on white. Violet stays the identity colour; the canvas
+   becomes light so the brand reads as clean, premium and approachable. The
+   violet is deepened (#7c3aed) so text and icons clear 4.5:1 on a light
+   surface, and button gradients darken so white labels stay legible. */
 :root {
   --radius: 1.25rem;
+  --background: #ffffff;
+  --foreground: #1a1426;
+  --noir: #ffffff;
+  --card: #fbfaff;
+  --card-foreground: #1a1426;
+  --popover: #ffffff;
+  --popover-foreground: #1a1426;
+  --primary: #7c3aed; /* deep violet — 5.9:1 on light */
+  --primary-foreground: #ffffff;
+  --primary-glow: #6d28d9;
+  --blush: #a78bfa;
+  --secondary: #efeaf9;
+  --secondary-foreground: #1a1426;
+  --muted: #efeaf9;
+  --muted-foreground: #635b78;
+  --accent: #ede9fb; /* elevated surface for subtle hovers */
+  --accent-foreground: #1a1426;
+  --destructive: #dc2626; /* crimson — emergency only */
+  --destructive-foreground: #ffffff;
+  --success: #15803d;
+  --warning: #b45309;
+  --info: #1d4ed8;
+  --border: rgba(26, 20, 38, 0.1);
+  --input: #ffffff;
+  --ring: #7c3aed;
+  --chart-1: #7c3aed;
+  --chart-2: #1d4ed8;
+  --chart-3: #15803d;
+  --chart-4: #b45309;
+  --chart-5: #635b78;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1a1426;
+  --sidebar-primary: #7c3aed;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ede9fb;
+  --sidebar-accent-foreground: #1a1426;
+  --sidebar-border: rgba(26, 20, 38, 0.1);
+  --sidebar-ring: #7c3aed;
+  --gradient-pink: linear-gradient(135deg, #8b5cf6, #7c3aed 45%, #6d28d9);
+  --gradient-noir: linear-gradient(180deg, #ffffff, #f5f2fb);
+  --shadow-glow: 0 8px 24px rgba(124, 58, 237, 0.28), 0 2px 8px rgba(124, 58, 237, 0.12);
+  --shadow-soft: 0 12px 32px -12px rgba(26, 20, 38, 0.14), 0 2px 8px rgba(26, 20, 38, 0.06);
+  /* Halos belong on a dark canvas; on white they read as smudges. */
+  --text-glow: none;
+  --doodle-glow: drop-shadow(0 2px 6px rgba(124, 58, 237, 0.28));
+
+  --font-display: "Playfair Display", serif;
+  --font-sans: "Manrope", sans-serif;
+}
+
+/* Dark mode — the original Amethyst identity, now a COMPLETE token set so
+   the toggle genuinely re-skins the app instead of only flipping the canvas.
+   Every value here mirrors a light token above. */
+.dark {
   --background: #121016;
   --foreground: #f8f6f2;
   --noir: #14101f;
@@ -64,17 +118,17 @@
   --card-foreground: #f8f6f2;
   --popover: #201c2a;
   --popover-foreground: #f8f6f2;
-  --primary: #8b5cf6; /* vivid violet */
+  --primary: #8b5cf6; /* brighter violet reads better on near-black */
   --primary-foreground: #14101f;
-  --primary-glow: #7c3aed; /* deep violet */
+  --primary-glow: #7c3aed;
   --blush: #c4b5fd;
   --secondary: #1a1622;
   --secondary-foreground: #f8f6f2;
   --muted: #1a1622;
   --muted-foreground: #bfb8cc;
-  --accent: #2a2537; /* elevated surface for subtle hovers */
+  --accent: #2a2537;
   --accent-foreground: #f8f6f2;
-  --destructive: #e11d48; /* crimson — emergency only */
+  --destructive: #e11d48;
   --destructive-foreground: #ffffff;
   --success: #3fae6a;
   --warning: #d4a017;
@@ -99,14 +153,8 @@
   --gradient-noir: linear-gradient(180deg, #14101f, #1a1622);
   --shadow-glow: 0 0 24px rgba(139, 92, 246, 0.3), 0 0 60px rgba(124, 58, 237, 0.15);
   --shadow-soft: 0 24px 60px -24px rgba(0, 0, 0, 0.72), 0 4px 14px rgba(0, 0, 0, 0.42);
-
-  --font-display: "Playfair Display", serif;
-  --font-sans: "Manrope", sans-serif;
-}
-
-.dark {
-  --background: #121016;
-  --foreground: #f8f6f2;
+  --text-glow: 0 0 20px rgba(139, 92, 246, 0.45);
+  --doodle-glow: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
 }
 
 @layer base {
@@ -144,10 +192,10 @@ body,
   box-shadow: var(--shadow-soft);
 }
 @utility text-glow {
-  text-shadow: 0 0 20px rgba(139, 92, 246, 0.45);
+  text-shadow: var(--text-glow);
 }
 @utility doodle-glow {
-  filter: drop-shadow(0 0 5px rgba(139, 92, 246, 0.5));
+  filter: var(--doodle-glow);
 }
 @utility scrollbar-hide {
   -ms-overflow-style: none;
