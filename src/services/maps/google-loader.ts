@@ -57,3 +57,15 @@ export function loadGoogleMaps(): Promise<typeof google> {
 export function isGoogleMapsEnabled(): boolean {
   return env.map.provider === "google" && Boolean(env.map.googleApiKey);
 }
+
+/**
+ * True when a key exists that can answer geocoding calls, regardless of which
+ * engine draws the basemap.
+ *
+ * Kept separate from {@link isGoogleMapsEnabled} on purpose: that one governs
+ * whether Google *renders the map*, and geocoding shouldn't be switched off
+ * just because tiles come from somewhere else.
+ */
+export function hasGeocodingKey(): boolean {
+  return Boolean(env.map.googleApiKey);
+}

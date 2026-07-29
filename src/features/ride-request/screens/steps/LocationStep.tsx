@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearch } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Circle, MapPin, Plus, Square, X } from "lucide-react";
 import { GlassCard } from "@/components/common";
@@ -16,6 +17,7 @@ import { formatDistance, formatDuration } from "../../lib/format";
 const CURRENT_LOCATION = SAVED_PICKUPS.find((p) => p.id === "p_current") ?? SAVED_PICKUPS[0];
 
 export function LocationStep() {
+  const { focus } = useSearch({ from: "/_app/book" });
   const pickup = useRideRequestStore((s) => s.pickup);
   const destination = useRideRequestStore((s) => s.destination);
   const stops = useRideRequestStore((s) => s.stops);
@@ -38,8 +40,12 @@ export function LocationStep() {
   useEffect(() => {
     if (initialised) return;
     if (!pickup) setPickup(CURRENT_LOCATION);
+    // Arriving from the home screen's search field means she has already said
+    // she wants to type a destination — opening the picker here saves the
+    // second tap that made that field feel like it did nothing.
+    if (focus === "destination" && !destination) setMapPicker("destination");
     setInitialised(true);
-  }, [initialised, pickup, setPickup]);
+  }, [initialised, pickup, setPickup, focus, destination]);
 
   useRouteEstimate();
 
