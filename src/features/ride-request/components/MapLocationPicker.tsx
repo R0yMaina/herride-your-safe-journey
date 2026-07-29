@@ -53,6 +53,8 @@ export function MapLocationPicker({
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<readonly GeoResult[]>([]);
   const [searching, setSearching] = useState(false);
+  /** Set when no geocoder could be reached at all, as opposed to no matches. */
+  const [unavailable, setUnavailable] = useState(false);
   const [locating, setLocating] = useState(false);
 
   // ---- search-mode autocomplete (debounced) ----
@@ -64,10 +66,16 @@ export function MapLocationPicker({
     }
     setSearching(true);
     const t = setTimeout(() => {
-      void searchPlaces(query, initial).then((r) => {
-        setResults(r);
-        setSearching(false);
-      });
+      void searchPlaces(query, initial)
+        .then((outcome) => {
+          setResults(outcome.results);
+          setUnavailable(outcome.unavailable);
+        })
+        .catch(() => {
+          setResults([]);
+          setUnavailable(true);
+        })
+        .finally(() => setSearching(false));
     }, 300);
     return () => clearTimeout(t);
   }, [query, initial]);
@@ -134,6 +142,8 @@ export function MapLocationPicker({
           results={results}
           recents={recents}
           locating={locating}
+          searching={searching}
+          unavailable={unavailable}
           onPickResult={(r) =>
             pick({ id: crypto.randomUUID(), label: r.label, address: r.address, coords: r.coords })
           }
@@ -183,6 +193,8 @@ function SearchList({
   results,
   recents,
   locating,
+  searching,
+  unavailable,
   onPickResult,
   onPickRecent,
   onUseCurrent,
@@ -192,6 +204,8 @@ function SearchList({
   results: readonly GeoResult[];
   recents: readonly Place[];
   locating: boolean;
+  searching: boolean;
+  unavailable: boolean;
   onPickResult: (r: GeoResult) => void;
   onPickRecent: (p: Place) => void;
   onUseCurrent: () => void;
@@ -240,6 +254,11 @@ function SearchList({
               </button>
             ))}
           </div>
+        ) : searching ? null : unavailable ? (
+          <p className="px-4 py-6 text-center text-sm text-muted-foreground">
+            Can&apos;t reach place search right now. Check your connection, or drop a pin with
+            &ldquo;Choose on the map&rdquo;.
+          </p>
         ) : (
           <p className="px-4 py-6 text-center text-sm text-muted-foreground">
             No matches — try a different search, or choose on the map.

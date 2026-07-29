@@ -8,11 +8,19 @@ export interface TileConfig {
 /**
  * Key-free fallback basemap (CARTO Voyager) — light, readable, no account
  * needed. Used whenever Mapbox isn't configured or its token is rejected.
+ *
+ * `@2x` is hardcoded rather than written as Leaflet's `{r}` placeholder.
+ * `{r}` only expands to "@2x" when `detectRetina` is on, and with it off the
+ * URL resolved to plain 256px tiles that every phone then upscaled — the map
+ * looked soft on any modern screen. Asking for the 512px image and laying it
+ * out in a 256px slot gives exactly 2x density, with no zoom shift (which is
+ * what `detectRetina` would add on top).
  */
 const CARTO_TILES: TileConfig = {
-  url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+  url: "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}@2x.png",
   options: {
     subdomains: "abcd",
+    tileSize: 256,
     maxZoom: 20,
     attribution: "&copy; OpenStreetMap &copy; CARTO",
   },

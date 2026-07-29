@@ -1,5 +1,8 @@
 import type { GeoPoint } from "@/types/ride";
-import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "./google-loader";
+import { hasGeocodingKey, hasGoogleAuthFailed } from "./google-loader";
+// Value import is safe here: google-places is a plain fetch module (env +
+// types only) and pulls in none of the Google JS SDK.
+import { hasPlacesKey } from "./google-places";
 import { mapboxUsable } from "./mapbox-loader";
 import { rankResults, type RankableResult } from "./result-ranking";
 
@@ -47,9 +50,22 @@ function toResult(f: PhotonFeature): GeoResult {
  * geocoder built for typeahead. Results are biased toward `near` when given.
  * Returns [] on any failure so the caller degrades gracefully.
  */
+/**
+ * Sentinel for a provider that never answered, kept distinct from `[]` so a
+ * timeout can't be mistaken for a genuine "no matches here".
+ */
+const TIMED_OUT: GeoResult[] = [];
+
 /** Give up on a provider rather than let it stall the whole search box. */
 function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
   return Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))]);
+}
+
+/** What a search run produced, and whether any provider was reachable. */
+export interface SearchOutcome {
+  readonly results: GeoResult[];
+  /** True when every provider errored or timed out — a network fault. */
+  readonly unavailable: boolean;
 }
 
 /**
@@ -64,21 +80,28 @@ function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
  *
  * Results are ranked so specific places beat broad areas (see rankResults).
  */
-export async function searchPlaces(query: string, near?: GeoPoint | null): Promise<GeoResult[]> {
+export async function searchPlaces(query: string, near?: GeoPoint | null): Promise<SearchOutcome> {
   const q = query.trim();
-  if (q.length < 3) return [];
+  if (q.length < 3) return { results: [], unavailable: false };
 
-  const sources: Promise<GeoResult[]>[] = [withTimeout(searchPhoton(q, near), 4000, [])];
+  const sources: Promise<GeoResult[]>[] = [withTimeout(searchPhoton(q, near), 4000, TIMED_OUT)];
 
-  if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
+  // Gated on the Places key alone, NOT on the basemap provider. Which engine
+  // draws tiles has nothing to do with which geocoders can answer a search,
+  // and tying them together meant a configured Places key was silently unused
+  // whenever the basemap was Mapbox or Leaflet.
+  // The key check happens HERE, not inside the closure: a provider that is
+  // switched off must not be enlisted at all, because returning [] from it
+  // would count as "answered" and mask a total outage of the others.
+  if (!hasGoogleAuthFailed() && hasPlacesKey()) {
     sources.push(
       withTimeout(
         (async () => {
-          const { hasPlacesKey, searchPlacesGooglePlaces } = await import("./google-places");
-          return hasPlacesKey() ? searchPlacesGooglePlaces(q, near) : [];
+          const { searchPlacesGooglePlaces } = await import("./google-places");
+          return searchPlacesGooglePlaces(q, near);
         })(),
         4000,
-        [],
+        TIMED_OUT,
       ),
     );
   }
@@ -91,36 +114,53 @@ export async function searchPlaces(query: string, near?: GeoPoint | null): Promi
           return searchPlacesMapbox(q, near);
         })(),
         4000,
-        [],
+        TIMED_OUT,
       ),
     );
   }
 
   const settled = await Promise.allSettled(sources);
-  const merged = settled.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
-  return rankResults(merged, near);
+  const answered = settled.filter(
+    (r): r is PromiseFulfilledResult<GeoResult[]> =>
+      r.status === "fulfilled" && r.value !== TIMED_OUT,
+  );
+  const merged = answered.flatMap((r) => r.value);
+
+  return {
+    results: rankResults(merged, near),
+    // Nobody answered: this is a connectivity problem, not a bad query, and
+    // telling her to "try a different search" would send her chasing her own
+    // spelling while the real fault is the network.
+    unavailable: answered.length === 0,
+  };
 }
 
 /** Photon typeahead — free, keyless, CORS-enabled, strong on OSM POI data. */
 async function searchPhoton(q: string, near?: GeoPoint | null): Promise<GeoResult[]> {
   const bias = near ? `&lat=${near.lat}&lon=${near.lng}` : "";
   const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(q)}&limit=6&lang=en${bias}`;
-  try {
-    const res = await fetch(url);
-    if (!res.ok) return [];
-    const data = (await res.json()) as { features?: PhotonFeature[] };
-    return (data.features ?? []).map(toResult);
-  } catch {
-    return [];
-  }
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Photon search failed (${res.status})`);
+  const data = (await res.json()) as { features?: PhotonFeature[] };
+  return (data.features ?? []).map(toResult);
 }
 
 /** Reverse geocode a point to an address (for tap/drag-to-select on the map). */
 export async function reverseGeocode(point: GeoPoint): Promise<GeoResult | null> {
-  if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
+  // Same reasoning as search: a usable key is what matters, not the basemap.
+  // Time-boxed, because this path loads the Google JS SDK — if that request
+  // hangs (blocked network, bad key) an unbounded await would leave the
+  // caller's label stuck on "Locating…" forever instead of trying Photon.
+  if (!hasGoogleAuthFailed() && hasGeocodingKey()) {
     try {
-      const { reverseGeocodeGoogle } = await import("./google-geocoding");
-      const result = await reverseGeocodeGoogle(point);
+      const result = await withTimeout(
+        (async () => {
+          const { reverseGeocodeGoogle } = await import("./google-geocoding");
+          return reverseGeocodeGoogle(point);
+        })(),
+        4000,
+        null,
+      );
       if (result) return result;
     } catch {
       /* fall through to Photon */

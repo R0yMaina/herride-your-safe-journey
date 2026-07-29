@@ -67,8 +67,12 @@ export function HomeSheet({
         </div>
       </div>
 
+      {/* Goes straight into the destination picker rather than just landing on
+          the booking step, so tapping a field that says "search" lets her
+          type immediately. */}
       <Link
         to={ROUTES.book}
+        search={{ focus: "destination" }}
         className="mt-4 flex items-center gap-3 rounded-2xl border border-border/60 bg-background/70 px-4 py-3.5 transition-colors hover:border-primary/40"
         aria-label="Search destination"
       >
