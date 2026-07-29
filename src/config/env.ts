@@ -39,6 +39,21 @@ export interface FinanceEnv {
 
 export type MapProvider = "leaflet" | "google" | "mapbox";
 
+/**
+ * A Mapbox public token is `pk.<base64url payload>.<base64url signature>`,
+ * ~90 chars, and never contains anything outside the base64url alphabet.
+ *
+ * This check exists because of a real deploy failure: the token was copied
+ * out of a dashboard that *abbreviates* long values, so what shipped was
+ * `pk.eyJ1Ijoicm95MTE1MyIs…` — an ellipsis, not a token. Vite happily
+ * inlined it, `Boolean(token)` was true, and every tile and geocode request
+ * came back 401 with no clue why. A malformed token is the same as no token,
+ * so treat it that way and fall back to the free providers.
+ */
+export function isValidMapboxToken(token: string): boolean {
+  return /^pk\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(token) && token.length >= 60;
+}
+
 /** Map/geo configuration. `provider` selects the map engine; Google unlocks
  * road-following routes (Directions) and address autocomplete (Places), and
  * requires a billing-enabled, referrer-restricted key. Defaults to the
@@ -93,7 +108,19 @@ export const env: AppEnv = Object.freeze({
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
         import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
     ),
-    mapboxToken: readString(import.meta.env.VITE_MAPBOX_TOKEN),
+    mapboxToken: ((): string => {
+      const raw = readString(import.meta.env.VITE_MAPBOX_TOKEN);
+      if (raw && !isValidMapboxToken(raw)) {
+        // Say so loudly — the failure this replaces was invisible.
+        console.warn(
+          `[env] VITE_MAPBOX_TOKEN is malformed (${raw.length} chars) and was ignored. ` +
+            `Expected pk.<payload>.<signature>. If it ends in "…" you copied the ` +
+            `dashboard's abbreviated display value, not the token. Falling back to OSM.`,
+        );
+        return "";
+      }
+      return raw;
+    })(),
     googlePlacesApiKey: readString(
       import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
         import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
