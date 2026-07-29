@@ -16,6 +16,7 @@ interface MapboxFeature {
     readonly name?: string;
     readonly full_address?: string;
     readonly place_formatted?: string;
+    readonly feature_type?: string;
   };
 }
 
@@ -27,6 +28,9 @@ function toResult(f: MapboxFeature, override?: GeoPoint): GeoResult | null {
     label: p.name || p.place_formatted?.split(",")[0] || "Location",
     address: p.full_address || p.place_formatted || "",
     coords: override ?? { lat: c![1], lng: c![0] },
+    // Mapbox leans administrative in this market; the kind lets the ranker
+    // push "Nairobi" below an actual mall or building.
+    kind: p.feature_type,
   };
 }
 
