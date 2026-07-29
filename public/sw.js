@@ -8,12 +8,7 @@
  */
 const CACHE = "heride-shell-v2";
 const OFFLINE_URL = "/offline.html";
-const STATIC_ASSETS = [
-  "/icon.svg",
-  "/icon-maskable.svg",
-  "/icon-192.png",
-  "/manifest.webmanifest",
-];
+const STATIC_ASSETS = ["/icon.svg", "/icon-maskable.svg", "/icon-192.png", "/manifest.webmanifest"];
 
 /**
  * Cache the offline page as a FRESH response.
