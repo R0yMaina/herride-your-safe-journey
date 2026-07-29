@@ -1,16 +1,20 @@
 import type { GeoPoint } from "@/types/ride";
 import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "./google-loader";
 import { mapboxUsable } from "./mapbox-loader";
+import { rankResults, type RankableResult } from "./result-ranking";
 
-export interface GeoResult {
+export interface GeoResult extends RankableResult {
   readonly label: string;
   readonly address: string;
   readonly coords: GeoPoint;
+  /** Provider classification, used only for ranking. */
+  readonly kind?: string;
 }
 
 interface PhotonFeature {
   geometry: { coordinates: [number, number] };
   properties: {
+    type?: string;
     name?: string;
     street?: string;
     housenumber?: string;
@@ -30,7 +34,12 @@ function toResult(f: PhotonFeature): GeoResult {
     .join(", ");
   const line2 = [p.city, p.state, p.country].filter(Boolean).join(", ");
   const address = [line1, line2].filter(Boolean).join(" · ") || line2 || "Selected location";
-  return { label: p.name || p.street || p.city || "Location", address, coords: { lat, lng } };
+  return {
+    label: p.name || p.street || p.city || "Location",
+    address,
+    coords: { lat, lng },
+    kind: p.type,
+  };
 }
 
 /**
@@ -38,47 +47,58 @@ function toResult(f: PhotonFeature): GeoResult {
  * geocoder built for typeahead. Results are biased toward `near` when given.
  * Returns [] on any failure so the caller degrades gracefully.
  */
+/** Give up on a provider rather than let it stall the whole search box. */
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return Promise.race([p, new Promise<T>((resolve) => setTimeout(() => resolve(fallback), ms))]);
+}
+
+/**
+ * Place search for the booking flow.
+ *
+ * Providers are queried IN PARALLEL rather than in a chain. A chain fails
+ * badly here: if the first provider is merely slow or silently returns
+ * nothing, the rider waits and then gets whatever the weaker provider said —
+ * which is how "Yaya Centre" ends up showing "Nairobi, Kenya". Racing them
+ * and ranking the union means the best answer wins regardless of which
+ * service is healthy.
+ *
+ * Results are ranked so specific places beat broad areas (see rankResults).
+ */
 export async function searchPlaces(query: string, near?: GeoPoint | null): Promise<GeoResult[]> {
   const q = query.trim();
   if (q.length < 3) return [];
 
-  // Photon leads deliberately. Measured against Nairobi landmarks it is the
-  // only provider that finds them: "Yaya Centre" and "Two Rivers Mall" return
-  // nothing from Mapbox, and "Sarit Centre" resolves to a village 400km away.
-  // A ride-hailing app in Nairobi lives on landmark search, so the keyless
-  // geocoder with the best local POI data goes first; the paid providers are
-  // the fallback, not the other way round.
-  const photon = await searchPhoton(q, near);
-  if (photon.length > 0) return photon;
+  const sources: Promise<GeoResult[]>[] = [withTimeout(searchPhoton(q, near), 4000, [])];
 
   if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
-    try {
-      const { hasPlacesKey, searchPlacesGooglePlaces } = await import("./google-places");
-      if (hasPlacesKey()) {
-        const results = await searchPlacesGooglePlaces(q, near);
-        if (results.length > 0) return results;
-      }
-    } catch {
-      /* fall through */
-    }
-    try {
-      const { searchPlacesGoogle } = await import("./google-geocoding");
-      const results = await searchPlacesGoogle(q, near);
-      if (results.length > 0) return results;
-    } catch {
-      /* fall through */
-    }
+    sources.push(
+      withTimeout(
+        (async () => {
+          const { hasPlacesKey, searchPlacesGooglePlaces } = await import("./google-places");
+          return hasPlacesKey() ? searchPlacesGooglePlaces(q, near) : [];
+        })(),
+        4000,
+        [],
+      ),
+    );
   }
 
   if (mapboxUsable()) {
-    try {
-      const { searchPlacesMapbox } = await import("./mapbox-geocoding");
-      return await searchPlacesMapbox(q, near);
-    } catch {
-      /* nothing left to try */
-    }
+    sources.push(
+      withTimeout(
+        (async () => {
+          const { searchPlacesMapbox } = await import("./mapbox-geocoding");
+          return searchPlacesMapbox(q, near);
+        })(),
+        4000,
+        [],
+      ),
+    );
   }
-  return [];
+
+  const settled = await Promise.allSettled(sources);
+  const merged = settled.flatMap((r) => (r.status === "fulfilled" ? r.value : []));
+  return rankResults(merged, near);
 }
 
 /** Photon typeahead — free, keyless, CORS-enabled, strong on OSM POI data. */
