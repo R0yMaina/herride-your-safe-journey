@@ -10,19 +10,25 @@ interface CheetahRunProps {
   readonly onSettled?: () => void;
 }
 
+/**
+ * How long the sprint takes, in seconds. Trails and speed lines are derived
+ * from this so the whole entrance stays in step if it's ever retuned.
+ */
+const RUN_DURATION = 1.7;
+
 /** Ghosted copies trailing the runner — the classic speed-blur read. */
 const TRAILS = [
-  { delay: 0.06, opacity: 0.28 },
-  { delay: 0.12, opacity: 0.16 },
-  { delay: 0.18, opacity: 0.08 },
+  { delay: 0.11, opacity: 0.28 },
+  { delay: 0.22, opacity: 0.16 },
+  { delay: 0.33, opacity: 0.08 },
 ];
 
 /** Horizontal streaks that rip past as she crosses the frame. */
 const SPEED_LINES = [
-  { top: "30%", width: 120, delay: 0.15 },
-  { top: "46%", width: 180, delay: 0.05 },
-  { top: "58%", width: 90, delay: 0.24 },
-  { top: "68%", width: 150, delay: 0.12 },
+  { top: "30%", width: 120, delay: 0.28 },
+  { top: "46%", width: 180, delay: 0.09 },
+  { top: "58%", width: 90, delay: 0.45 },
+  { top: "68%", width: 150, delay: 0.22 },
 ];
 
 /**
@@ -46,7 +52,7 @@ export function CheetahRun({ size = 200, className, onSettled }: CheetahRunProps
         style={{ width: size }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.9 }}
         onAnimationComplete={onSettled}
       >
         <CheetahMark className="w-full text-foreground" />
@@ -64,7 +70,7 @@ export function CheetahRun({ size = 200, className, onSettled }: CheetahRunProps
           style={{ top, width }}
           initial={{ x: size * 0.9, opacity: 0 }}
           animate={{ x: -size * 1.4, opacity: [0, 0.9, 0] }}
-          transition={{ duration: 0.55, delay, ease: "easeOut" }}
+          transition={{ duration: 1.05, delay, ease: "easeOut" }}
         />
       ))}
 
@@ -75,7 +81,7 @@ export function CheetahRun({ size = 200, className, onSettled }: CheetahRunProps
           className="absolute inset-0"
           initial={{ x: "-135%", opacity: 0 }}
           animate={{ x: "0%", opacity: [0, opacity, 0] }}
-          transition={{ duration: 0.9, delay, ease: [0.16, 0.8, 0.3, 1] }}
+          transition={{ duration: RUN_DURATION, delay, ease: [0.16, 0.8, 0.3, 1] }}
         >
           <CheetahMark className="w-full text-foreground" />
         </motion.div>
@@ -92,10 +98,10 @@ export function CheetahRun({ size = 200, className, onSettled }: CheetahRunProps
           scaleX: [1.06, 1.06, 1, 1, 1],
         }}
         transition={{
-          duration: 0.9,
+          duration: RUN_DURATION,
           ease: [0.16, 0.8, 0.3, 1],
-          y: { duration: 0.9, times: [0, 0.3, 0.55, 0.78, 1] },
-          scaleX: { duration: 0.9, times: [0, 0.4, 0.7, 0.85, 1] },
+          y: { duration: RUN_DURATION, times: [0, 0.3, 0.55, 0.78, 1] },
+          scaleX: { duration: RUN_DURATION, times: [0, 0.4, 0.7, 0.85, 1] },
         }}
         onAnimationComplete={onSettled}
       >

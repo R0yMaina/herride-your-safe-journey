@@ -6,7 +6,10 @@ export const appConfig = Object.freeze({
   supportEmail: "care@heride.app",
   defaultLocale: "en-KE",
   defaultCurrency: "KES",
-  splash: { minDurationMs: 1600 },
+  // Long enough for the full cheetah entrance to land and the wordmark to
+  // resolve — see CheetahRun/SplashScreen. Shorten this and the sprint gets
+  // cut off mid-stride.
+  splash: { minDurationMs: 3000 },
   api: {
     baseUrl: env.apiBaseUrl,
     timeoutMs: 15_000,

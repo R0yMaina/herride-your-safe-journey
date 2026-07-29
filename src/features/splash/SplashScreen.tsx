@@ -25,8 +25,8 @@ export function SplashScreen() {
         animate={landed ? { width: "0%" } : { width: "50%" }}
         transition={
           landed
-            ? { duration: 0.5, ease: [0.4, 0, 0.2, 1] }
-            : { duration: 0.85, ease: [0.16, 0.8, 0.3, 1], delay: 0.1 }
+            ? { duration: 0.9, ease: [0.4, 0, 0.2, 1] }
+            : { duration: 1.6, ease: [0.16, 0.8, 0.3, 1], delay: 0.18 }
         }
       />
       <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
@@ -41,7 +41,7 @@ export function SplashScreen() {
           className="flex flex-col items-center"
           initial={{ opacity: 0, y: 10 }}
           animate={landed ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.45, ease: "easeOut" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <span className="mt-6 font-display text-4xl font-semibold leading-none tracking-tight text-foreground">
             Her<span className="text-muted-foreground">ide</span>
@@ -54,7 +54,7 @@ export function SplashScreen() {
               className="h-full bg-gradient-pink"
               initial={{ x: "-100%" }}
               animate={{ x: "100%" }}
-              transition={{ repeat: Infinity, duration: 1.4, ease: "easeInOut" }}
+              transition={{ repeat: Infinity, duration: 2.2, ease: "easeInOut" }}
               style={{ width: "60%" }}
             />
           </div>
