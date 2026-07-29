@@ -5,6 +5,15 @@ export interface PromoPreview {
   readonly discount: number;
 }
 
+/** A live offer, for surfacing on the home screen. */
+export interface ActivePromo {
+  readonly code: string;
+  /** Short headline, e.g. "20% off your ride". */
+  readonly headline: string;
+  /** The code's own description, or null if it has none. */
+  readonly description: string | null;
+}
+
 export interface ReferralInfo {
   readonly code: string;
   /** Shareable invite link built from the code. */
@@ -12,6 +21,13 @@ export interface ReferralInfo {
 }
 
 export interface IPromoService {
+  /**
+   * Live offers to advertise on the home screen.
+   *
+   * Display only — the discount a rider actually gets is still decided by
+   * `validate_promo` server-side, so nothing here can inflate a fare.
+   */
+  listActive(): Promise<readonly ActivePromo[]>;
   /** Validate a promo code against a fare subtotal; throws with a reason if invalid. */
   validate(code: string, subtotal: number): Promise<PromoPreview>;
   /** Lock a validated code onto a requested ride (server re-validates + records redemption). */
@@ -38,6 +54,15 @@ export class MockPromoService implements IPromoService {
   private readonly used = new Set<string>();
   private referral: string | null = null;
   private referredBy: string | null = null;
+
+  async listActive(): Promise<readonly ActivePromo[]> {
+    await delay(120);
+    return Object.entries(MOCK_CODES).map(([code, promo]) => ({
+      code,
+      headline: `${promo.percent}% off your ride`,
+      description: promo.label,
+    }));
+  }
 
   async validate(code: string, subtotal: number): Promise<PromoPreview> {
     await delay();

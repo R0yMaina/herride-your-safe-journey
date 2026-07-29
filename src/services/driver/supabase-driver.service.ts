@@ -7,6 +7,7 @@ import type {
   DriverLiveLocation,
   DriverLocationPing,
   IDriverService,
+  NearbyDriver,
   PublicDriver,
 } from "./driver.service";
 
@@ -236,5 +237,28 @@ export class SupabaseDriverService implements IDriverService {
       plate: driver.vehicle_plate,
       color: driver.vehicle_color,
     };
+  }
+
+  async nearbyDrivers(
+    center: { readonly lat: number; readonly lng: number },
+    radiusKm = 5,
+    limit = 10,
+  ): Promise<readonly NearbyDriver[]> {
+    const { data, error } = await supabase.rpc("nearest_available_drivers", {
+      _lat: center.lat,
+      _lng: center.lng,
+      _radius_km: radiusKm,
+      _limit: limit,
+    });
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      driverUserId: row.driver_user_id,
+      lat: row.lat,
+      lng: row.lng,
+      distanceKm: Number(row.distance_km),
+      rating: Number(row.rating ?? 5),
+      vehicle: [row.vehicle_make, row.vehicle_model].filter(Boolean).join(" ") || "Vehicle",
+      plate: row.vehicle_plate,
+    }));
   }
 }
