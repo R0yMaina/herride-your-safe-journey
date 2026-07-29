@@ -1,5 +1,6 @@
 import type { GeoPoint } from "@/types/ride";
 import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "./google-loader";
+import { mapboxUsable } from "./mapbox-loader";
 
 export interface RoadRoute {
   /** Ordered points that follow the road network, for drawing the line. */
@@ -22,8 +23,19 @@ export async function fetchRoadRoute(
   to: GeoPoint,
   via: readonly GeoPoint[] = [],
 ): Promise<RoadRoute | null> {
-  // Google Directions when configured; OSRM stays the fallback so routing —
-  // and therefore fare quoting — never depends on a single provider.
+  // Mapbox first (it has an SLA, unlike the OSRM demo server), then Google,
+  // then OSRM — routing, and therefore fare quoting, never depends on a
+  // single provider.
+  if (mapboxUsable()) {
+    try {
+      const { fetchRoadRouteMapbox } = await import("./mapbox-routing");
+      const route = await fetchRoadRouteMapbox(from, to, via);
+      if (route) return route;
+    } catch {
+      /* fall through */
+    }
+  }
+
   if (isGoogleMapsEnabled() && !hasGoogleAuthFailed()) {
     try {
       const { fetchRoadRouteGoogle } = await import("./google-routing");
