@@ -20,3 +20,33 @@ export function formatDistanceKm(km: number): string {
   if (km < 1) return `${Math.round(km * 1000)} m`;
   return `${km.toFixed(1)} km`;
 }
+
+/** Nairobi CBD — where a map opens when the browser gives us nothing. */
+export const FALLBACK_CENTER: GeoPoint = { lat: -1.2921, lng: 36.8219 };
+
+/**
+ * Best-effort current position, resolving to {@link FALLBACK_CENTER} when
+ * geolocation is unavailable or denied.
+ *
+ * Never rejects: every caller is drawing a map, and a map that fails to open
+ * because a permission prompt was dismissed is worse than one centred on the
+ * wrong city.
+ */
+export function getCurrentPosition(): Promise<GeoPoint & { readonly heading?: number }> {
+  return new Promise((resolve) => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      resolve(FALLBACK_CENTER);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          heading: pos.coords.heading ?? undefined,
+        }),
+      () => resolve(FALLBACK_CENTER),
+      { enableHighAccuracy: true, timeout: 5000 },
+    );
+  });
+}

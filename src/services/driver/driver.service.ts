@@ -17,8 +17,11 @@ export interface PublicDriver {
   readonly color: string | null;
 }
 
+/** An available driver near a rider, as returned by nearest_available_drivers. */
 export interface NearbyDriver {
   readonly driverUserId: string;
+  readonly lat: number;
+  readonly lng: number;
   readonly distanceKm: number;
   readonly rating: number;
   readonly vehicle: string;
@@ -56,6 +59,19 @@ export interface IDriverService {
    */
   startTripWithPin(rideId: string, pin: string): Promise<RideRecord>;
   getPublicDriver(userId: string): Promise<PublicDriver | null>;
+  /**
+   * Available drivers around a point, for the rider's home map.
+   *
+   * Backed by the `nearest_available_drivers` SECURITY DEFINER function, which
+   * is the only thing a rider may use to see driver positions — it filters to
+   * verified female drivers with a fresh ping, so no raw `driver_locations`
+   * read is ever needed client-side.
+   */
+  nearbyDrivers(
+    center: { readonly lat: number; readonly lng: number },
+    radiusKm?: number,
+    limit?: number,
+  ): Promise<readonly NearbyDriver[]>;
   /** Last known position of a driver (passenger-side; RLS-gated). */
   getDriverLocation(driverUserId: string): Promise<DriverLiveLocation | null>;
   /** Live GPS stream of one driver, for the passenger's active trip. */
@@ -106,6 +122,31 @@ export class MockDriverService implements IDriverService {
   async getPublicDriver(): Promise<PublicDriver | null> {
     await delay();
     return null;
+  }
+  async nearbyDrivers(
+    center: { readonly lat: number; readonly lng: number },
+    radiusKm = 5,
+  ): Promise<readonly NearbyDriver[]> {
+    await delay(120);
+    // Fixed offsets rather than random ones: the home map should look the
+    // same on every render in mock mode, or it reads as drivers teleporting.
+    const offsets = [
+      { dLat: 0.012, dLng: 0.008, km: 1.6 },
+      { dLat: -0.009, dLng: 0.015, km: 2.0 },
+      { dLat: 0.006, dLng: -0.017, km: 2.1 },
+      { dLat: -0.018, dLng: -0.006, km: 2.2 },
+    ];
+    return offsets
+      .filter((o) => o.km <= radiusKm)
+      .map((o, i) => ({
+        driverUserId: `mock-driver-${i}`,
+        lat: center.lat + o.dLat,
+        lng: center.lng + o.dLng,
+        distanceKm: o.km,
+        rating: 4.9,
+        vehicle: "Toyota Vitz",
+        plate: null,
+      }));
   }
   async getDriverLocation(): Promise<DriverLiveLocation | null> {
     await delay(50);

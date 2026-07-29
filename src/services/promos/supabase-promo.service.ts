@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { IPromoService, PromoPreview, ReferralInfo } from "./promo.service";
+import type { ActivePromo, IPromoService, PromoPreview, ReferralInfo } from "./promo.service";
 
 function referralUrl(code: string): string {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -7,6 +7,28 @@ function referralUrl(code: string): string {
 }
 
 export class SupabasePromoService implements IPromoService {
+  async listActive(): Promise<readonly ActivePromo[]> {
+    const now = new Date().toISOString();
+    // RLS already restricts this table to `active = true`; the date window is
+    // the part it can't express, so filter it here.
+    const { data, error } = await supabase
+      .from("promo_codes")
+      .select("code, description, discount_type, value")
+      .lte("starts_at", now)
+      .or(`expires_at.is.null,expires_at.gt.${now}`)
+      .order("created_at", { ascending: false })
+      .limit(5);
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      code: row.code,
+      headline:
+        row.discount_type === "fixed"
+          ? `KES ${Number(row.value)} off your ride`
+          : `${Number(row.value)}% off your ride`,
+      description: row.description,
+    }));
+  }
+
   async validate(code: string, subtotal: number): Promise<PromoPreview> {
     const { data, error } = await supabase.rpc("validate_promo", {
       _code: code.trim().toUpperCase(),

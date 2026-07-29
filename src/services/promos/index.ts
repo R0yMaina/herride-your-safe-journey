@@ -6,4 +6,4 @@ export const promoService: IPromoService = env.useMocks
   ? new MockPromoService()
   : new SupabasePromoService();
 
-export type { IPromoService, PromoPreview, ReferralInfo } from "./promo.service";
+export type { ActivePromo, IPromoService, PromoPreview, ReferralInfo } from "./promo.service";
