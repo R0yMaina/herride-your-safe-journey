@@ -37,7 +37,7 @@ export interface FinanceEnv {
   readonly commissionRate: number;
 }
 
-export type MapProvider = "leaflet" | "google";
+export type MapProvider = "leaflet" | "google" | "mapbox";
 
 /** Map/geo configuration. `provider` selects the map engine; Google unlocks
  * road-following routes (Directions) and address autocomplete (Places), and
@@ -48,6 +48,8 @@ export interface MapEnv {
   readonly googleApiKey: string;
   /** Separate key for the Places API (New). Falls back to the Maps key. */
   readonly googlePlacesApiKey: string;
+  /** Mapbox public token (pk.*) — basemap tiles, geocoding and directions. */
+  readonly mapboxToken: string;
 }
 
 export interface AppEnv {
@@ -83,13 +85,15 @@ export const env: AppEnv = Object.freeze({
     commissionRate: readNumber(import.meta.env.VITE_COMMISSION_RATE, 0.1),
   }),
   map: Object.freeze({
-    provider: (readString(import.meta.env.VITE_MAP_PROVIDER, "leaflet") === "google"
-      ? "google"
-      : "leaflet") as MapProvider,
+    provider: ((): MapProvider => {
+      const raw = readString(import.meta.env.VITE_MAP_PROVIDER, "leaflet");
+      return raw === "google" || raw === "mapbox" ? raw : "leaflet";
+    })(),
     googleApiKey: readString(
       import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
         import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
     ),
+    mapboxToken: readString(import.meta.env.VITE_MAPBOX_TOKEN),
     googlePlacesApiKey: readString(
       import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
         import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
