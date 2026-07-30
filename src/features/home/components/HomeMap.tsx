@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
+import { LocateFixed } from "lucide-react";
 import type { GeoPoint } from "@/types/ride";
 import type { NearbyDriver } from "@/services/driver";
 import { basemapTiles } from "@/services/maps/tiles";
+import { enableCooperativeGestures } from "@/services/maps/leaflet-gestures";
 import { FALLBACK_CENTER } from "@/lib/geo";
 import { useThemeStore } from "@/store/theme.store";
 import { cn } from "@/lib/utils";
@@ -52,10 +54,12 @@ interface MapState {
  * The ambient map behind the home screen: the rider's position and the
  * verified drivers currently available around her.
  *
- * Deliberately non-interactive — dragging and zooming are off. This map is
- * scenery behind a sheet the rider is meant to tap through, and a pannable
- * map under a draggable sheet fights the sheet for every touch. Booking opens
- * the real, interactive picker.
+ * Pannable and zoomable. The home screen is a fixed-height surface with no
+ * page scroll, so a one-finger drag is safe here — unlike the booking flow's
+ * preview, which sits in a scrolling form and needs two.
+ *
+ * Once she moves the map herself we stop recentring on her GPS, or every tick
+ * would drag the view back from wherever she was looking.
  *
  * Client-only: Leaflet touches `window`, so it is imported inside an effect
  * and never runs during SSR.
@@ -72,6 +76,9 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
    * never run again and data that arrived first would never be drawn.
    */
   const [ready, setReady] = useState(false);
+  /** True once she has panned or zoomed, so we stop recentring on her. */
+  const [movedByUser, setMovedByUser] = useState(false);
+  const detachGesturesRef = useRef<(() => void) | null>(null);
   const dark = useThemeStore((s) => s.mode) === "dark";
   // Read inside the mount effect without making the theme a dependency there.
   const darkRef = useRef(dark);
@@ -87,12 +94,7 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
       const map = L.map(containerRef.current, {
         zoomControl: false,
         attributionControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
         boxZoom: false,
-        keyboard: false,
       }).setView([center?.lat ?? FALLBACK_CENTER.lat, center?.lng ?? FALLBACK_CENTER.lng], 14);
       const cfg = basemapTiles(darkRef.current);
       const tiles = L.tileLayer(cfg.url, { ...cfg.options }).addTo(map);
@@ -108,6 +110,14 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
       observer.observe(containerRef.current);
       observerRef.current = observer;
 
+      // One finger is enough here: the home screen is a fixed-height surface
+      // with no page scroll to compete for.
+      detachGesturesRef.current = enableCooperativeGestures(map, containerRef.current, {
+        requireTwoFingerPan: false,
+      });
+
+      map.on("dragend zoomend", () => setMovedByUser(true));
+
       setReady(true);
     })();
 
@@ -115,6 +125,8 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
       cancelled = true;
       observerRef.current?.disconnect();
       observerRef.current = null;
+      detachGesturesRef.current?.();
+      detachGesturesRef.current = null;
       stateRef.current?.map.remove();
       stateRef.current = null;
       setReady(false);
@@ -135,7 +147,9 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
   useEffect(() => {
     const s = stateRef.current;
     if (!s || !center) return;
-    s.map.setView([center.lat, center.lng], 14, { animate: true });
+    // Only follow her while she hasn't taken the map over herself — otherwise
+    // every GPS tick would drag the view back from wherever she panned to.
+    if (!movedByUser) s.map.setView([center.lat, center.lng], 14, { animate: true });
     if (!s.riderM) {
       s.riderM = s.L.marker([center.lat, center.lng], {
         icon: riderIcon(s.L),
@@ -174,10 +188,29 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
   // overflow-hidden is a backstop: nothing Leaflet draws should ever escape
   // the map's box and land on the sheet.
   return (
-    <div
-      ref={containerRef}
-      className={cn("h-full w-full overflow-hidden", className)}
-      aria-hidden
-    />
+    <div className={cn("relative h-full w-full overflow-hidden", className)}>
+      <div
+        ref={containerRef}
+        className="absolute inset-0"
+        role="application"
+        aria-label="Map of your area and nearby drivers"
+      />
+      {/* Only offered once she has moved away — before that it would do
+          nothing, and the home screen has little room to spare. */}
+      {movedByUser && center && (
+        <button
+          type="button"
+          onClick={() => {
+            setMovedByUser(false);
+            stateRef.current?.map.setView([center.lat, center.lng], 14, { animate: true });
+          }}
+          aria-label="Recentre on my location"
+          title="Recentre on my location"
+          className="absolute right-3 top-20 z-[500] grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-soft backdrop-blur transition-colors hover:border-primary/40 hover:text-primary"
+        >
+          <LocateFixed className="h-4 w-4" />
+        </button>
+      )}
+    </div>
   );
 }

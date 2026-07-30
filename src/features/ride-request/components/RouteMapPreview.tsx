@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import "leaflet/dist/leaflet.css";
 import type * as Leaflet from "leaflet";
-import { LocateFixed } from "lucide-react";
+import { LocateFixed, Maximize2, Minus, Plus } from "lucide-react";
 import type { GeoPoint, RouteEstimate } from "@/types/ride";
 import { basemapTiles } from "@/services/maps/tiles";
+import { enableCooperativeGestures } from "@/services/maps/leaflet-gestures";
 import { FALLBACK_CENTER } from "@/lib/geo";
 import { useThemeStore } from "@/store/theme.store";
 import { cn } from "@/lib/utils";
@@ -83,6 +84,10 @@ export function RouteMapPreview({
   const observerRef = useRef<ResizeObserver | null>(null);
   const [ready, setReady] = useState(false);
   const [locating, setLocating] = useState(true);
+  const [wheelHint, setWheelHint] = useState(false);
+  /** True once she has panned or zoomed, so auto-framing backs off. */
+  const [movedByUser, setMovedByUser] = useState(false);
+  const detachGesturesRef = useRef<(() => void) | null>(null);
   const dark = useThemeStore((s) => s.mode) === "dark";
   // Read inside the mount effect without making the theme a dependency there.
   const darkRef = useRef(dark);
@@ -94,14 +99,11 @@ export function RouteMapPreview({
       const L = await import("leaflet");
       if (cancelled || !containerRef.current || stateRef.current) return;
       const map = L.map(containerRef.current, {
+        // Our own buttons sit in the corner instead — Leaflet's default control
+        // doesn't inherit the design tokens.
         zoomControl: false,
         attributionControl: false,
-        dragging: false,
-        scrollWheelZoom: false,
-        doubleClickZoom: false,
-        touchZoom: false,
         boxZoom: false,
-        keyboard: false,
       }).setView([FALLBACK_CENTER.lat, FALLBACK_CENTER.lng], 12);
       const cfg = basemapTiles(darkRef.current);
       const tiles = L.tileLayer(cfg.url, { ...cfg.options }).addTo(map);
@@ -119,6 +121,19 @@ export function RouteMapPreview({
       const observer = new ResizeObserver(() => map.invalidateSize());
       observer.observe(containerRef.current);
       observerRef.current = observer;
+
+      // Pan/zoom without stealing the page's scroll — two fingers here, since
+      // this card lives inside a scrolling form.
+      detachGesturesRef.current = enableCooperativeGestures(map, containerRef.current, {
+        requireTwoFingerPan: true,
+        onWheelHint: setWheelHint,
+      });
+
+      // Once she has moved the map herself, stop re-framing it under her; the
+      // Recentre button is how she asks for the route framing back.
+      const markMoved = () => setMovedByUser(true);
+      map.on("dragend", markMoved);
+      map.on("zoomend", markMoved);
 
       // Live position, tracked for as long as the preview is on screen.
       if (typeof navigator !== "undefined" && navigator.geolocation) {
@@ -150,6 +165,8 @@ export function RouteMapPreview({
       cancelled = true;
       observerRef.current?.disconnect();
       observerRef.current = null;
+      detachGesturesRef.current?.();
+      detachGesturesRef.current = null;
       const s = stateRef.current;
       if (s) {
         if (s.watchId !== null && typeof navigator !== "undefined") {
@@ -234,15 +251,32 @@ export function RouteMapPreview({
       );
     }
 
-    if (shape.length >= 2) {
-      map.fitBounds(L.latLngBounds(shape.map((p) => [p.lat, p.lng] as [number, number])), {
-        padding: [28, 28],
-      });
-    } else if (shape.length === 1) {
-      map.setView([shape[0].lat, shape[0].lng], 15);
-    }
+    // Don't yank the view back while she is looking around. A changed route is
+    // still worth re-framing, so this only holds until the shape changes.
+    if (!movedByUser) frame(shape);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready, shapeKey]);
+
+  // A new route means new framing is wanted again, even after panning.
+  useEffect(() => setMovedByUser(false), [shapeKey]);
+
+  /** Fits the given shape, or the current one, into the frame. */
+  function frame(shape?: readonly GeoPoint[]) {
+    const s = stateRef.current;
+    if (!s) return;
+    const pts =
+      shape ??
+      (route && route.polyline.length >= 2
+        ? route.polyline
+        : [pickup, ...stops, destination].filter((p): p is GeoPoint => Boolean(p)));
+    if (pts.length >= 2) {
+      s.map.fitBounds(s.L.latLngBounds(pts.map((p) => [p.lat, p.lng] as [number, number])), {
+        padding: [28, 28],
+      });
+    } else if (pts.length === 1) {
+      s.map.setView([pts[0].lat, pts[0].lng], 15);
+    }
+  }
 
   const hasSomething = Boolean(route || pickup || destination);
 
@@ -254,7 +288,14 @@ export function RouteMapPreview({
         className,
       )}
     >
-      <div ref={containerRef} className="absolute inset-0" aria-hidden />
+      {/* Interactive, so it is exposed to assistive tech rather than hidden.
+          Leaflet's keyboard handler pans with the arrow keys once focused. */}
+      <div
+        ref={containerRef}
+        className="absolute inset-0"
+        role="application"
+        aria-label="Trip route map — pan with two fingers, zoom with the buttons or ctrl and scroll"
+      />
 
       {/* Tells her the blue dot is her, and that it's still resolving. */}
       <div className="pointer-events-none absolute left-3 top-3 z-[500] flex items-center gap-1.5 rounded-full bg-card/90 px-2.5 py-1.5 text-[10px] font-medium uppercase tracking-[0.16em] text-muted-foreground shadow-soft backdrop-blur">
@@ -264,11 +305,65 @@ export function RouteMapPreview({
         {locating ? "Locating you" : "Your live location"}
       </div>
 
+      {/* Zoom + recentre. Buttons matter beyond convenience: they are the only
+          way to zoom without a trackpad modifier or two free fingers. */}
+      <div className="absolute bottom-3 right-3 z-[500] flex flex-col gap-1.5">
+        <MapButton label="Zoom in" onClick={() => stateRef.current?.map.zoomIn()}>
+          <Plus className="h-4 w-4" />
+        </MapButton>
+        <MapButton label="Zoom out" onClick={() => stateRef.current?.map.zoomOut()}>
+          <Minus className="h-4 w-4" />
+        </MapButton>
+        {hasSomething && (
+          <MapButton
+            label="Recentre on route"
+            onClick={() => {
+              setMovedByUser(false);
+              frame();
+            }}
+          >
+            <Maximize2 className="h-4 w-4" />
+          </MapButton>
+        )}
+      </div>
+
+      {/* The cooperative-gesture nudge, same idea as Google Maps' overlay. */}
+      {wheelHint && (
+        <div className="pointer-events-none absolute inset-0 z-[600] grid place-items-center bg-noir/45 backdrop-blur-[1px]">
+          <p className="rounded-full bg-card/95 px-3.5 py-2 text-xs font-medium text-foreground shadow-soft">
+            Hold ctrl (or ⌘) and scroll to zoom
+          </p>
+        </div>
+      )}
+
       {!hasSomething && (
         <div className="pointer-events-none absolute inset-x-0 bottom-3 z-[500] text-center text-[10px] uppercase tracking-[0.3em] text-muted-foreground">
           Pick a pickup and destination
         </div>
       )}
     </div>
+  );
+}
+
+/** Small round control that floats over a map. */
+function MapButton({
+  label,
+  onClick,
+  children,
+}: {
+  readonly label: string;
+  readonly onClick: () => void;
+  readonly children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      title={label}
+      className="grid h-9 w-9 place-items-center rounded-full border border-border/60 bg-card/90 text-foreground shadow-soft backdrop-blur transition-colors hover:border-primary/40 hover:text-primary"
+    >
+      {children}
+    </button>
   );
 }
