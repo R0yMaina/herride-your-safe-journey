@@ -1,10 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "heride-your-safe-journey",
+  "main": "src/server.ts",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
   "observability": {
     "enabled": false
   }
-  "main" "src/server.ts",
 }
