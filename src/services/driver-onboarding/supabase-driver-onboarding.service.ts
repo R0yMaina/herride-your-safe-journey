@@ -2,6 +2,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type {
   DriverApplication,
   DriverApplicationInput,
+  DriverCheckState,
   IDriverOnboardingService,
 } from "./driver-onboarding.service";
 
@@ -76,5 +77,23 @@ export class SupabaseDriverOnboardingService implements IDriverOnboardingService
       .upload(path, file, { upsert: true, contentType: file.type || "image/jpeg" });
     if (error) throw new Error(error.message);
     return path;
+  }
+
+  async getCheckState(): Promise<DriverCheckState | null> {
+    const { data, error } = await supabase.rpc("my_driver_check_state");
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) return null;
+    return {
+      isCurrent: Boolean(row.is_current),
+      lastCheckedAt: row.last_checked_at,
+      dueAt: row.due_at,
+      pendingReview: Boolean(row.pending_review),
+    };
+  }
+
+  async submitCheck(selfieUrl: string): Promise<void> {
+    const { error } = await supabase.rpc("submit_driver_check", { _selfie_url: selfieUrl });
+    if (error) throw new Error(error.message);
   }
 }
