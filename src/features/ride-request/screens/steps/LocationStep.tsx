@@ -136,7 +136,12 @@ export function LocationStep() {
         </button>
       )}
 
-      <RouteMapPreview route={route} />
+      <RouteMapPreview
+        route={route}
+        pickup={pickup?.coords ?? null}
+        destination={destination?.coords ?? null}
+        stops={stops.map((s) => s.coords)}
+      />
       {route && (
         <GlassCard className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Trip estimate</span>

@@ -5,6 +5,7 @@ import type { GeoPoint } from "@/types/ride";
 import type { NearbyDriver } from "@/services/driver";
 import { basemapTiles } from "@/services/maps/tiles";
 import { FALLBACK_CENTER } from "@/lib/geo";
+import { useThemeStore } from "@/store/theme.store";
 import { cn } from "@/lib/utils";
 
 interface HomeMapProps {
@@ -42,6 +43,7 @@ function driverIcon(L: typeof Leaflet) {
 interface MapState {
   map: Leaflet.Map;
   L: typeof Leaflet;
+  tiles: Leaflet.TileLayer;
   riderM: Leaflet.Marker | null;
   driverMs: Map<string, Leaflet.Marker>;
 }
@@ -70,6 +72,10 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
    * never run again and data that arrived first would never be drawn.
    */
   const [ready, setReady] = useState(false);
+  const dark = useThemeStore((s) => s.mode) === "dark";
+  // Read inside the mount effect without making the theme a dependency there.
+  const darkRef = useRef(dark);
+  darkRef.current = dark;
 
   // Mount once. Centre updates are handled by the effect below, so a late
   // geolocation fix pans the existing map instead of rebuilding it.
@@ -88,9 +94,9 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
         boxZoom: false,
         keyboard: false,
       }).setView([center?.lat ?? FALLBACK_CENTER.lat, center?.lng ?? FALLBACK_CENTER.lng], 14);
-      const tiles = basemapTiles();
-      L.tileLayer(tiles.url, { ...tiles.options }).addTo(map);
-      stateRef.current = { map, L, riderM: null, driverMs: new Map() };
+      const cfg = basemapTiles(darkRef.current);
+      const tiles = L.tileLayer(cfg.url, { ...cfg.options }).addTo(map);
+      stateRef.current = { map, L, tiles, riderM: null, driverMs: new Map() };
 
       /**
        * Leaflet caches the container size at init. This map is created inside
@@ -117,6 +123,13 @@ export function HomeMap({ center, drivers, className }: HomeMapProps) {
     // effect below. Re-running here would tear the map down on every fix.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Swap the basemap in place when the theme flips, keeping view and markers.
+  useEffect(() => {
+    const s = stateRef.current;
+    if (!s) return;
+    s.tiles.setUrl(basemapTiles(dark).url);
+  }, [ready, dark]);
 
   // Centre + rider dot.
   useEffect(() => {

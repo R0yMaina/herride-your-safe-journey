@@ -5,6 +5,7 @@ import type { GeoPoint } from "@/types/ride";
 import { haversineKm } from "@/lib/geo";
 import { fetchRoadRoute } from "@/services/maps/osrm";
 import { basemapTiles } from "@/services/maps/tiles";
+import { useThemeStore } from "@/store/theme.store";
 import { cn } from "@/lib/utils";
 
 export type TripMapPhase = "to_pickup" | "on_trip";
@@ -104,6 +105,8 @@ export function LiveTripMap({
   const propsRef = useRef({ pickup, destination, driver, phase });
   propsRef.current = { pickup, destination, driver, phase };
   const [eta, setEta] = useState<{ text: string; distance: string } | null>(null);
+  const darkRef = useRef(useThemeStore.getState().mode === "dark");
+  darkRef.current = useThemeStore((s) => s.mode) === "dark";
 
   function draw() {
     const s = stateRef.current;
@@ -170,7 +173,9 @@ export function LiveTripMap({
         attributionControl: true,
         dragging: true,
       }).setView([pk.lat, pk.lng], 13);
-      const tiles = basemapTiles();
+      // Theme read at mount: this map lives for a whole trip, and re-styling
+      // tiles under a moving driver is more churn than the toggle is worth.
+      const tiles = basemapTiles(darkRef.current);
       L.tileLayer(tiles.url, { ...tiles.options }).addTo(map);
       const pickupM = L.marker([pk.lat, pk.lng], { icon: markerIcon(L, "pickup") }).addTo(map);
       const destM = L.marker([dest.lat, dest.lng], { icon: markerIcon(L, "dest") }).addTo(map);
