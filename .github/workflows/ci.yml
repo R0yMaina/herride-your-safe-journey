@@ -18,3 +18,36 @@ jobs:
       - run: npm run lint
       - run: npm run test
       - run: npm run build
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # Only what ships to a rider's browser fails the build. Dev-tool
+      # advisories are real but cannot be exploited through the deployed app,
+      # and blocking every PR on them means the gate gets switched off.
+      - name: Audit runtime dependencies
+        run: npm audit --omit=dev --audit-level=high
+      - name: Report dev-tool advisories (non-blocking)
+        if: always()
+        run: npm audit --audit-level=high || true
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - uses: github/codeql-action/analyze@v3

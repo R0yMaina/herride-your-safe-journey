@@ -76,25 +76,46 @@ Branch: `claude/heride-full-stack-setup-3ed04h` · PR #3 open against `main`.
 
 ## SQL scripts — application status
 
-| Script | Applied to live DB? |
-| --- | --- |
-| setup-database.sql | ✅ |
-| phase3-database.sql | ✅ |
-| phase4-database.sql | ✅ |
-| phase5-hardening.sql | ⏳ user must run |
-| phase6-audit-hardening.sql | ⏳ user must run (token-enumeration fix) |
-| phase7-dispatch.sql | ⏳ user must run (busy drivers, location RLS, expiry) |
-| phase8-financials.sql | ⏳ user must run (immutable ledger, payouts, refunds, admin summary) |
-| phase9-pricing-authority.sql | ✅ (verified: quote_fare(4,10,1)=530, commission 0.10) |
-| phase10-financial-completion.sql | ✅ |
-| phase11-ratings-tips.sql | ⏳ user must run (ratings, compliments, tips, driver-rating trigger) |
-| phase12-chat.sql | ⏳ user must run (ride_messages + Realtime + policies) |
-| phase13-growth.sql | ⏳ user must run (promo codes, referrals, complete_ride v3 with discount) |
-| phase14-trip-flexibility.sql | ✅ |
-| phase15-driver-onboarding.sql | ⏳ user must run (apply_as_driver, role grant, docs bucket) |
-| phase15b-pickup-pin.sql | ⏳ user must run (ride_pins, start_trip_with_pin, PIN gate) |
-| phase15c-driver-earnings.sql | ⏳ user must run (driver_earnings RPC) |
-| seed.sql | optional (test accounts for local/staging only) |
+**This table was wrong for a long time** — it listed eleven scripts as pending
+that had in fact been applied. A hand-maintained ledger of what is deployed is
+worth less than no ledger, because it is trusted. Treat the probe below as the
+source of truth and re-run it rather than editing from memory.
+
+Verification on **30 Jul 2026**, by anonymous PostgREST reads against project
+`jhebtnrifgiabmvgmqrb` (a table that answers exists; RLS still returns 0 rows):
+
+```bash
+U=$(grep VITE_SUPABASE_URL .env | cut -d'"' -f2)
+K=$(grep VITE_SUPABASE_PUBLISHABLE_KEY .env | cut -d'"' -f2)
+curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -H "apikey: $K"
+# 200 = present, PGRST205 = the script has not been applied
+```
+
+| Script | Status | Evidence |
+| --- | --- | --- |
+| setup-database.sql | ✅ applied | `profiles`, `rides`, `drivers`, `driver_locations` all answer |
+| phase3-database.sql | ✅ applied | ride lifecycle live |
+| phase4-database.sql | ✅ applied | `sos_alerts`, `trip_shares`, `notifications` answer |
+| phase5-hardening.sql | ❓ unverified | policies/functions only — nothing to probe |
+| phase6-audit-hardening.sql | ✅ applied | `audit_log` answers |
+| phase7-dispatch.sql | ❓ unverified | policies/functions only — nothing to probe |
+| phase8-financials.sql | ✅ applied | `platform_ledger`, `payouts` answer |
+| phase9-pricing-authority.sql | ✅ applied | `pricing_config` answers; `quote_fare(4,10,1)=530` |
+| phase10-financial-completion.sql | ✅ applied | — |
+| phase11-ratings-tips.sql | ✅ applied | `ride_ratings` answers |
+| phase12-chat.sql | ✅ applied | `ride_messages` answers |
+| phase13-growth.sql | ✅ applied | `promo_codes`, `referral_codes` answer |
+| phase14-trip-flexibility.sql | ✅ applied | — |
+| phase15-driver-onboarding.sql | ✅ applied | `fraud_signals` answers; docs bucket needs a dashboard check |
+| phase15b-pickup-pin.sql | ✅ applied | `ride_pins` answers |
+| phase15c-driver-earnings.sql | ❓ unverified | RPC only — nothing to probe |
+| phase17-admin-dashboard.sql | ✅ applied | `platform_owners` answers |
+| phase18-security-hardening.sql | ⏳ user must run | rate limits, GPS sanity checks, account deletion |
+| seed.sql | optional | test accounts for local/staging only |
+
+**Replace this table.** Each script should `INSERT` its own name into a
+`schema_migrations` table on success, so "what is deployed" is a query rather
+than a document someone has to remember to update.
 
 ## Known gaps / deliberate v1 scope
 

@@ -1,0 +1,23 @@
+version: 2
+updates:
+  # Security patches within the current major, weekly. Major bumps are excluded
+  # on purpose: vitest and eslint majors are migrations, and having them arrive
+  # as surprise PRs is how a security update ends up ignored along with them.
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore(ci)"
