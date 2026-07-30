@@ -110,7 +110,9 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -
 | phase15b-pickup-pin.sql | ✅ applied | `ride_pins` answers |
 | phase15c-driver-earnings.sql | ❓ unverified | RPC only — nothing to probe |
 | phase17-admin-dashboard.sql | ✅ applied | `platform_owners` answers |
-| phase18-security-hardening.sql | ⏳ user must run | rate limits, GPS sanity checks, account deletion |
+| phase18-security-hardening.sql | ✅ applied | `rate_limits` answers |
+| phase19-driver-recheck.sql | ✅ applied | `driver_checks` answers |
+| phase20-audit-fixes.sql | ⏳ user must run | driver-location leak, fraud_signals columns, REVOKE FROM PUBLIC |
 | seed.sql | optional | test accounts for local/staging only |
 
 **Replace this table.** Each script should `INSERT` its own name into a
