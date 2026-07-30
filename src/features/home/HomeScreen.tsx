@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { ShieldCheck } from "lucide-react";
-import { HomeMap } from "./components/HomeMap";
+import { HomeMapView } from "./components/HomeMapView";
 import { HomeSheet } from "./components/HomeSheet";
 import { NotificationBell } from "@/features/notifications/components/NotificationBell";
 import { walletService } from "@/services/wallet";
@@ -97,7 +97,7 @@ export function HomeScreen() {
           which without a stacking context here outranks the sheet's z-10 and
           paints driver pucks on top of it. */}
       <div className="absolute inset-0 isolate z-0">
-        <HomeMap center={center} drivers={drivers ?? []} />
+        <HomeMapView center={center} drivers={drivers ?? []} />
       </div>
 
       {/* Top chrome. Pointer events are re-enabled per control so the map
