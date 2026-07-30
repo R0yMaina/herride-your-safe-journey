@@ -13,5 +13,6 @@ export type {
   DriverApplication,
   DriverApplicationInput,
   DriverApplicationStatus,
+  DriverCheckState,
   IDriverOnboardingService,
 } from "./driver-onboarding.service";

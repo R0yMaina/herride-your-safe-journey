@@ -997,6 +997,40 @@ export type Database = {
         Args: { _user_id: string };
         Returns: boolean;
       };
+      // Phase 19 — periodic driver identity re-check.
+      my_driver_check_state: {
+        Args: Record<string, never>;
+        Returns: {
+          is_current: boolean;
+          last_checked_at: string | null;
+          due_at: string | null;
+          pending_review: boolean;
+        }[];
+      };
+      submit_driver_check: {
+        Args: { _selfie_url: string };
+        Returns: unknown;
+      };
+      review_driver_check: {
+        Args: { _check_id: string; _passed: boolean; _reason?: string };
+        Returns: unknown;
+      };
+      list_pending_driver_checks: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          driver_user_id: string;
+          full_name: string | null;
+          selfie_url: string;
+          verification_selfie_url: string | null;
+          submitted_at: string;
+          last_checked_at: string | null;
+        }[];
+      };
+      driver_check_is_current: {
+        Args: { _driver_user_id: string };
+        Returns: boolean;
+      };
       // Phase 18 — hand-added alongside the SQL, per CLAUDE.md rule 6.
       ping_driver_location: {
         Args: { _lat: number; _lng: number; _heading?: number };

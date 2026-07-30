@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { Loader2, MapPin, MessageCircle, Navigation, Power } from "lucide-react";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { driverService, type DriverLocationPing } from "@/services/driver";
+import { driverOnboardingService, type DriverCheckState } from "@/services/driver-onboarding";
 import { ridesService } from "@/services/ride";
 import { rideRankingStrategy, type RankedRide } from "@/services/dispatch";
 import { canTransition, type RideRecord, type RideStatus } from "@/types/ride";
@@ -11,6 +12,7 @@ import { formatDistanceKm } from "@/lib/geo";
 import { TripMap } from "@/features/trip/components/TripMap";
 import { TripChatSheet } from "@/features/trip/components/TripChatSheet";
 import { PinPromptSheet } from "./components/PinPromptSheet";
+import { IdentityCheckCard } from "./components/IdentityCheckCard";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -29,7 +31,17 @@ export function DriverHomeScreen() {
   const [chatOpen, setChatOpen] = useState(false);
   const [pinPrompt, setPinPrompt] = useState(false);
   const [position, setPosition] = useState<DriverLocationPing | null>(null);
+  const [checkState, setCheckState] = useState<DriverCheckState | null>(null);
   const pingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  /** Identity re-check status. Null for anyone who is not a driver yet. */
+  const refreshCheck = useCallback(async () => {
+    try {
+      setCheckState(await driverOnboardingService.getCheckState());
+    } catch {
+      /* the server is the real gate; a failed read must not block the screen */
+    }
+  }, []);
 
   const refreshOpen = useCallback(async () => {
     try {
@@ -42,6 +54,7 @@ export function DriverHomeScreen() {
   // Initial state: are we already online, and do we have an active ride?
   useEffect(() => {
     void driverService.isOnline().then(setOnline);
+    void refreshCheck();
   }, []);
 
   // Subscribe to the open-ride pool while online.
@@ -178,6 +191,11 @@ export function DriverHomeScreen() {
     <ScreenWrapper>
       <Container className="space-y-6">
         <PageHeader eyebrow="Driver" title="Drive with HeRide" />
+
+        {/* Sits above the toggle: the server will refuse to bring her online on
+            a stale check, so telling her first is the difference between a fix
+            and a mystery. */}
+        {checkState && <IdentityCheckCard state={checkState} onSubmitted={refreshCheck} />}
 
         <GlassCard className="flex items-center justify-between">
           <div>

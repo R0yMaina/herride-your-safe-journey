@@ -28,6 +28,22 @@ export interface DriverApplicationInput {
   readonly idDocumentUrl?: string;
 }
 
+/**
+ * Where a driver stands on her periodic identity re-check.
+ *
+ * Verification used to be permanent, which meant an account could be lent or
+ * sold with nothing noticing — the one failure that breaks the product's whole
+ * promise. She now re-proves it on a schedule.
+ */
+export interface DriverCheckState {
+  /** False once the check is overdue — she cannot go online or be matched. */
+  readonly isCurrent: boolean;
+  readonly lastCheckedAt: string | null;
+  readonly dueAt: string | null;
+  /** A submission is waiting on the verification desk. */
+  readonly pendingReview: boolean;
+}
+
 export interface IDriverOnboardingService {
   /** The caller's application, or null if she never applied. */
   getMyApplication(): Promise<DriverApplication | null>;
@@ -35,6 +51,10 @@ export interface IDriverOnboardingService {
   apply(input: DriverApplicationInput): Promise<DriverApplication>;
   /** Upload an identity document; returns the stored path for apply(). */
   uploadDocument(kind: "selfie" | "id", file: File): Promise<string>;
+  /** Whether her identity check is current, and when the next one is due. */
+  getCheckState(): Promise<DriverCheckState | null>;
+  /** Submit a fresh selfie for review. Reviewed by a person, not a script. */
+  submitCheck(selfieUrl: string): Promise<void>;
 }
 
 const delay = (ms = 350) => new Promise<void>((r) => setTimeout(r, ms));
@@ -73,4 +93,24 @@ export class MockDriverOnboardingService implements IDriverOnboardingService {
     await delay();
     return `mock://driver-docs/${kind}-${Date.now()}.jpg`;
   }
+
+  async getCheckState(): Promise<DriverCheckState | null> {
+    await delay(80);
+    if (!this.application) return null;
+    // Mock mode reports a due check, so the prompt is reachable without
+    // waiting a month for the real clock.
+    return {
+      isCurrent: this.checkSubmitted,
+      lastCheckedAt: this.checkSubmitted ? new Date().toISOString() : null,
+      dueAt: null,
+      pendingReview: false,
+    };
+  }
+
+  async submitCheck(): Promise<void> {
+    await delay();
+    this.checkSubmitted = true;
+  }
+
+  private checkSubmitted = false;
 }
