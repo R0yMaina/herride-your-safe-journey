@@ -1,14 +1,10 @@
 import { supabase } from "@/integrations/supabase/client";
-import { RIDE_STATUS_TRANSITIONS } from "@/types/ride";
-import type { RideRequestDraft, RideStatus, TripSummary } from "@/types/ride";
+import type { RideRequestDraft, TripSummary } from "@/types/ride";
 import type { IRideRequestService } from "./ride-request.service";
 
-/** Statuses from which "cancelled" is a legal transition, per the canonical map. */
-const CANCELLABLE_STATUSES = (
-  Object.entries(RIDE_STATUS_TRANSITIONS) as [RideStatus, readonly RideStatus[]][]
-)
-  .filter(([, next]) => next.includes("cancelled"))
-  .map(([from]) => from);
+// The legal-transition filter that used to live here moved into cancel_ride:
+// the DB already enforces RIDE_STATUS_TRANSITIONS by trigger, so deriving the
+// same list client-side was a second copy of the law that could drift.
 
 /**
  * Creates real ride rows. `fare_estimate` is the client-side quote from the
@@ -59,18 +55,14 @@ export class SupabaseRideRequestService implements IRideRequestService {
   }
 
   async cancel(requestId: string): Promise<void> {
-    // Conditional update: only rows whose current status legally allows
-    // "cancelled" (per RIDE_STATUS_TRANSITIONS) are touched, so a ride that
-    // completed or was already cancelled in a race is left untouched.
-    const { data, error } = await supabase
-      .from("rides")
-      .update({ status: "cancelled", cancellation_reason: "Cancelled by passenger" })
-      .eq("id", requestId)
-      .in("status", CANCELLABLE_STATUSES)
-      .select("id");
+    // Goes through cancel_ride rather than writing the status directly: the
+    // cancellation fee, the compensation paid to a driver already en route, and
+    // freeing her back into the pool all have to happen in one transaction, and
+    // none of them can be trusted to a client.
+    const { error } = await supabase.rpc("cancel_ride", {
+      _ride_id: requestId,
+      _reason: "Cancelled by passenger",
+    });
     if (error) throw new Error(error.message);
-    if (!data || data.length === 0) {
-      throw new Error("This ride can no longer be cancelled.");
-    }
   }
 }

@@ -997,6 +997,19 @@ export type Database = {
         Args: { _user_id: string };
         Returns: boolean;
       };
+      // Phase 18 — hand-added alongside the SQL, per CLAUDE.md rule 6.
+      ping_driver_location: {
+        Args: { _lat: number; _lng: number; _heading?: number };
+        Returns: undefined;
+      };
+      set_driver_availability: {
+        Args: { _available: boolean; _lat?: number; _lng?: number };
+        Returns: undefined;
+      };
+      cancel_ride: {
+        Args: { _ride_id: string; _reason?: string };
+        Returns: Database["public"]["Tables"]["rides"]["Row"];
+      };
       nearest_available_drivers: {
         Args: {
           _lat: number;
