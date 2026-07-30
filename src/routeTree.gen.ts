@@ -37,7 +37,9 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-pas
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
 import { Route as AppWalletRouteImport } from './routes/_app.wallet'
+import { Route as AppSupportRouteImport } from './routes/_app.support'
 import { Route as AppSearchingRouteImport } from './routes/_app.searching'
+import { Route as AppSafetyRouteImport } from './routes/_app.safety'
 import { Route as AppRidesRouteImport } from './routes/_app.rides'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
@@ -183,9 +185,19 @@ const AppWalletRoute = AppWalletRouteImport.update({
   path: '/wallet',
   getParentRoute: () => AppRoute,
 } as any)
+const AppSupportRoute = AppSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppSearchingRoute = AppSearchingRouteImport.update({
   id: '/searching',
   path: '/searching',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSafetyRoute = AppSafetyRouteImport.update({
+  id: '/safety',
+  path: '/safety',
   getParentRoute: () => AppRoute,
 } as any)
 const AppRidesRoute = AppRidesRouteImport.update({
@@ -226,7 +238,9 @@ export interface FileRoutesByFullPath {
   '/home': typeof AppHomeRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
+  '/safety': typeof AppSafetyRoute
   '/searching': typeof AppSearchingRoute
+  '/support': typeof AppSupportRoute
   '/wallet': typeof AppWalletRoute
   '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
@@ -259,7 +273,9 @@ export interface FileRoutesByTo {
   '/home': typeof AppHomeRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
+  '/safety': typeof AppSafetyRoute
   '/searching': typeof AppSearchingRoute
+  '/support': typeof AppSupportRoute
   '/wallet': typeof AppWalletRoute
   '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
@@ -296,7 +312,9 @@ export interface FileRoutesById {
   '/_app/home': typeof AppHomeRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/rides': typeof AppRidesRoute
+  '/_app/safety': typeof AppSafetyRoute
   '/_app/searching': typeof AppSearchingRoute
+  '/_app/support': typeof AppSupportRoute
   '/_app/wallet': typeof AppWalletRoute
   '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
@@ -333,7 +351,9 @@ export interface FileRouteTypes {
     | '/home'
     | '/profile'
     | '/rides'
+    | '/safety'
     | '/searching'
+    | '/support'
     | '/wallet'
     | '/admin/drivers'
     | '/admin/finance'
@@ -366,7 +386,9 @@ export interface FileRouteTypes {
     | '/home'
     | '/profile'
     | '/rides'
+    | '/safety'
     | '/searching'
+    | '/support'
     | '/wallet'
     | '/admin/drivers'
     | '/admin/finance'
@@ -402,7 +424,9 @@ export interface FileRouteTypes {
     | '/_app/home'
     | '/_app/profile'
     | '/_app/rides'
+    | '/_app/safety'
     | '/_app/searching'
+    | '/_app/support'
     | '/_app/wallet'
     | '/admin/drivers'
     | '/admin/finance'
@@ -637,11 +661,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWalletRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/support': {
+      id: '/_app/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AppSupportRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/searching': {
       id: '/_app/searching'
       path: '/searching'
       fullPath: '/searching'
       preLoaderRoute: typeof AppSearchingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/safety': {
+      id: '/_app/safety'
+      path: '/safety'
+      fullPath: '/safety'
+      preLoaderRoute: typeof AppSafetyRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/rides': {
@@ -687,7 +725,9 @@ interface AppRouteChildren {
   AppHomeRoute: typeof AppHomeRoute
   AppProfileRoute: typeof AppProfileRoute
   AppRidesRoute: typeof AppRidesRoute
+  AppSafetyRoute: typeof AppSafetyRoute
   AppSearchingRoute: typeof AppSearchingRoute
+  AppSupportRoute: typeof AppSupportRoute
   AppWalletRoute: typeof AppWalletRoute
   AppTripRideIdRoute: typeof AppTripRideIdRoute
 }
@@ -697,7 +737,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppHomeRoute: AppHomeRoute,
   AppProfileRoute: AppProfileRoute,
   AppRidesRoute: AppRidesRoute,
+  AppSafetyRoute: AppSafetyRoute,
   AppSearchingRoute: AppSearchingRoute,
+  AppSupportRoute: AppSupportRoute,
   AppWalletRoute: AppWalletRoute,
   AppTripRideIdRoute: AppTripRideIdRoute,
 }

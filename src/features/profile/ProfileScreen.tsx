@@ -96,7 +96,7 @@ export function ProfileScreen() {
       label: "Safety suite",
       sub: "SOS, live trip share & trusted contacts",
       Icon: ShieldCheck,
-      to: ROUTES.profile,
+      to: ROUTES.safety,
       value: "On",
     },
     {
@@ -121,7 +121,7 @@ export function ProfileScreen() {
       label: "Help & support",
       sub: "FAQs, report an issue, contact us",
       Icon: HelpCircle,
-      to: ROUTES.profile,
+      to: ROUTES.support,
     },
     {
       id: "signout",

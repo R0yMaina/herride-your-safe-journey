@@ -19,6 +19,8 @@ export const ROUTES = Object.freeze({
   profile: "/profile",
   book: "/book",
   searching: "/searching",
+  support: "/support",
+  safety: "/safety",
   driver: "/driver",
   driverApply: "/driver/apply",
   driverEarnings: "/driver/earnings",
