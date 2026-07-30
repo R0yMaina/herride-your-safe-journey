@@ -98,7 +98,12 @@ export function ConfirmStep() {
         title="Review your ride"
         subtitle="Everything looks good? Confirm to find your driver."
       />
-      <RouteMapPreview route={route} />
+      <RouteMapPreview
+        route={route}
+        pickup={pickup?.coords ?? null}
+        destination={destination?.coords ?? null}
+        stops={stops.map((s) => s.coords)}
+      />
       <TripSummaryCard summary={summary} />
       <PromoCodeCard />
       <EmergencyReminder />

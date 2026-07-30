@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import type { GeoPoint, Place } from "@/types/ride";
 import { basemapTiles } from "@/services/maps/tiles";
+import { useThemeStore } from "@/store/theme.store";
 import { reverseGeocode, searchPlaces, type GeoResult } from "@/services/maps/geocoding";
 import { hasGoogleAuthFailed, isGoogleMapsEnabled } from "@/services/maps/google-loader";
 import { GooglePickMap } from "./GooglePickMap";
@@ -335,7 +336,9 @@ function MapPickMode({
         zoomControl: true,
         attributionControl: true,
       }).setView([start.lat, start.lng], 15);
-      const tiles = basemapTiles();
+      // Theme read at mount — the picker is a short-lived modal, so there is
+      // no toggle to follow while it is open.
+      const tiles = basemapTiles(useThemeStore.getState().mode === "dark");
       L.tileLayer(tiles.url, { ...tiles.options }).addTo(map);
       stateRef.current = { map, L, userM: null, watchId: null, skipNextReverse: false };
       const onMoveEnd = () => {
