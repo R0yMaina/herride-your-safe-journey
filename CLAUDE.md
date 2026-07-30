@@ -11,8 +11,14 @@ task prompt assumes.
 npm run dev      # dev server (in sandboxes that can't bind '::', use:
                  #   npx vite dev --host 0.0.0.0 --port 8080)
 npm run build    # production build (also regenerates routeTree.gen.ts)
-npm run lint     # eslint (0 errors expected; 6 known shadcn warnings)
+npm run lint     # eslint (0 errors expected; 8 known warnings)
 npx vitest run   # unit tests (vitest.config.ts, node env, @ alias)
+
+# Cross-tenant RLS probe — signs in as two users and checks neither can read or
+# write the other's rows. Needs two throwaway accounts; point it at STAGING,
+# since it attempts real writes. Exits non-zero on any leak.
+RLS_USER_A_EMAIL=… RLS_USER_A_PASSWORD=… \
+RLS_USER_B_EMAIL=… RLS_USER_B_PASSWORD=… npm run test:rls
 ```
 
 ## Hard rules

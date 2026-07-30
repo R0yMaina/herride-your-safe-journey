@@ -21,42 +21,34 @@ async function currentUserId(): Promise<string> {
 }
 
 export class SupabaseDriverService implements IDriverService {
+  // Availability and coordinates both go through RPCs now. Direct writes to
+  // driver_locations are revoked, because a client that can PATCH its own
+  // coordinates can claim to be anywhere and get matched there.
   async goOnline(ping: DriverLocationPing): Promise<void> {
-    const userId = await currentUserId();
-    const { error } = await supabase.from("driver_locations").upsert(
-      {
-        driver_user_id: userId,
-        lat: ping.lat,
-        lng: ping.lng,
-        heading: ping.heading ?? null,
-        is_available: true,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "driver_user_id" },
-    );
+    const { error } = await supabase.rpc("set_driver_availability", {
+      _available: true,
+      // Passing the position resets the speed baseline, so reconnecting from a
+      // different part of town isn't mistaken for a teleport.
+      _lat: ping.lat,
+      _lng: ping.lng,
+    });
     if (error) throw new Error(error.message);
   }
 
   async goOffline(): Promise<void> {
-    const userId = await currentUserId();
-    const { error } = await supabase
-      .from("driver_locations")
-      .update({ is_available: false, updated_at: new Date().toISOString() })
-      .eq("driver_user_id", userId);
+    const { error } = await supabase.rpc("set_driver_availability", { _available: false });
     if (error) throw new Error(error.message);
   }
 
   async pingLocation(ping: DriverLocationPing): Promise<void> {
-    const userId = await currentUserId();
-    const { error } = await supabase
-      .from("driver_locations")
-      .update({
-        lat: ping.lat,
-        lng: ping.lng,
-        heading: ping.heading ?? null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("driver_user_id", userId);
+    const { error } = await supabase.rpc("ping_driver_location", {
+      _lat: ping.lat,
+      _lng: ping.lng,
+      _heading: ping.heading ?? undefined,
+    });
+    // A rejected ping means the server judged the movement impossible. Surface
+    // it rather than swallowing it — the driver's position is now stale, and a
+    // silent failure would leave her invisible to riders with no explanation.
     if (error) throw new Error(error.message);
   }
 
