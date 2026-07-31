@@ -12,4 +12,5 @@ export type {
   DriverLiveLocation,
   PublicDriver,
   NearbyDriver,
+  RideOffer,
 } from "./driver.service";
