@@ -51,3 +51,36 @@ jobs:
           languages: javascript-typescript
           queries: security-extended
       - uses: github/codeql-action/analyze@v3
+
+  rls:
+    name: Cross-tenant RLS probe
+    runs-on: ubuntu-latest
+    # Skips itself until the staging secrets exist, so this can land now and
+    # start protecting the moment a staging project is created. A silently
+    # skipped job is honest; a job that passes because it did nothing is not,
+    # which is why the summary below says which of the two happened.
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Probe staging for cross-tenant access
+        env:
+          SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+          RLS_USER_A_EMAIL: ${{ secrets.RLS_USER_A_EMAIL }}
+          RLS_USER_A_PASSWORD: ${{ secrets.RLS_USER_A_PASSWORD }}
+          RLS_USER_B_EMAIL: ${{ secrets.RLS_USER_B_EMAIL }}
+          RLS_USER_B_PASSWORD: ${{ secrets.RLS_USER_B_PASSWORD }}
+          # Node's global fetch ignores proxy env vars without this.
+          NODE_USE_ENV_PROXY: "1"
+        run: |
+          if [ -z "$SUPABASE_URL" ] || [ -z "$RLS_USER_A_EMAIL" ]; then
+            echo "::warning::Staging secrets not set — RLS probe skipped. See CLAUDE.md."
+            echo "- ⚠️ RLS probe **skipped** (no staging secrets)" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          npm run test:rls
+          echo "- ✅ RLS probe passed against staging" >> "$GITHUB_STEP_SUMMARY"

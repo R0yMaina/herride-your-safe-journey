@@ -997,6 +997,15 @@ export type Database = {
         Args: { _user_id: string };
         Returns: boolean;
       };
+      // Phase 21 — data rights (Kenya DPA 2019).
+      delete_my_account: {
+        Args: { _reason?: string };
+        Returns: undefined;
+      };
+      enforce_retention: {
+        Args: Record<string, never>;
+        Returns: { what: string; removed: number }[];
+      };
       // Phase 19 — periodic driver identity re-check.
       my_driver_check_state: {
         Args: Record<string, never>;

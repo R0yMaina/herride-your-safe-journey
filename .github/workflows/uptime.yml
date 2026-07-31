@@ -1,0 +1,71 @@
+name: Uptime
+
+# Outage detection. Without this the first signal of a problem is a rider
+# complaining — and with Worker logs only just switched on, an incident nobody
+# noticed is an incident nobody can reconstruct.
+on:
+  schedule:
+    # Every 15 minutes. GitHub's scheduler is best-effort and can run late;
+    # that is fine for "is it down", not for latency SLOs.
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    env:
+      SITE: https://heride-your-safe-journey.roymaina395.workers.dev
+    steps:
+      - name: The app answers
+        id: app
+        run: |
+          code=$(curl -sS -o /tmp/body.html -w "%{http_code}" --max-time 20 "$SITE/home")
+          echo "status=$code" >> "$GITHUB_OUTPUT"
+          test "$code" -lt 400 || { echo "::error::$SITE/home returned $code"; exit 1; }
+
+      - name: Security headers are still applied
+        # A deploy that silently drops these is the kind of regression that
+        # goes unnoticed for weeks, so it is checked here rather than trusted.
+        run: |
+          h=$(curl -sSI --max-time 20 "$SITE/home")
+          for want in "x-frame-options" "strict-transport-security" "x-content-type-options"; do
+            echo "$h" | grep -qi "^$want:" || { echo "::error::missing $want"; exit 1; }
+          done
+
+      - name: The database answers
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+        run: |
+          if [ -z "$SUPABASE_URL" ]; then
+            echo "::warning::SUPABASE_URL secret not set — database probe skipped"
+            exit 0
+          fi
+          # A table that answers proves PostgREST and Postgres are both up.
+          # limit=0 returns no rows, so this reads nobody's data.
+          code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 20 \
+            "$SUPABASE_URL/rest/v1/pricing_config?select=id&limit=0" -H "apikey: $SUPABASE_ANON_KEY")
+          test "$code" = "200" || { echo "::error::Supabase returned $code"; exit 1; }
+
+      - name: Open an issue if this is a new outage
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "Uptime check failing";
+            const { data } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo,
+              state: "open", labels: "uptime",
+            });
+            // One issue per outage, not one per 15 minutes.
+            if (data.some((i) => i.title === title)) return;
+            await github.rest.issues.create({
+              owner: context.repo.owner, repo: context.repo.repo,
+              title,
+              labels: ["uptime"],
+              body: `The scheduled uptime check failed.\n\n[Run](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})\n\nCloses itself is not automatic — check the app, then close this by hand once it is healthy.`,
+            });

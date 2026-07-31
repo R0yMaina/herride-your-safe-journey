@@ -51,4 +51,26 @@ export class SupabaseUserService implements IUserService {
     }
     return loadCurrentUser();
   }
+
+  async deleteAccount(reason?: string): Promise<void> {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    // Storage is not reachable from SQL, so identity documents are cleared
+    // here BEFORE the RPC scrubs the rows that point at them. Doing it after
+    // would leave the paths gone and the files behind.
+    if (user) {
+      const { data: files } = await supabase.storage.from("driver-docs").list(user.id);
+      if (files?.length) {
+        await supabase.storage.from("driver-docs").remove(files.map((f) => `${user.id}/${f.name}`));
+      }
+    }
+
+    const { error } = await supabase.rpc("delete_my_account", { _reason: reason ?? undefined });
+    if (error) throw new Error(error.message);
+
+    // Nothing left to be signed in to.
+    await supabase.auth.signOut();
+  }
 }

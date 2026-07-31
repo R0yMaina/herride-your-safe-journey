@@ -42,6 +42,7 @@ import { Route as AppSearchingRouteImport } from './routes/_app.searching'
 import { Route as AppSafetyRouteImport } from './routes/_app.safety'
 import { Route as AppRidesRouteImport } from './routes/_app.rides'
 import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppPrivacyRouteImport } from './routes/_app.privacy'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppBookRouteImport } from './routes/_app.book'
 import { Route as AppTripRideIdRouteImport } from './routes/_app.trip.$rideId'
@@ -210,6 +211,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPrivacyRoute = AppPrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
@@ -236,6 +242,7 @@ export interface FileRoutesByFullPath {
   '/welcome': typeof WelcomeRoute
   '/book': typeof AppBookRoute
   '/home': typeof AppHomeRoute
+  '/privacy': typeof AppPrivacyRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
   '/safety': typeof AppSafetyRoute
@@ -271,6 +278,7 @@ export interface FileRoutesByTo {
   '/welcome': typeof WelcomeRoute
   '/book': typeof AppBookRoute
   '/home': typeof AppHomeRoute
+  '/privacy': typeof AppPrivacyRoute
   '/profile': typeof AppProfileRoute
   '/rides': typeof AppRidesRoute
   '/safety': typeof AppSafetyRoute
@@ -310,6 +318,7 @@ export interface FileRoutesById {
   '/welcome': typeof WelcomeRoute
   '/_app/book': typeof AppBookRoute
   '/_app/home': typeof AppHomeRoute
+  '/_app/privacy': typeof AppPrivacyRoute
   '/_app/profile': typeof AppProfileRoute
   '/_app/rides': typeof AppRidesRoute
   '/_app/safety': typeof AppSafetyRoute
@@ -349,6 +358,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/book'
     | '/home'
+    | '/privacy'
     | '/profile'
     | '/rides'
     | '/safety'
@@ -384,6 +394,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/book'
     | '/home'
+    | '/privacy'
     | '/profile'
     | '/rides'
     | '/safety'
@@ -422,6 +433,7 @@ export interface FileRouteTypes {
     | '/welcome'
     | '/_app/book'
     | '/_app/home'
+    | '/_app/privacy'
     | '/_app/profile'
     | '/_app/rides'
     | '/_app/safety'
@@ -696,6 +708,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/privacy': {
+      id: '/_app/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof AppPrivacyRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -723,6 +742,7 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppBookRoute: typeof AppBookRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppPrivacyRoute: typeof AppPrivacyRoute
   AppProfileRoute: typeof AppProfileRoute
   AppRidesRoute: typeof AppRidesRoute
   AppSafetyRoute: typeof AppSafetyRoute
@@ -735,6 +755,7 @@ interface AppRouteChildren {
 const AppRouteChildren: AppRouteChildren = {
   AppBookRoute: AppBookRoute,
   AppHomeRoute: AppHomeRoute,
+  AppPrivacyRoute: AppPrivacyRoute,
   AppProfileRoute: AppProfileRoute,
   AppRidesRoute: AppRidesRoute,
   AppSafetyRoute: AppSafetyRoute,

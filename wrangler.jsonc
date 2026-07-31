@@ -4,7 +4,12 @@
   "main": "src/server.ts",
   "compatibility_date": "2025-09-24",
   "compatibility_flags": ["nodejs_compat"],
+  // Worker logs. Off meant a rider could hit a 500 and leave no trace
+  // anywhere — src/lib/error-capture.ts recovers the stack for the error page,
+  // then console.errors it into a void. head_sampling_rate 1 keeps every
+  // request while volume is low; drop it when traffic makes that expensive.
   "observability": {
-    "enabled": false
+    "enabled": true,
+    "head_sampling_rate": 1
   }
 }
