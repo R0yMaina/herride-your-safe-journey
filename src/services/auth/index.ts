@@ -29,3 +29,12 @@ export { initAuthSync } from "./auth-bootstrap";
 export type { IUserService } from "./user.service";
 export { sessionService } from "./session.service";
 export { tokenService } from "./token.service";
+
+import { MockMfaService, SupabaseMfaService, type IMfaService } from "./mfa.service";
+
+/** Two-factor for the admin console. Mock reports aal2 so dev is not blocked. */
+export const mfaService: IMfaService = env.useMocks
+  ? new MockMfaService()
+  : new SupabaseMfaService();
+
+export type { AssuranceLevel, IMfaService, MfaEnrolment, MfaStatus } from "./mfa.service";
