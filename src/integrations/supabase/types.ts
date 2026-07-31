@@ -997,6 +997,40 @@ export type Database = {
         Args: { _user_id: string };
         Returns: boolean;
       };
+      // Phase 23 — sequential dispatch + no-show.
+      my_pending_offer: {
+        Args: Record<string, never>;
+        Returns: {
+          offer_id: string;
+          ride_id: string;
+          distance_km: number | null;
+          expires_at: string;
+          pickup_address: string | null;
+          drop_address: string | null;
+          fare_estimate: number | null;
+        }[];
+      };
+      accept_offer: {
+        Args: { _offer_id: string };
+        Returns: Database["public"]["Tables"]["rides"]["Row"];
+      };
+      decline_offer: {
+        Args: { _offer_id: string };
+        Returns: undefined;
+      };
+      report_no_show: {
+        Args: { _ride_id: string };
+        Returns: Database["public"]["Tables"]["rides"]["Row"];
+      };
+      offer_next_driver: {
+        Args: { _ride_id: string };
+        Returns: unknown;
+      };
+      // Phase 22 — admin second factor.
+      session_has_mfa: {
+        Args: Record<string, never>;
+        Returns: boolean;
+      };
       // Phase 21 — data rights (Kenya DPA 2019).
       delete_my_account: {
         Args: { _reason?: string };

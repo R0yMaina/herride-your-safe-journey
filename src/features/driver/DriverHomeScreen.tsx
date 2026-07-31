@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Loader2, MapPin, MessageCircle, Navigation, Power } from "lucide-react";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
-import { driverService, type DriverLocationPing } from "@/services/driver";
+import { driverService, type DriverLocationPing, type RideOffer } from "@/services/driver";
 import { driverOnboardingService, type DriverCheckState } from "@/services/driver-onboarding";
 import { ridesService } from "@/services/ride";
 import { rideRankingStrategy, type RankedRide } from "@/services/dispatch";
@@ -13,6 +13,7 @@ import { TripMap } from "@/features/trip/components/TripMap";
 import { TripChatSheet } from "@/features/trip/components/TripChatSheet";
 import { PinPromptSheet } from "./components/PinPromptSheet";
 import { IdentityCheckCard } from "./components/IdentityCheckCard";
+import { RideOfferCard } from "./components/RideOfferCard";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -32,6 +33,7 @@ export function DriverHomeScreen() {
   const [pinPrompt, setPinPrompt] = useState(false);
   const [position, setPosition] = useState<DriverLocationPing | null>(null);
   const [checkState, setCheckState] = useState<DriverCheckState | null>(null);
+  const [offer, setOffer] = useState<RideOffer | null>(null);
   const pingTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /** Identity re-check status. Null for anyone who is not a driver yet. */
@@ -51,11 +53,31 @@ export function DriverHomeScreen() {
     }
   }, []);
 
+  const refreshOffer = useCallback(async () => {
+    try {
+      setOffer(await driverService.pendingOffer());
+    } catch {
+      /* transient — the next tick will retry */
+    }
+  }, []);
+
   // Initial state: are we already online, and do we have an active ride?
   useEffect(() => {
     void driverService.isOnline().then(setOnline);
     void refreshCheck();
   }, []);
+
+  // Offers are short-lived, so poll while online and idle. Realtime would be
+  // nicer; a 3s poll is honest and costs one indexed lookup.
+  useEffect(() => {
+    if (!online || activeRide) {
+      setOffer(null);
+      return;
+    }
+    void refreshOffer();
+    const t = setInterval(() => void refreshOffer(), 3000);
+    return () => clearInterval(t);
+  }, [online, activeRide, refreshOffer]);
 
   // Subscribe to the open-ride pool while online.
   useEffect(() => {
@@ -116,6 +138,53 @@ export function DriverHomeScreen() {
       }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not update status");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const acceptOffer = async () => {
+    if (!offer) return;
+    setBusy(true);
+    try {
+      const ride = await driverService.acceptOffer(offer.offerId);
+      setActiveRide(ride);
+      setOffer(null);
+      setOpenRides([]);
+      toast.success("Ride accepted");
+    } catch (e) {
+      // Expired or taken — say so, then look for the next one.
+      toast.error(e instanceof Error ? e.message : "That offer is no longer open");
+      void refreshOffer();
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const declineOffer = async () => {
+    if (!offer) return;
+    setBusy(true);
+    try {
+      await driverService.declineOffer(offer.offerId);
+      setOffer(null);
+    } catch {
+      /* it lapsed on its own; the poll will clear it */
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const reportNoShow = async () => {
+    if (!activeRide) return;
+    setBusy(true);
+    try {
+      await driverService.reportNoShow(activeRide.id);
+      setActiveRide(null);
+      toast.success("Reported. You're back online.");
+    } catch (e) {
+      // The server refuses until the wait has elapsed and says how long is
+      // left — pass that through rather than flattening it.
+      toast.error(e instanceof Error ? e.message : "Could not report a no-show");
     } finally {
       setBusy(false);
     }
@@ -247,6 +316,19 @@ export function DriverHomeScreen() {
                   <Navigation className="h-4 w-4" /> {step.label}
                 </button>
               )}
+              {/* Only once she has said she is there. The server enforces the
+                  wait as well; this just stops the button appearing before it
+                  could possibly succeed. */}
+              {activeRide.status === "arrived" && (
+                <button
+                  type="button"
+                  onClick={reportNoShow}
+                  disabled={busy}
+                  className="w-full rounded-2xl border border-border/60 py-2.5 text-sm text-muted-foreground hover:border-destructive/50 hover:text-destructive disabled:opacity-50"
+                >
+                  Rider didn&apos;t show
+                </button>
+              )}
               <button
                 type="button"
                 onClick={() => setChatOpen(true)}
@@ -270,12 +352,25 @@ export function DriverHomeScreen() {
               />
             )}
           </Section>
+        ) : online && offer ? (
+          <Section title="Offered to you">
+            <RideOfferCard
+              offer={offer}
+              busy={busy}
+              onAccept={acceptOffer}
+              onDecline={declineOffer}
+              onExpire={refreshOffer}
+            />
+          </Section>
         ) : online ? (
           <Section title={`Open requests (${openRides.length})`}>
             {openRides.length === 0 ? (
               <GlassCard className="py-6 text-center text-sm text-muted-foreground">
                 <MapPin className="mx-auto mb-2 h-6 w-6 opacity-60" />
                 Waiting for ride requests…
+                <span className="mt-1 block text-xs">
+                  We offer each ride to the closest driver first — yours will come.
+                </span>
               </GlassCard>
             ) : (
               <div className="space-y-3">

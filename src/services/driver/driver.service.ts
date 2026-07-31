@@ -28,6 +28,18 @@ export interface NearbyDriver {
   readonly plate: string | null;
 }
 
+/** A ride this driver is being asked to take, and how long she has to answer. */
+export interface RideOffer {
+  readonly offerId: string;
+  readonly rideId: string;
+  readonly distanceKm: number | null;
+  /** When the offer lapses and moves to the next driver. */
+  readonly expiresAt: string;
+  readonly pickupAddress: string | null;
+  readonly dropAddress: string | null;
+  readonly fareEstimate: number | null;
+}
+
 /** A driver's last known position, as streamed to their passenger. */
 export interface DriverLiveLocation {
   readonly lat: number;
@@ -51,6 +63,22 @@ export interface IDriverService {
   subscribeOpenRides(onChange: () => void): RideSubscription;
   /** Atomically claim a requested ride; throws if already taken. */
   claim(rideId: string): Promise<RideRecord>;
+  /**
+   * The offer this driver is currently being asked to answer.
+   *
+   * Dispatch is sequential: one driver at a time on a timer, nearest first.
+   * An open pool let whoever tapped fastest win, which is not the same as the
+   * rider getting the closest car.
+   */
+  pendingOffer(): Promise<RideOffer | null>;
+  acceptOffer(offerId: string): Promise<RideRecord>;
+  /** Decline; the ride moves to the next driver immediately. */
+  declineOffer(offerId: string): Promise<void>;
+  /**
+   * Rider never came. Refused server-side until the configured wait has
+   * elapsed since arrival, so it cannot be claimed the moment she pulls up.
+   */
+  reportNoShow(rideId: string): Promise<RideRecord>;
   /** Advance a ride the driver owns to the next legal status. */
   transition(rideId: string, next: RideStatus): Promise<RideRecord>;
   /**
@@ -122,6 +150,21 @@ export class MockDriverService implements IDriverService {
   async getPublicDriver(): Promise<PublicDriver | null> {
     await delay();
     return null;
+  }
+  async pendingOffer(): Promise<RideOffer | null> {
+    await delay(80);
+    return null;
+  }
+  async acceptOffer(): Promise<RideRecord> {
+    await delay();
+    throw new Error("Mock driver cannot accept offers");
+  }
+  async declineOffer(): Promise<void> {
+    await delay(80);
+  }
+  async reportNoShow(): Promise<RideRecord> {
+    await delay();
+    throw new Error("Mock driver cannot report no-shows");
   }
   async nearbyDrivers(
     center: { readonly lat: number; readonly lng: number },

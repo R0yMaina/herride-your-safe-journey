@@ -9,6 +9,7 @@ import type {
   IDriverService,
   NearbyDriver,
   PublicDriver,
+  RideOffer,
 } from "./driver.service";
 
 async function currentUserId(): Promise<string> {
@@ -252,5 +253,38 @@ export class SupabaseDriverService implements IDriverService {
       vehicle: [row.vehicle_make, row.vehicle_model].filter(Boolean).join(" ") || "Vehicle",
       plate: row.vehicle_plate,
     }));
+  }
+
+  async pendingOffer(): Promise<RideOffer | null> {
+    const { data, error } = await supabase.rpc("my_pending_offer");
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) return null;
+    return {
+      offerId: row.offer_id,
+      rideId: row.ride_id,
+      distanceKm: row.distance_km,
+      expiresAt: row.expires_at,
+      pickupAddress: row.pickup_address,
+      dropAddress: row.drop_address,
+      fareEstimate: row.fare_estimate === null ? null : Number(row.fare_estimate),
+    };
+  }
+
+  async acceptOffer(offerId: string): Promise<RideRecord> {
+    const { data, error } = await supabase.rpc("accept_offer", { _offer_id: offerId });
+    if (error) throw new Error(error.message);
+    return mapRideRow(data as unknown as Database["public"]["Tables"]["rides"]["Row"]);
+  }
+
+  async declineOffer(offerId: string): Promise<void> {
+    const { error } = await supabase.rpc("decline_offer", { _offer_id: offerId });
+    if (error) throw new Error(error.message);
+  }
+
+  async reportNoShow(rideId: string): Promise<RideRecord> {
+    const { data, error } = await supabase.rpc("report_no_show", { _ride_id: rideId });
+    if (error) throw new Error(error.message);
+    return mapRideRow(data as unknown as Database["public"]["Tables"]["rides"]["Row"]);
   }
 }
