@@ -150,6 +150,8 @@ export interface RideRecord {
   readonly fareFinal: number | null;
   readonly distanceKm: number | null;
   readonly cancellationReason: string | null;
+  /** Charged only when a driver was already on her way; paid to that driver. */
+  readonly cancellationFee: number | null;
   readonly requestedAt: ISODateString;
   readonly acceptedAt: ISODateString | null;
   readonly startedAt: ISODateString | null;

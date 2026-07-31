@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { MapPin } from "lucide-react";
+import { MapPin, Receipt as ReceiptIcon } from "lucide-react";
 import {
   Container,
   EmptyState,
@@ -25,6 +25,9 @@ const STATUS_LABEL: Record<string, string> = {
 
 function RideRow({ ride }: { ride: RideRecord }) {
   const where = `${ride.pickup.address ?? "Pickup"} → ${ride.destination.address ?? "Destination"}`;
+  // Anything that moved money has an itemised receipt on the trip screen; say
+  // so on the row, or she has no reason to think tapping it would show one.
+  const hasReceipt = ride.status === "completed" || (ride.cancellationFee ?? 0) > 0;
   const when = new Date(ride.requestedAt).toLocaleString("en-KE", {
     weekday: "short",
     day: "numeric",
@@ -32,17 +35,27 @@ function RideRow({ ride }: { ride: RideRecord }) {
     hour: "2-digit",
     minute: "2-digit",
   });
-  const fare = ride.fareFinal ?? ride.fareEstimate ?? 0;
+  const fare =
+    ride.status === "cancelled"
+      ? (ride.cancellationFee ?? 0)
+      : (ride.fareFinal ?? ride.fareEstimate ?? 0);
   return (
     <Link to="/trip/$rideId" params={{ rideId: ride.id }}>
-      <GlassCard className="flex items-center justify-between">
+      <GlassCard className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <p className="truncate font-display text-base text-foreground">{where}</p>
           <p className="text-xs text-muted-foreground">
             {when} · {STATUS_LABEL[ride.status] ?? ride.status}
           </p>
         </div>
-        <span className="text-sm font-semibold text-primary">{formatCurrency(fare)}</span>
+        <div className="shrink-0 text-right">
+          <span className="text-sm font-semibold text-primary">{formatCurrency(fare)}</span>
+          {hasReceipt && (
+            <p className="flex items-center justify-end gap-1 text-[11px] text-muted-foreground">
+              <ReceiptIcon className="h-3 w-3" /> Receipt
+            </p>
+          )}
+        </div>
       </GlassCard>
     </Link>
   );

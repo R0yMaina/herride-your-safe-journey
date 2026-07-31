@@ -113,6 +113,10 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -
 | phase18-security-hardening.sql | ✅ applied | `rate_limits` answers |
 | phase19-driver-recheck.sql | ✅ applied | `driver_checks` answers |
 | phase20-audit-fixes.sql | ⏳ user must run | driver-location leak, fraud_signals columns, REVOKE FROM PUBLIC |
+| phase21-data-rights.sql | ⏳ user must run | `delete_my_account`, retention sweep (Kenya DPA) |
+| phase22-admin-mfa.sql | ⏳ user must run | second factor on admin actions; keep `enforce_admin_mfa` false until enrolled |
+| phase23-dispatch-offers.sql | ⏳ user must run | sequential offers, `advance_dispatch`, no-show |
+| phase24-receipts.sql | ⏳ user must run | `get_receipt` rebuilt so the lines reconcile with the total |
 | seed.sql | optional | test accounts for local/staging only |
 
 **Replace this table.** Each script should `INSERT` its own name into a

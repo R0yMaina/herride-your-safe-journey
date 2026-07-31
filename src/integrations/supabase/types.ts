@@ -404,6 +404,8 @@ export type Database = {
       rides: {
         Row: {
           accepted_at: string | null;
+          arrived_at: string | null;
+          cancellation_fee: number | null;
           cancellation_reason: string | null;
           category_multiplier: number | null;
           completed_at: string | null;
@@ -428,10 +430,14 @@ export type Database = {
           started_at: string | null;
           status: Database["public"]["Enums"]["ride_status"];
           updated_at: string;
+          waiting_fee: number | null;
+          waiting_minutes: number | null;
           waypoints: Json;
         };
         Insert: {
           accepted_at?: string | null;
+          arrived_at?: string | null;
+          cancellation_fee?: number | null;
           cancellation_reason?: string | null;
           category_multiplier?: number | null;
           completed_at?: string | null;
@@ -456,10 +462,14 @@ export type Database = {
           started_at?: string | null;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
+          waiting_fee?: number | null;
+          waiting_minutes?: number | null;
           waypoints?: Json;
         };
         Update: {
           accepted_at?: string | null;
+          arrived_at?: string | null;
+          cancellation_fee?: number | null;
           cancellation_reason?: string | null;
           category_multiplier?: number | null;
           completed_at?: string | null;
@@ -484,6 +494,8 @@ export type Database = {
           started_at?: string | null;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
+          waiting_fee?: number | null;
+          waiting_minutes?: number | null;
           waypoints?: Json;
         };
         Relationships: [];
@@ -1234,12 +1246,20 @@ export type Database = {
         Args: { _ride_id: string };
         Returns: {
           ride_id: string;
+          status: string;
           currency: string;
           base_fare: number;
           distance_cost: number;
           time_cost: number;
           booking_fee: number;
+          adjustment: number;
+          discount: number;
+          promo_code: string | null;
+          waiting_minutes: number;
+          waiting_fee: number;
+          cancellation_fee: number;
           total: number;
+          tip: number;
           commission: number;
           driver_earnings: number;
           distance_km: number | null;
@@ -1249,6 +1269,7 @@ export type Database = {
           plate: string | null;
           pickup_address: string | null;
           drop_address: string | null;
+          requested_at: string;
           completed_at: string | null;
         }[];
       };

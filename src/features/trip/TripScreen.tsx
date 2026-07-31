@@ -239,6 +239,10 @@ export function TripScreen({ rideId }: { rideId: string }) {
           </>
         )}
 
+        {/* A cancelled ride only has a receipt when it actually cost her
+            something — otherwise there is nothing to itemise. */}
+        {cancelled && (ride.cancellationFee ?? 0) > 0 && <TripReceipt rideId={rideId} />}
+
         <div className="flex flex-col gap-2">
           {!completed && !cancelled && (
             <>
