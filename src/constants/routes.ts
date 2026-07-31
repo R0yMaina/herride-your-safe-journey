@@ -20,6 +20,7 @@ export const ROUTES = Object.freeze({
   book: "/book",
   searching: "/searching",
   support: "/support",
+  privacy: "/privacy",
   safety: "/safety",
   driver: "/driver",
   driverApply: "/driver/apply",

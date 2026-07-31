@@ -28,6 +28,7 @@ import { walletService } from "@/services/wallet";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { TrustedContactsSection } from "./components/TrustedContactsSection";
 import { InviteEarnCard } from "./components/InviteEarnCard";
+import { DeleteAccountCard } from "./components/DeleteAccountCard";
 import { pushEnabled, requestPushPermission } from "@/features/notifications/lib/push";
 
 interface Row {
@@ -122,6 +123,13 @@ export function ProfileScreen() {
       sub: "FAQs, report an issue, contact us",
       Icon: HelpCircle,
       to: ROUTES.support,
+    },
+    {
+      id: "privacy",
+      label: "Privacy",
+      sub: "What we collect, and your rights over it",
+      Icon: ShieldCheck,
+      to: ROUTES.privacy,
     },
     {
       id: "signout",
@@ -241,6 +249,10 @@ export function ProfileScreen() {
             </GlassCard>
             {preferences.map(renderRow)}
           </div>
+        </Section>
+
+        <Section title="Your data">
+          <DeleteAccountCard />
         </Section>
       </Container>
     </ScreenWrapper>
