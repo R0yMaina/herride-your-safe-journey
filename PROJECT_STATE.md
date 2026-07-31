@@ -117,6 +117,7 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -
 | phase22-admin-mfa.sql | ⏳ user must run | second factor on admin actions; keep `enforce_admin_mfa` false until enrolled |
 | phase23-dispatch-offers.sql | ⏳ user must run | sequential offers, `advance_dispatch`, no-show |
 | phase24-receipts.sql | ⏳ user must run | `get_receipt` rebuilt so the lines reconcile with the total |
+| phase25-rider-verification.sql | ⏳ user must run | **closes the self-declared-gender hole**; rider ID checks, `rider-docs` bucket |
 | seed.sql | optional | test accounts for local/staging only |
 
 **Replace this table.** Each script should `INSERT` its own name into a

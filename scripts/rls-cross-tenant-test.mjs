@@ -77,6 +77,7 @@ const TENANT_TABLES = [
   "audit_log",
   "fraud_signals",
   "user_roles",
+  "rider_verifications",
 ];
 
 async function signIn({ email, password }) {
@@ -181,6 +182,41 @@ async function main() {
     await probeWrite(b.token, "rides", aRides[0].id, { status: "cancelled" });
   } else {
     console.log("  skip  rides: A has no ride to target (book one to cover this)");
+  }
+
+  console.log("\nSelf-escalation as B:");
+  // The columns that decide whether she is allowed on the platform at all. The
+  // row-level policy lets her edit her own profile, so only the phase 25
+  // trigger stands between "I am verified" and it being true.
+  //
+  // `gender` is deliberately NOT probed: the trigger allows a one-time set
+  // while it is NULL (an account that signed up without choosing has to be
+  // able to finish its profile), so a pass or a fail here would depend on the
+  // probe account's history rather than on the rule.
+  //
+  // The trigger only fires on an actual change, so each probe has to attempt a
+  // real one — and revert it if the platform lets it through.
+  for (const [column, value, revert] of [
+    ["identity_verified", true, false],
+    ["is_blacklisted", true, false],
+  ]) {
+    const patch = (body) =>
+      fetch(`${URL_}/rest/v1/profiles?id=eq.${b.userId}`, {
+        method: "PATCH",
+        headers: { ...headers(b.token), Prefer: "return=representation" },
+        body: JSON.stringify(body),
+      });
+    const res = await patch({ [column]: value });
+    // A 200 with an empty body means the row matched nothing, not that the
+    // write was refused — check the returned row, not just the status.
+    const rows = res.ok ? await res.json().catch(() => []) : [];
+    const changed = res.ok && Array.isArray(rows) && rows.length > 0;
+    let detail = "";
+    if (changed) {
+      const undo = await patch({ [column]: revert });
+      detail = undo.ok ? "WRITE ACCEPTED (reverted)" : "WRITE ACCEPTED — COULD NOT REVERT";
+    }
+    record(!changed, `profiles.${column}: B cannot set her own`, detail);
   }
 
   console.log("\nPrivileged function abuse as B:");

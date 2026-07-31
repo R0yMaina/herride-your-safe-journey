@@ -29,6 +29,7 @@ export const PRIVACY_SECTIONS: readonly PolicySection[] = [
     heading: "What we collect",
     body: [
       "From riders: your name, phone number, email, and the gender you tell us at sign-up. Your pickup and drop-off locations, the route taken, what you paid, and any messages you send your driver through the app.",
+      "For rider verification: a photograph of your face and of your national ID or passport, and optionally the ID number. These are seen only by the person who reviews them, are never shown to drivers or other riders, and are deleted when you delete your account.",
       "From drivers: everything above, plus your national ID, driving licence, vehicle registration and a photograph of your face. We take a fresh photograph periodically to confirm the person driving is still you.",
       "From your device: your location while you are using the app. For drivers, location while you are online — this is how riders near you can be matched to you.",
       "We do not collect your contacts, your photo library, or anything from other apps.",
@@ -39,7 +40,7 @@ export const PRIVACY_SECTIONS: readonly PolicySection[] = [
     heading: "Why we collect it",
     body: [
       "To match you with a driver, price and settle the trip, and let you and your driver reach each other without exchanging phone numbers.",
-      "To keep the service women-only. Verifying identity and gender is the entire basis of the promise we make, and it is the reason we ask drivers for documents most services would not.",
+      "To keep the service women-only. Verifying identity and gender is the entire basis of the promise we make, and it is the reason we ask riders and drivers alike for documents most services would not.",
       "To respond to a safety incident. If you raise an alarm, your location and trip details go to your trusted contacts and to our safety team.",
       "To meet legal obligations — tax records, and responding to a lawful order.",
     ],

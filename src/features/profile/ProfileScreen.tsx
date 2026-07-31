@@ -30,6 +30,8 @@ import { TrustedContactsSection } from "./components/TrustedContactsSection";
 import { InviteEarnCard } from "./components/InviteEarnCard";
 import { DeleteAccountCard } from "./components/DeleteAccountCard";
 import { pushEnabled, requestPushPermission } from "@/features/notifications/lib/push";
+import { riderVerificationService } from "@/services/rider-verification";
+import { VERIFICATION_KEY } from "@/features/verification/VerifyIdentityScreen";
 
 interface Row {
   readonly id: string;
@@ -60,7 +62,28 @@ export function ProfileScreen() {
     queryFn: () => walletService.getBalance(),
   });
 
+  const { data: verification } = useQuery({
+    queryKey: VERIFICATION_KEY,
+    queryFn: () => riderVerificationService.getState(),
+  });
+
   const account: readonly Row[] = [
+    {
+      id: "verify",
+      label: "Identity verification",
+      sub: verification?.isVerified
+        ? "Your identity is confirmed"
+        : verification?.status === "pending"
+          ? "Your documents are being reviewed"
+          : "Confirm who you are with an ID and a selfie",
+      Icon: BadgeCheck,
+      to: ROUTES.verifyIdentity,
+      value: verification?.isVerified
+        ? "Verified"
+        : verification?.status === "pending"
+          ? "Pending"
+          : undefined,
+    },
     {
       id: "rides",
       label: "Ride history",

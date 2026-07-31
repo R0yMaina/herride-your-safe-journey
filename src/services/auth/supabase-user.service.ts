@@ -61,9 +61,11 @@ export class SupabaseUserService implements IUserService {
     // here BEFORE the RPC scrubs the rows that point at them. Doing it after
     // would leave the paths gone and the files behind.
     if (user) {
-      const { data: files } = await supabase.storage.from("driver-docs").list(user.id);
-      if (files?.length) {
-        await supabase.storage.from("driver-docs").remove(files.map((f) => `${user.id}/${f.name}`));
+      for (const bucket of ["driver-docs", "rider-docs"] as const) {
+        const { data: files } = await supabase.storage.from(bucket).list(user.id);
+        if (files?.length) {
+          await supabase.storage.from(bucket).remove(files.map((f) => `${user.id}/${f.name}`));
+        }
       }
     }
 

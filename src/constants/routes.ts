@@ -22,6 +22,7 @@ export const ROUTES = Object.freeze({
   support: "/support",
   privacy: "/privacy",
   safety: "/safety",
+  verifyIdentity: "/verify",
   driver: "/driver",
   driverApply: "/driver/apply",
   driverEarnings: "/driver/earnings",
@@ -30,6 +31,7 @@ export const ROUTES = Object.freeze({
   admin: "/admin",
   adminFinance: "/admin/finance",
   adminDrivers: "/admin/drivers",
+  adminRiders: "/admin/riders",
 });
 
 export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES];

@@ -142,6 +142,8 @@ export type Database = {
           full_name: string | null;
           gender: Database["public"]["Enums"]["gender"] | null;
           id: string;
+          identity_verified: boolean;
+          identity_verified_at: string | null;
           is_blacklisted: boolean;
           phone: string | null;
           updated_at: string;
@@ -153,6 +155,8 @@ export type Database = {
           full_name?: string | null;
           gender?: Database["public"]["Enums"]["gender"] | null;
           id: string;
+          identity_verified?: boolean;
+          identity_verified_at?: string | null;
           is_blacklisted?: boolean;
           phone?: string | null;
           updated_at?: string;
@@ -164,6 +168,8 @@ export type Database = {
           full_name?: string | null;
           gender?: Database["public"]["Enums"]["gender"] | null;
           id?: string;
+          identity_verified?: boolean;
+          identity_verified_at?: string | null;
           is_blacklisted?: boolean;
           phone?: string | null;
           updated_at?: string;
@@ -1051,6 +1057,44 @@ export type Database = {
       enforce_retention: {
         Args: Record<string, never>;
         Returns: { what: string; removed: number }[];
+      };
+      // Phase 25 — rider identity verification.
+      my_rider_verification: {
+        Args: Record<string, never>;
+        Returns: {
+          is_verified: boolean;
+          status: string;
+          reject_reason: string | null;
+          submitted_at: string | null;
+          required: boolean;
+          rides_remaining: number;
+        }[];
+      };
+      submit_rider_verification: {
+        Args: { _selfie_url: string; _id_document_url: string; _id_number?: string };
+        Returns: unknown;
+      };
+      list_pending_rider_verifications: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          user_id: string;
+          full_name: string | null;
+          phone: string | null;
+          gender: string | null;
+          selfie_url: string;
+          id_document_url: string;
+          id_number: string | null;
+          submitted_at: string;
+        }[];
+      };
+      review_rider_verification: {
+        Args: { _verification_id: string; _approve: boolean; _reason?: string };
+        Returns: unknown;
+      };
+      rider_may_book: {
+        Args: { _user_id: string };
+        Returns: boolean;
       };
       // Phase 19 — periodic driver identity re-check.
       my_driver_check_state: {
