@@ -11,6 +11,7 @@ import {
   verificationBlocksBooking,
   type RiderVerificationState,
 } from "@/services/rider-verification";
+import { useT } from "@/i18n";
 
 export const VERIFICATION_KEY = ["rider-verification"] as const;
 
@@ -22,6 +23,7 @@ export const VERIFICATION_KEY = ["rider-verification"] as const;
  * driver already passed, reviewed by a person rather than a script.
  */
 export function VerifyIdentityScreen() {
+  const { t } = useT();
   const { data: state, isLoading } = useQuery({
     queryKey: VERIFICATION_KEY,
     queryFn: () => riderVerificationService.getState(),
@@ -31,12 +33,12 @@ export function VerifyIdentityScreen() {
     <ScreenWrapper>
       <Container className="space-y-6 pb-16">
         <PageHeader
-          eyebrow="Account"
-          title="Verify your identity"
-          subtitle="So every woman in the car knows who the other one is."
+          eyebrow={t("profile.account")}
+          title={t("verification.title")}
+          subtitle={t("verification.subtitle")}
         />
         {isLoading || !state ? (
-          <p className="pt-6 text-center text-sm text-muted-foreground">Loading…</p>
+          <p className="pt-6 text-center text-sm text-muted-foreground">{t("common.loading")}</p>
         ) : state.isVerified || state.status === "pending" ? (
           <StatusCard state={state} />
         ) : (
@@ -48,6 +50,7 @@ export function VerifyIdentityScreen() {
 }
 
 function StatusCard({ state }: { readonly state: RiderVerificationState }) {
+  const { t } = useT();
   const verified = state.isVerified;
   return (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
@@ -60,12 +63,10 @@ function StatusCard({ state }: { readonly state: RiderVerificationState }) {
           {verified ? <BadgeCheck className="h-7 w-7" /> : <Clock3 className="h-7 w-7" />}
         </div>
         <p className="font-display text-xl text-foreground">
-          {verified ? "You're verified" : "Documents under review"}
+          {verified ? t("verification.verified") : t("verification.underReview")}
         </p>
         <p className="mx-auto max-w-xs text-sm text-muted-foreground">
-          {verified
-            ? "Thank you. Your account is fully verified — nothing else to do."
-            : "A person is looking at your photos. This usually takes a few hours, and you can keep booking in the meantime."}
+          {verified ? t("verification.verifiedBody") : t("verification.underReviewBody")}
         </p>
         {state.submittedAt && !verified && (
           <p className="text-xs text-muted-foreground">
@@ -78,6 +79,7 @@ function StatusCard({ state }: { readonly state: RiderVerificationState }) {
 }
 
 function VerificationForm({ state }: { readonly state: RiderVerificationState }) {
+  const { t } = useT();
   const queryClient = useQueryClient();
   const [selfie, setSelfie] = useState<File | null>(null);
   const [idDoc, setIdDoc] = useState<File | null>(null);
@@ -129,10 +131,10 @@ function VerificationForm({ state }: { readonly state: RiderVerificationState })
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
           <p className="text-sm text-muted-foreground">
             {blocked
-              ? "Verification is now needed before you can book again."
-              : `You can book ${state.ridesRemaining} more ${
-                  state.ridesRemaining === 1 ? "ride" : "rides"
-                } before this is required.`}
+              ? t("verification.required")
+              : state.ridesRemaining === 1
+                ? t("verification.ridesRemainingOne")
+                : t("verification.ridesRemaining", { count: state.ridesRemaining })}
           </p>
         </GlassCard>
       )}
@@ -140,18 +142,18 @@ function VerificationForm({ state }: { readonly state: RiderVerificationState })
       <GlassCard className="space-y-4">
         <PhotoField
           id="rider-selfie"
-          label="A photo of you, right now"
+          label={t("verification.selfieLabel")}
           file={selfie}
           onFile={setSelfie}
         />
         <PhotoField
           id="rider-id"
-          label="Your national ID or passport"
+          label={t("verification.idLabel")}
           file={idDoc}
           onFile={setIdDoc}
         />
         <FormField
-          label="ID number (optional)"
+          label={t("verification.idNumberLabel")}
           value={idNumber}
           onChange={(e) => setIdNumber(e.target.value)}
           placeholder="12345678"
@@ -160,14 +162,11 @@ function VerificationForm({ state }: { readonly state: RiderVerificationState })
 
       <GlassCard className="space-y-2">
         <p className="text-sm font-semibold text-foreground">What happens to these photos</p>
-        <p className="text-sm text-muted-foreground">
-          They are stored privately, seen only by the person who reviews them, and deleted when you
-          delete your account. They are never shown to drivers or other riders.
-        </p>
+        <p className="text-sm text-muted-foreground">{t("verification.photoNote")}</p>
       </GlassCard>
 
       <PrimaryButton type="submit" disabled={submitting}>
-        {submitting ? "Submitting…" : "Submit for review"}
+        {submitting ? t("verification.submitting") : t("verification.submit")}
       </PrimaryButton>
     </form>
   );

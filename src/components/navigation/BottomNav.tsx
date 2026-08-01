@@ -2,23 +2,26 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, MapPin, Wallet, User } from "lucide-react";
 import { motion } from "framer-motion";
 import { ROUTES, type AppRoute } from "@/constants/routes";
+import { useT, type TranslationKey } from "@/i18n";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
   readonly to: AppRoute;
-  readonly label: string;
+  /** Translated at render time, not baked in at module load. */
+  readonly labelKey: TranslationKey;
   readonly Icon: typeof Home;
 }
 
 const NAV_ITEMS: readonly NavItem[] = [
-  { to: ROUTES.home, label: "Home", Icon: Home },
-  { to: ROUTES.rides, label: "Rides", Icon: MapPin },
-  { to: ROUTES.wallet, label: "Wallet", Icon: Wallet },
-  { to: ROUTES.profile, label: "Profile", Icon: User },
+  { to: ROUTES.home, labelKey: "nav.home", Icon: Home },
+  { to: ROUTES.rides, labelKey: "nav.rides", Icon: MapPin },
+  { to: ROUTES.wallet, labelKey: "nav.wallet", Icon: Wallet },
+  { to: ROUTES.profile, labelKey: "nav.profile", Icon: User },
 ];
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { t } = useT();
 
   return (
     <nav
@@ -26,7 +29,7 @@ export function BottomNav() {
       className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center pb-6"
     >
       <div className="pointer-events-auto flex w-[92%] max-w-md items-center justify-between rounded-full border border-border/60 bg-card/70 px-3 py-2 shadow-soft backdrop-blur-2xl">
-        {NAV_ITEMS.map(({ to, label, Icon }) => {
+        {NAV_ITEMS.map(({ to, labelKey, Icon }) => {
           const active = pathname === to;
           return (
             <Link
@@ -45,7 +48,7 @@ export function BottomNav() {
                 />
               )}
               <Icon className="h-5 w-5" aria-hidden />
-              <span className="uppercase tracking-[0.18em]">{label}</span>
+              <span className="uppercase tracking-[0.18em]">{t(labelKey)}</span>
             </Link>
           );
         })}

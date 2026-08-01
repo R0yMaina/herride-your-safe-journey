@@ -19,6 +19,7 @@ import { fetchRoadRoute } from "@/services/maps/osrm";
 import type { RouteStep, StepManeuver } from "@/services/maps/route-steps";
 import { haversineKm } from "@/lib/geo";
 import { distanceCue, navigationDeepLink, navigationProgress } from "../lib/navigation";
+import { useT } from "@/i18n";
 
 const ICONS: Record<StepManeuver, typeof ArrowUp> = {
   depart: Navigation2,
@@ -59,6 +60,7 @@ export function NavigationPanel({
   readonly to: GeoPoint;
   readonly label: string;
 }) {
+  const { t } = useT();
   const [steps, setSteps] = useState<readonly RouteStep[]>([]);
   const [floor, setFloor] = useState(0);
   const routedFrom = useRef<GeoPoint | null>(null);
@@ -99,7 +101,7 @@ export function NavigationPanel({
     return (
       <GlassCard className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted-foreground">
-          {from ? "Finding the route…" : "Waiting for your location…"}
+          {from ? t("driver.findingRoute") : t("driver.waitingForLocation")}
         </p>
         <DeepLinks to={to} />
       </GlassCard>
@@ -127,7 +129,7 @@ export function NavigationPanel({
 
       {progress.next && (
         <p className="truncate border-t border-border/50 pt-2 text-xs text-muted-foreground">
-          Then: {progress.next.instruction}
+          {t("driver.then", { instruction: progress.next.instruction })}
         </p>
       )}
 

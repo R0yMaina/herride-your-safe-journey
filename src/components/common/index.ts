@@ -9,3 +9,4 @@ export * from "./LoadingSkeleton";
 export * from "./IconButton";
 export * from "./Typography";
 export * from "./ThemeToggle";
+export * from "./LanguageToggle";

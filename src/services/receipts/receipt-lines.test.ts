@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { receiptLines, receiptText } from "./receipt-lines";
+import { translate } from "@/i18n";
 import { MockReceiptService, type RideReceipt } from "./receipt.service";
 
 const base: RideReceipt = {
@@ -43,23 +44,28 @@ describe("receiptLines", () => {
   it("adds up once a promo discount is applied", () => {
     const r: RideReceipt = { ...base, discount: 100, promoCode: "HERIDE50", total: 430 };
     expect(sum(r)).toBeCloseTo(r.total, 2);
-    expect(receiptLines(r).find((l) => l.label === "Promo HERIDE50")?.amount).toBe(-100);
+    const promo = receiptLines(r).find((l) => l.labelKey === "receipt.promo");
+    expect(promo?.amount).toBe(-100);
+    expect(promo?.labelValues).toEqual({ code: "HERIDE50" });
   });
 
   it("adds up once a busy-period multiplier is applied", () => {
     const r: RideReceipt = { ...base, surgeMultiplier: 1.5, surgeAmount: 240, total: 770 };
     expect(sum(r)).toBeCloseTo(r.total, 2);
-    expect(receiptLines(r).find((l) => l.label === "Busy period (1.5x)")?.amount).toBe(240);
+    const busy = receiptLines(r).find((l) => l.labelKey === "receipt.busyPeriod");
+    expect(busy?.amount).toBe(240);
+    expect(busy?.labelValues).toEqual({ multiplier: "1.5x" });
   });
 
   it("prints no surge line at 1.0x, rather than a zero one", () => {
-    expect(receiptLines(base).some((l) => l.label.startsWith("Busy period"))).toBe(false);
+    expect(receiptLines(base).some((l) => l.labelKey === "receipt.busyPeriod")).toBe(false);
   });
 
   it("adds up once a waiting charge is applied", () => {
     const r: RideReceipt = { ...base, waitingMinutes: 8, waitingFee: 25, total: 555 };
     expect(sum(r)).toBeCloseTo(r.total, 2);
-    expect(receiptLines(r).some((l) => l.label === "Waiting (8 min)")).toBe(true);
+    const wait = receiptLines(r).find((l) => l.labelKey === "receipt.waiting");
+    expect(wait?.labelValues).toEqual({ minutes: 8 });
   });
 
   it("absorbs the minimum-fare floor into the adjustment line", () => {
@@ -77,21 +83,21 @@ describe("receiptLines", () => {
       total: 150,
     };
     expect(sum(r)).toBeCloseTo(r.total, 2);
-    expect(receiptLines(r).some((l) => l.label === "Minimum fare adjustment")).toBe(true);
+    expect(receiptLines(r).some((l) => l.labelKey === "receipt.minimumFareAdjustment")).toBe(true);
   });
 
   it("bills a cancelled ride as the fee alone, with no metered fare", () => {
     const r: RideReceipt = { ...base, status: "cancelled", cancellationFee: 100, total: 100 };
     const lines = receiptLines(r);
     expect(lines).toHaveLength(1);
-    expect(lines[0].label).toBe("Cancellation fee");
+    expect(lines[0].labelKey).toBe("receipt.cancellationFee");
     expect(sum(r)).toBeCloseTo(r.total, 2);
   });
 
   it("leaves the tip out of the lines — it is paid after settlement", () => {
     const r: RideReceipt = { ...base, tip: 200 };
     expect(sum(r)).toBeCloseTo(r.total, 2);
-    expect(receiptLines(r).some((l) => l.label.toLowerCase().includes("tip"))).toBe(false);
+    expect(receiptLines(r).some((l) => l.labelKey === "receipt.tip")).toBe(false);
   });
 
   it("reconciles the mock receipt, so mock mode never shows broken arithmetic", async () => {
@@ -104,8 +110,12 @@ describe("receiptLines", () => {
 describe("receiptText", () => {
   it("prints every line, the total, and the ride id", () => {
     const r: RideReceipt = { ...base, discount: 100, promoCode: "HERIDE50", total: 430, tip: 50 };
-    const text = receiptText(r, (n) => `KES ${n}`);
-    expect(text).toContain("HeRide receipt");
+    const text = receiptText(
+      r,
+      (n) => `KES ${n}`,
+      (k, v) => translate("en", k, v),
+    );
+    expect(text).toContain("HeRide Receipt");
     expect(text).toContain("Base fare: KES 180");
     expect(text).toContain("Promo HERIDE50: KES -100");
     expect(text).toContain("Total charged: KES 430");
@@ -115,7 +125,11 @@ describe("receiptText", () => {
 
   it("omits the route and timestamp when they are unknown", () => {
     const r: RideReceipt = { ...base, pickupAddress: null, dropAddress: null, completedAt: null };
-    const text = receiptText(r, (n) => `KES ${n}`);
+    const text = receiptText(
+      r,
+      (n) => `KES ${n}`,
+      (k, v) => translate("en", k, v),
+    );
     expect(text).not.toContain("→");
     expect(text).not.toContain("null");
   });
