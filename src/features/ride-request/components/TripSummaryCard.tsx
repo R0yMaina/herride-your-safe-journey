@@ -2,6 +2,7 @@ import { MapPin, Circle, Clock, Route } from "lucide-react";
 import { GlassCard } from "@/components/common";
 import type { TripSummary } from "@/types/ride";
 import { RIDE_PREFERENCES } from "../data/preferences";
+import { TrafficNotice } from "./TrafficNotice";
 import { formatCurrency, formatDistance, formatDuration, formatScheduledFor } from "../lib/format";
 
 interface TripSummaryCardProps {
@@ -86,6 +87,8 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
             : `Now · ${summary.option.etaMin} min away`}
         </p>
       </div>
+
+      <TrafficNotice route={summary.route} />
 
       {prefs.length > 0 && (
         <div className="flex flex-wrap gap-1.5">

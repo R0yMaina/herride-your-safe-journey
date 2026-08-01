@@ -68,6 +68,10 @@ class RoadTripService implements ITripService {
       return {
         distanceKm: Math.round(road.distanceKm * 10) / 10,
         durationMin: Math.max(1, Math.round(road.durationMin)),
+        freeFlowDurationMin:
+          road.freeFlowDurationMin === undefined
+            ? undefined
+            : Math.max(1, Math.round(road.freeFlowDurationMin)),
         polyline: road.coordinates,
       };
     }

@@ -16,7 +16,13 @@ export interface Place {
 
 export interface RouteEstimate {
   readonly distanceKm: number;
+  /** Traffic-aware where the provider could see traffic — this is the ETA quoted. */
   readonly durationMin: number;
+  /**
+   * The same drive on empty roads. Absent when no provider could see traffic,
+   * which is deliberately distinct from "the roads are clear".
+   */
+  readonly freeFlowDurationMin?: number;
   readonly polyline: readonly GeoPoint[];
 }
 

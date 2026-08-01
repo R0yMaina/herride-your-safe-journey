@@ -14,6 +14,7 @@ import { TripChatSheet } from "@/features/trip/components/TripChatSheet";
 import { PinPromptSheet } from "./components/PinPromptSheet";
 import { IdentityCheckCard } from "./components/IdentityCheckCard";
 import { RideOfferCard } from "./components/RideOfferCard";
+import { NavigationPanel } from "./components/NavigationPanel";
 import { getCurrentPing } from "./lib/geo";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
@@ -296,6 +297,15 @@ export function DriverHomeScreen() {
               phase={activeRide.status === "in_progress" ? "on_trip" : "to_pickup"}
               className="mb-3"
             />
+            <div className="mb-3">
+              <NavigationPanel
+                from={position}
+                to={
+                  activeRide.status === "in_progress" ? activeRide.destination : activeRide.pickup
+                }
+                label={activeRide.status === "in_progress" ? "To the destination" : "To your rider"}
+              />
+            </div>
             <GlassCard className="space-y-3">
               <div>
                 <p className="text-sm text-foreground">{activeRide.pickup.address ?? "Pickup"}</p>
