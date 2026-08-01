@@ -434,6 +434,8 @@ export type Database = {
           requested_at: string;
           scheduled_for: string | null;
           started_at: string | null;
+          surge_amount: number | null;
+          surge_multiplier: number;
           status: Database["public"]["Enums"]["ride_status"];
           updated_at: string;
           waiting_fee: number | null;
@@ -466,6 +468,8 @@ export type Database = {
           requested_at?: string;
           scheduled_for?: string | null;
           started_at?: string | null;
+          surge_amount?: number | null;
+          surge_multiplier?: number;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
           waiting_fee?: number | null;
@@ -498,6 +502,8 @@ export type Database = {
           requested_at?: string;
           scheduled_for?: string | null;
           started_at?: string | null;
+          surge_amount?: number | null;
+          surge_multiplier?: number;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
           waiting_fee?: number | null;
@@ -1058,6 +1064,19 @@ export type Database = {
         Args: Record<string, never>;
         Returns: { what: string; removed: number }[];
       };
+      // Phase 26 — surge pricing.
+      surge_at: {
+        Args: { _lat: number; _lng: number };
+        Returns: number;
+      };
+      current_surge: {
+        Args: { _lat: number; _lng: number };
+        Returns: number;
+      };
+      km_between: {
+        Args: { _lat1: number; _lng1: number; _lat2: number; _lng2: number };
+        Returns: number;
+      };
       // Phase 25 — rider identity verification.
       my_rider_verification: {
         Args: Record<string, never>;
@@ -1296,6 +1315,8 @@ export type Database = {
           distance_cost: number;
           time_cost: number;
           booking_fee: number;
+          surge_multiplier: number;
+          surge_amount: number;
           adjustment: number;
           discount: number;
           promo_code: string | null;

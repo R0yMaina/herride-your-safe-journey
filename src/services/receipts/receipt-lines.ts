@@ -37,6 +37,13 @@ export function receiptLines(receipt: RideReceipt): readonly ReceiptLine[] {
     { label: "Booking fee", amount: receipt.bookingFee },
   ];
 
+  if (receipt.surgeAmount > 0) {
+    lines.push({
+      label: `Busy period (${receipt.surgeMultiplier.toFixed(1)}x)`,
+      amount: receipt.surgeAmount,
+    });
+  }
+
   if (receipt.adjustment !== 0) {
     lines.push({
       label: receipt.adjustment > 0 ? "Minimum fare adjustment" : "Fare adjustment",

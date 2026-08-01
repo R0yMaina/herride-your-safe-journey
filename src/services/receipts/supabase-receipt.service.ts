@@ -18,6 +18,8 @@ export class SupabaseReceiptService implements IReceiptService {
       distanceCost: n(row.distance_cost),
       timeCost: n(row.time_cost),
       bookingFee: n(row.booking_fee),
+      surgeMultiplier: Number(row.surge_multiplier ?? 1),
+      surgeAmount: n(row.surge_amount),
       adjustment: n(row.adjustment),
       discount: n(row.discount),
       promoCode: row.promo_code,

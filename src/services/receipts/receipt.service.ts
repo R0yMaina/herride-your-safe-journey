@@ -7,6 +7,10 @@ export interface RideReceipt {
   readonly distanceCost: number;
   readonly timeCost: number;
   readonly bookingFee: number;
+  /** Locked at booking; 1 when there was no surge. */
+  readonly surgeMultiplier: number;
+  /** What that multiplier added, in money. */
+  readonly surgeAmount: number;
   /**
    * Whatever the metered lines do not explain — normally the minimum-fare
    * floor on a very short trip. Exists so the printed lines always sum to the
@@ -46,8 +50,9 @@ export interface IReceiptService {
 export class MockReceiptService implements IReceiptService {
   async getReceipt(rideId: string): Promise<RideReceipt | null> {
     await new Promise<void>((r) => setTimeout(r, 120));
-    // Carries a promo and a waiting charge so the fuller receipt is reachable
-    // in mock mode without anyone having to be kept waiting at a kerb.
+    // Carries a surge, a promo and a waiting charge so the fuller receipt is
+    // reachable in mock mode without needing a real shortage of drivers or
+    // anyone kept waiting at a kerb.
     return {
       rideId,
       status: "completed",
@@ -56,16 +61,18 @@ export class MockReceiptService implements IReceiptService {
       distanceCost: 220,
       timeCost: 80,
       bookingFee: 50,
+      surgeMultiplier: 1.4,
+      surgeAmount: 192,
       adjustment: 0,
       discount: 100,
       promoCode: "HERIDE50",
       waitingMinutes: 6,
       waitingFee: 15,
       cancellationFee: 0,
-      total: 445,
+      total: 637,
       tip: 50,
-      commission: 44.5,
-      driverEarnings: 400.5,
+      commission: 63.7,
+      driverEarnings: 573.3,
       distanceKm: 4,
       durationMin: 10,
       driverName: "Grace Wanjiku",

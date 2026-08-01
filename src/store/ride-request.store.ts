@@ -36,6 +36,11 @@ interface RideRequestState {
   readonly route: RouteEstimate | null;
   readonly option: RideOption | null;
   readonly fare: FareEstimate | null;
+  /**
+   * Live demand multiplier for the pickup, 1 when there is none. An estimate:
+   * the charged value is locked onto the ride row server-side at booking.
+   */
+  readonly surge: number;
   readonly preferences: readonly RidePreferenceId[];
   readonly schedule: ScheduledRide;
   readonly note: string;
@@ -57,6 +62,7 @@ interface RideRequestState {
   setRoute: (route: RouteEstimate | null) => void;
   setOption: (option: RideOption | null) => void;
   setFare: (fare: FareEstimate | null) => void;
+  setSurge: (surge: number) => void;
   togglePreference: (id: RidePreferenceId) => void;
   setScheduleMode: (mode: ScheduleMode) => void;
   setScheduledFor: (iso: string | null) => void;
@@ -76,6 +82,7 @@ const initial = {
   route: null,
   option: null,
   fare: null,
+  surge: 1,
   preferences: DEFAULT_PREFS,
   schedule: { mode: "now" as ScheduleMode, scheduledFor: null },
   note: "",
@@ -114,6 +121,7 @@ export const useRideRequestStore = create<RideRequestState>((set, get) => ({
   setRoute: (route) => set({ route }),
   setOption: (option) => set({ option, fare: null }),
   setFare: (fare) => set({ fare }),
+  setSurge: (surge) => set({ surge: Math.max(surge, 1) }),
   togglePreference: (id) =>
     set((s) => ({
       preferences: s.preferences.includes(id)

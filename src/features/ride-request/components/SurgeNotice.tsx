@@ -1,0 +1,24 @@
+import { TrendingUp } from "lucide-react";
+import { formatSurge, isSurging } from "@/services/surge";
+
+/**
+ * Tells her prices are up, by how much, and why — before she commits.
+ *
+ * The multiplier is locked onto her ride the moment she books, so this number
+ * is the one she pays even if demand spikes further while she is choosing a
+ * car. Renders nothing below 1.1x, where the difference is not worth a banner.
+ */
+export function SurgeNotice({ multiplier }: { readonly multiplier: number }) {
+  if (!isSurging(multiplier)) return null;
+
+  return (
+    <div className="flex items-start gap-2 rounded-2xl bg-primary/10 px-3 py-2 text-xs text-foreground">
+      <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+      <span>
+        <span className="font-semibold">{formatSurge(multiplier)} fares</span> — more riders than
+        drivers nearby right now. This rate is locked in when you book, even if it climbs while you
+        decide.
+      </span>
+    </div>
+  );
+}

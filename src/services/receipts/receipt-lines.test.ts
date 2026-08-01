@@ -10,6 +10,8 @@ const base: RideReceipt = {
   distanceCost: 220,
   timeCost: 80,
   bookingFee: 50,
+  surgeMultiplier: 1,
+  surgeAmount: 0,
   adjustment: 0,
   discount: 0,
   promoCode: null,
@@ -42,6 +44,16 @@ describe("receiptLines", () => {
     const r: RideReceipt = { ...base, discount: 100, promoCode: "HERIDE50", total: 430 };
     expect(sum(r)).toBeCloseTo(r.total, 2);
     expect(receiptLines(r).find((l) => l.label === "Promo HERIDE50")?.amount).toBe(-100);
+  });
+
+  it("adds up once a busy-period multiplier is applied", () => {
+    const r: RideReceipt = { ...base, surgeMultiplier: 1.5, surgeAmount: 240, total: 770 };
+    expect(sum(r)).toBeCloseTo(r.total, 2);
+    expect(receiptLines(r).find((l) => l.label === "Busy period (1.5x)")?.amount).toBe(240);
+  });
+
+  it("prints no surge line at 1.0x, rather than a zero one", () => {
+    expect(receiptLines(base).some((l) => l.label.startsWith("Busy period"))).toBe(false);
   });
 
   it("adds up once a waiting charge is applied", () => {
