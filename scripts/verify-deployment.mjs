@@ -13,29 +13,18 @@
  * script reports a leak rather than leaving a row behind.
  *
  * Usage:
- *   RLS_USER_A_EMAIL=… RLS_USER_A_PASSWORD=… node scripts/verify-deployment.mjs
+ *   RLS_USER_A_EMAIL=… RLS_USER_A_PASSWORD=… npm run verify:deployment
+ *
+ * Run it through npm, not `node` directly — the script relies on npm passing
+ * --env-file-if-exists=.env for the Supabase URL and key.
  *
  * Any signed-in account works — no admin needed. Admin-only functions are
  * probed for "exists but refused me", which is itself proof they are deployed.
  */
-import { readFileSync } from "node:fs";
-
-function fromEnvFile(key) {
-  try {
-    const line = readFileSync(new URL("../.env", import.meta.url), "utf8")
-      .split("\n")
-      .find((l) => l.startsWith(`${key}=`));
-    return line
-      ?.slice(key.length + 1)
-      .trim()
-      .replace(/^["']|["']$/g, "");
-  } catch {
-    return undefined;
-  }
-}
-
-const URL_ = process.env.SUPABASE_URL ?? fromEnvFile("SUPABASE_URL");
-const ANON = process.env.SUPABASE_PUBLISHABLE_KEY ?? fromEnvFile("SUPABASE_PUBLISHABLE_KEY");
+// Loaded by Node via --env-file-if-exists (see package.json) rather than read
+// here — see the note in rls-cross-tenant-test.mjs.
+const URL_ = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+const ANON = process.env.SUPABASE_PUBLISHABLE_KEY ?? process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 const EMAIL = process.env.RLS_USER_A_EMAIL;
 const PASSWORD = process.env.RLS_USER_A_PASSWORD;
 

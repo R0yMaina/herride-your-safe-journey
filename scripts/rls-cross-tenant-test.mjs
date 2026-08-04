@@ -21,26 +21,16 @@
  *
  * Exits non-zero on any leak, so it can gate CI against a staging project.
  */
-import { readFileSync } from "node:fs";
-
-function fromDotEnv(key) {
-  try {
-    const line = readFileSync(new URL("../.env", import.meta.url), "utf8")
-      .split("\n")
-      .find((l) => l.startsWith(`${key}=`));
-    return line
-      ? line
-          .slice(key.length + 1)
-          .replace(/^"|"$/g, "")
-          .trim()
-      : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-const URL_ = process.env.SUPABASE_URL ?? fromDotEnv("VITE_SUPABASE_URL");
-const ANON = process.env.SUPABASE_ANON_KEY ?? fromDotEnv("VITE_SUPABASE_PUBLISHABLE_KEY");
+// `.env` is loaded by Node itself via --env-file-if-exists (see package.json),
+// not parsed here. Reading the file in-process and then handing what it
+// contained to fetch() is a file-to-network flow, which is what CodeQL was
+// flagging — correctly, as a shape. Letting the runtime do it removes the
+// flow, and Node quotes and escapes better than the regex this replaced.
+const URL_ = process.env.SUPABASE_URL ?? process.env.VITE_SUPABASE_URL;
+const ANON =
+  process.env.SUPABASE_ANON_KEY ??
+  process.env.SUPABASE_PUBLISHABLE_KEY ??
+  process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 const A = { email: process.env.RLS_USER_A_EMAIL, password: process.env.RLS_USER_A_PASSWORD };
 const B = { email: process.env.RLS_USER_B_EMAIL, password: process.env.RLS_USER_B_PASSWORD };
