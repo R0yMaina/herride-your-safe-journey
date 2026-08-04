@@ -245,8 +245,12 @@ BEGIN
   SELECT p.identity_verified INTO verified FROM public.profiles p WHERE p.id = auth.uid();
   SELECT * INTO v FROM public.rider_verifications rv
     WHERE rv.user_id = auth.uid() ORDER BY rv.submitted_at DESC LIMIT 1;
-  SELECT COUNT(*) INTO used FROM public.rides
-    WHERE passenger_id = auth.uid() AND status = 'completed';
+  -- Alias and qualify: `status` is also one of this function's OUT
+  -- parameters, and an unqualified reference is ambiguous to Postgres. The
+  -- body is not validated at creation, so this failed on every call rather
+  -- than when the script was applied.
+  SELECT COUNT(*) INTO used FROM public.rides r
+    WHERE r.passenger_id = auth.uid() AND r.status = 'completed';
 
   RETURN QUERY SELECT
     COALESCE(verified, false),

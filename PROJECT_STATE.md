@@ -121,9 +121,15 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -
 | phase26-surge.sql | ⏳ user must run | demand pricing, locked per ride; `surge_enabled` off by default |
 | seed.sql | optional | test accounts for local/staging only |
 
-**Replace this table.** Each script should `INSERT` its own name into a
-`schema_migrations` table on success, so "what is deployed" is a query rather
-than a document someone has to remember to update.
+**Do not trust this table — run the probe.** `npm run verify:deployment` asks
+the database what is actually live: each check hits something only its phase
+creates, so the answer comes from the deployment rather than from someone's
+memory of it. It is read-only, needs any signed-in account, and demands a
+*working* answer from the RPCs a rider should be able to call — an existence
+check is too weak, as `my_rider_verification` proved by shipping deployed,
+callable and broken on every call.
+
+A `schema_migrations` table is still the tidier long-term answer.
 
 ## Known gaps / deliberate v1 scope
 

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:rls": "node scripts/rls-cross-tenant-test.mjs"
+    "test:rls": "node scripts/rls-cross-tenant-test.mjs",
+    "verify:deployment": "node scripts/verify-deployment.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
