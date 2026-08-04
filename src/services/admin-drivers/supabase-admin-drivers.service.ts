@@ -1,5 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import type {
+  PendingDriverCheck,
   DriverApplicationSummary,
   DriverVerificationStatus,
   IAdminDriversService,
@@ -59,6 +60,29 @@ export class SupabaseAdminDriversService implements IAdminDriversService {
     const { error } = await supabase.rpc("set_driver_status", {
       _driver_user_id: driverUserId,
       _status: status,
+      _reason: reason,
+    });
+    if (error) throw new Error(error.message);
+  }
+
+  async listPendingChecks(): Promise<readonly PendingDriverCheck[]> {
+    const { data, error } = await supabase.rpc("list_pending_driver_checks");
+    if (error) throw new Error(error.message);
+    return (data ?? []).map((row) => ({
+      id: row.id,
+      driverUserId: row.driver_user_id,
+      fullName: row.full_name,
+      selfieUrl: row.selfie_url,
+      verificationSelfieUrl: row.verification_selfie_url,
+      submittedAt: row.submitted_at,
+      lastCheckedAt: row.last_checked_at,
+    }));
+  }
+
+  async reviewCheck(checkId: string, passed: boolean, reason?: string): Promise<void> {
+    const { error } = await supabase.rpc("review_driver_check", {
+      _check_id: checkId,
+      _passed: passed,
       _reason: reason,
     });
     if (error) throw new Error(error.message);

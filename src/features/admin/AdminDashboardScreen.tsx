@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { adminOverviewService, type AdminOverview } from "@/services/admin-overview";
+import { adminDriversService } from "@/services/admin-drivers";
+import { CHECK_QUEUE_KEY } from "./components/DriverCheckQueue";
 import { useAuth } from "@/hooks/useAuth";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { ROUTES } from "@/constants/routes";
@@ -115,6 +117,14 @@ export function AdminDashboardScreen() {
 
 /** Red-flag banners: open SOS first, then the verification backlog. */
 function AttentionRow({ overview }: { readonly overview: AdminOverview }) {
+  // Read separately from the overview RPC: the re-check queue postdates it,
+  // and a count is not worth widening admin_overview and re-running SQL for.
+  const { data: checks } = useQuery({
+    queryKey: CHECK_QUEUE_KEY,
+    queryFn: () => adminDriversService.listPendingChecks(),
+  });
+  const pendingChecks = checks?.length ?? 0;
+
   const items: { key: string; text: string; urgent: boolean; to: string }[] = [];
   if (overview.openSos > 0) {
     items.push({
@@ -130,6 +140,17 @@ function AttentionRow({ overview }: { readonly overview: AdminOverview }) {
       text: `${overview.openFraudSignals} fraud ${overview.openFraudSignals === 1 ? "signal" : "signals"} in the last 7 days`,
       urgent: false,
       to: ROUTES.adminFinance,
+    });
+  }
+  if (pendingChecks > 0) {
+    // Urgent: unlike an application, this is a driver who already works here
+    // and cannot earn until someone looks. The phase 19 gate keeps her both
+    // offline and unmatchable, so this queue is her only way back.
+    items.push({
+      key: "rechecks",
+      text: `${pendingChecks} identity re-${pendingChecks === 1 ? "check" : "checks"} waiting — drivers are locked out until cleared`,
+      urgent: true,
+      to: ROUTES.adminDrivers,
     });
   }
   if (overview.pendingDrivers > 0) {

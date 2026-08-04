@@ -15,6 +15,7 @@ import {
   type DriverApplicationSummary,
   type DriverVerificationStatus,
 } from "@/services/admin-drivers";
+import { DriverCheckQueue } from "./components/DriverCheckQueue";
 
 const TABS: readonly { id: DriverVerificationStatus; label: string }[] = [
   { id: "pending", label: "Pending" },
@@ -67,6 +68,8 @@ export function AdminDriversScreen() {
             matches the ID, the ID is hers, and the licence is valid.
           </p>
         </GlassCard>
+
+        <DriverCheckQueue />
 
         <div className="flex gap-2 overflow-x-auto pb-1">
           {TABS.map(({ id, label }) => (

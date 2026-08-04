@@ -134,6 +134,10 @@ than a document someone has to remember to update.
 - In-app voice calls not built — chat covers rider↔driver contact without
   sharing numbers; masked calling needs a telephony provider (Twilio /
   Africa's Talking).
-- Admin driver-approval UI not built (`set_driver_status` RPC exists).
+- Admin verification desks are built: `/admin/drivers` covers driver
+  applications (approve / reject / suspend, signed-URL document viewing) and
+  the phase 19 identity re-check queue; `/admin/riders` covers rider identity
+  verification. Approving a driver or reviewing a re-check requires a second
+  factor once `enforce_admin_mfa` is on.
 - Cloudflare "Workers Builds" check on PRs fails instantly — misconfigured
   integration on the Cloudflare side, unrelated to the code.
