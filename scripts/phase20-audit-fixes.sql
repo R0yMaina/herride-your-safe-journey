@@ -161,7 +161,7 @@ BEGIN
       COALESCE(_reason, 'We could not match your photo. Contact support.'), NULL);
   END IF;
 
-  PERFORM public.log_audit('review_driver_check', 'driver_checks', c.id::text,
+  PERFORM public.log_audit('review_driver_check', 'driver_checks', c.id,
     jsonb_build_object('passed', _passed, 'reason', _reason));
   RETURN c;
 END; $$;

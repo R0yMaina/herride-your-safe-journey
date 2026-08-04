@@ -101,7 +101,7 @@ BEGIN
   INSERT INTO public.account_deletions (user_id, reason)
     VALUES (me, _reason) ON CONFLICT (user_id) DO NOTHING;
 
-  PERFORM public.log_audit('delete_my_account', 'profiles', me::text,
+  PERFORM public.log_audit('delete_my_account', 'profiles', me,
     jsonb_build_object('reason', _reason));
 END; $$;
 REVOKE EXECUTE ON FUNCTION public.delete_my_account(text) FROM PUBLIC;
