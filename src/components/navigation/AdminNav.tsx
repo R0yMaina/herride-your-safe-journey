@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { BadgeCheck, LayoutDashboard, Wallet } from "lucide-react";
+import { BadgeCheck, LayoutDashboard, UserCheck, Wallet } from "lucide-react";
 import { motion } from "framer-motion";
 import { ROUTES, type AppRoute } from "@/constants/routes";
 import { cn } from "@/lib/utils";
@@ -13,6 +13,7 @@ interface NavItem {
 const NAV_ITEMS: readonly NavItem[] = [
   { to: ROUTES.admin, label: "Overview", Icon: LayoutDashboard },
   { to: ROUTES.adminDrivers, label: "Drivers", Icon: BadgeCheck },
+  { to: ROUTES.adminRiders, label: "Riders", Icon: UserCheck },
   { to: ROUTES.adminFinance, label: "Finance", Icon: Wallet },
 ];
 

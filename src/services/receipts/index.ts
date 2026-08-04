@@ -8,3 +8,4 @@ export const receiptService: IReceiptService = env.useMocks
   : new SupabaseReceiptService();
 
 export type { IReceiptService, RideReceipt } from "./receipt.service";
+export { receiptLines, receiptText, type ReceiptLine } from "./receipt-lines";

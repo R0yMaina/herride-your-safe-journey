@@ -34,9 +34,11 @@ import { Route as AuthPasswordUpdatedRouteImport } from './routes/auth.password-
 import { Route as AuthOtpRouteImport } from './routes/auth.otp'
 import { Route as AuthLogoutRouteImport } from './routes/auth.logout'
 import { Route as AuthForgotPasswordRouteImport } from './routes/auth.forgot-password'
+import { Route as AdminRidersRouteImport } from './routes/admin.riders'
 import { Route as AdminFinanceRouteImport } from './routes/admin.finance'
 import { Route as AdminDriversRouteImport } from './routes/admin.drivers'
 import { Route as AppWalletRouteImport } from './routes/_app.wallet'
+import { Route as AppVerifyRouteImport } from './routes/_app.verify'
 import { Route as AppSupportRouteImport } from './routes/_app.support'
 import { Route as AppSearchingRouteImport } from './routes/_app.searching'
 import { Route as AppSafetyRouteImport } from './routes/_app.safety'
@@ -171,6 +173,11 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const AdminRidersRoute = AdminRidersRouteImport.update({
+  id: '/riders',
+  path: '/riders',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFinanceRoute = AdminFinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -184,6 +191,11 @@ const AdminDriversRoute = AdminDriversRouteImport.update({
 const AppWalletRoute = AppWalletRouteImport.update({
   id: '/wallet',
   path: '/wallet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVerifyRoute = AppVerifyRouteImport.update({
+  id: '/verify',
+  path: '/verify',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSupportRoute = AppSupportRouteImport.update({
@@ -248,9 +260,11 @@ export interface FileRoutesByFullPath {
   '/safety': typeof AppSafetyRoute
   '/searching': typeof AppSearchingRoute
   '/support': typeof AppSupportRoute
+  '/verify': typeof AppVerifyRoute
   '/wallet': typeof AppWalletRoute
   '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/riders': typeof AdminRidersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -284,9 +298,11 @@ export interface FileRoutesByTo {
   '/safety': typeof AppSafetyRoute
   '/searching': typeof AppSearchingRoute
   '/support': typeof AppSupportRoute
+  '/verify': typeof AppVerifyRoute
   '/wallet': typeof AppWalletRoute
   '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/riders': typeof AdminRidersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -324,9 +340,11 @@ export interface FileRoutesById {
   '/_app/safety': typeof AppSafetyRoute
   '/_app/searching': typeof AppSearchingRoute
   '/_app/support': typeof AppSupportRoute
+  '/_app/verify': typeof AppVerifyRoute
   '/_app/wallet': typeof AppWalletRoute
   '/admin/drivers': typeof AdminDriversRoute
   '/admin/finance': typeof AdminFinanceRoute
+  '/admin/riders': typeof AdminRidersRoute
   '/auth/forgot-password': typeof AuthForgotPasswordRoute
   '/auth/logout': typeof AuthLogoutRoute
   '/auth/otp': typeof AuthOtpRoute
@@ -364,9 +382,11 @@ export interface FileRouteTypes {
     | '/safety'
     | '/searching'
     | '/support'
+    | '/verify'
     | '/wallet'
     | '/admin/drivers'
     | '/admin/finance'
+    | '/admin/riders'
     | '/auth/forgot-password'
     | '/auth/logout'
     | '/auth/otp'
@@ -400,9 +420,11 @@ export interface FileRouteTypes {
     | '/safety'
     | '/searching'
     | '/support'
+    | '/verify'
     | '/wallet'
     | '/admin/drivers'
     | '/admin/finance'
+    | '/admin/riders'
     | '/auth/forgot-password'
     | '/auth/logout'
     | '/auth/otp'
@@ -439,9 +461,11 @@ export interface FileRouteTypes {
     | '/_app/safety'
     | '/_app/searching'
     | '/_app/support'
+    | '/_app/verify'
     | '/_app/wallet'
     | '/admin/drivers'
     | '/admin/finance'
+    | '/admin/riders'
     | '/auth/forgot-password'
     | '/auth/logout'
     | '/auth/otp'
@@ -652,6 +676,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/admin/riders': {
+      id: '/admin/riders'
+      path: '/riders'
+      fullPath: '/admin/riders'
+      preLoaderRoute: typeof AdminRidersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/finance': {
       id: '/admin/finance'
       path: '/finance'
@@ -671,6 +702,13 @@ declare module '@tanstack/react-router' {
       path: '/wallet'
       fullPath: '/wallet'
       preLoaderRoute: typeof AppWalletRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/verify': {
+      id: '/_app/verify'
+      path: '/verify'
+      fullPath: '/verify'
+      preLoaderRoute: typeof AppVerifyRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/support': {
@@ -748,6 +786,7 @@ interface AppRouteChildren {
   AppSafetyRoute: typeof AppSafetyRoute
   AppSearchingRoute: typeof AppSearchingRoute
   AppSupportRoute: typeof AppSupportRoute
+  AppVerifyRoute: typeof AppVerifyRoute
   AppWalletRoute: typeof AppWalletRoute
   AppTripRideIdRoute: typeof AppTripRideIdRoute
 }
@@ -761,6 +800,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSafetyRoute: AppSafetyRoute,
   AppSearchingRoute: AppSearchingRoute,
   AppSupportRoute: AppSupportRoute,
+  AppVerifyRoute: AppVerifyRoute,
   AppWalletRoute: AppWalletRoute,
   AppTripRideIdRoute: AppTripRideIdRoute,
 }
@@ -770,12 +810,14 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 interface AdminRouteChildren {
   AdminDriversRoute: typeof AdminDriversRoute
   AdminFinanceRoute: typeof AdminFinanceRoute
+  AdminRidersRoute: typeof AdminRidersRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminDriversRoute: AdminDriversRoute,
   AdminFinanceRoute: AdminFinanceRoute,
+  AdminRidersRoute: AdminRidersRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 

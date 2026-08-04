@@ -1,5 +1,7 @@
 import { env } from "@/config/env";
 import { contact } from "@/config/contact";
+import type { Language } from "@/i18n";
+import { FAQS_SW } from "./faqs.sw";
 
 export interface Faq {
   readonly id: string;
@@ -85,3 +87,16 @@ export const FAQS: readonly Faq[] = [
       "Name, phone and trusted contacts are all editable in your profile. To delete your account and the data attached to it, email us from the address on your account and we will confirm before anything is removed.",
   },
 ];
+
+/**
+ * The FAQs in the reader's language.
+ *
+ * Falls back to English per-question rather than wholesale: if a Swahili
+ * answer is ever missing, she still gets the other eleven in Swahili and only
+ * that one in English, which beats flipping the whole page.
+ */
+export function faqsFor(language: Language): readonly Faq[] {
+  if (language !== "sw") return FAQS;
+  const bySwId = new Map(FAQS_SW.map((f) => [f.id, f]));
+  return FAQS.map((english) => bySwId.get(english.id) ?? english);
+}

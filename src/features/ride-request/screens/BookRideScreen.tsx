@@ -7,6 +7,7 @@ import { VehicleStep } from "./steps/VehicleStep";
 import { PreferencesStep } from "./steps/PreferencesStep";
 import { ScheduleStep } from "./steps/ScheduleStep";
 import { ConfirmStep } from "./steps/ConfirmStep";
+import { VerificationNotice } from "@/features/verification/components/VerificationNotice";
 
 /** Orchestrates the multi-step ride request flow. Each step is presentational. */
 export function BookRideScreen() {
@@ -23,6 +24,7 @@ export function BookRideScreen() {
   return (
     <ScreenWrapper className="pb-48">
       <Container>
+        <VerificationNotice />
         <AnimatePresence mode="wait">
           {step === "location" && <LocationStep key="location" />}
           {step === "vehicle" && <VehicleStep key="vehicle" />}

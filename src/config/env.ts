@@ -104,10 +104,7 @@ export const env: AppEnv = Object.freeze({
       const raw = readString(import.meta.env.VITE_MAP_PROVIDER, "leaflet");
       return raw === "google" || raw === "mapbox" ? raw : "leaflet";
     })(),
-    googleApiKey: readString(
-      import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
-        import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
-    ),
+    googleApiKey: readString(import.meta.env.VITE_GOOGLE_MAPS_API_KEY),
     mapboxToken: ((): string => {
       const raw = readString(import.meta.env.VITE_MAPBOX_TOKEN);
       if (raw && !isValidMapboxToken(raw)) {
@@ -121,10 +118,11 @@ export const env: AppEnv = Object.freeze({
       }
       return raw;
     })(),
+    // Falls back to the Maps key: one key may legitimately serve both, but the
+    // Lovable connector key that used to sit at the end of this chain is gone.
+    // It had no caller of its own and only widened the blast radius of a leak.
     googlePlacesApiKey: readString(
-      import.meta.env.VITE_GOOGLE_PLACES_API_KEY ||
-        import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
-        import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY,
+      import.meta.env.VITE_GOOGLE_PLACES_API_KEY || import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     ),
   }),
 });

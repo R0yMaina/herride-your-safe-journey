@@ -1,6 +1,7 @@
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { contact } from "@/config/contact";
-import { POLICY_UPDATED, PRIVACY_SECTIONS } from "./data/privacy";
+import { POLICY_UPDATED, privacyFor } from "./data/privacy";
+import { useT } from "@/i18n";
 
 /**
  * The privacy policy. Required by the Kenya Data Protection Act 2019, and
@@ -12,16 +13,24 @@ import { POLICY_UPDATED, PRIVACY_SECTIONS } from "./data/privacy";
  * where they are at night.
  */
 export function PrivacyScreen() {
+  const { t, language } = useT();
+  const { sections, translationNote } = privacyFor(language);
   return (
     <ScreenWrapper>
       <Container className="space-y-6">
         <PageHeader
-          eyebrow="Privacy"
+          eyebrow={t("profile.privacy")}
           title="What we know about you"
           subtitle={`And what we do with it. Last updated ${POLICY_UPDATED}.`}
         />
 
-        {PRIVACY_SECTIONS.map((section) => (
+        {translationNote && (
+          <GlassCard className="py-3">
+            <p className="text-xs leading-relaxed text-muted-foreground">{translationNote}</p>
+          </GlassCard>
+        )}
+
+        {sections.map((section) => (
           <Section key={section.id} title={section.heading}>
             <GlassCard className="space-y-3 py-4">
               {section.body.map((paragraph, i) => (

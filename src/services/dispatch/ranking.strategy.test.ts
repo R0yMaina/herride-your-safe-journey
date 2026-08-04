@@ -19,6 +19,7 @@ function ride(id: string, pickup: { lat: number; lng: number }): RideRecord {
     fareFinal: null,
     distanceKm: null,
     cancellationReason: null,
+    cancellationFee: null,
     requestedAt: new Date().toISOString(),
     acceptedAt: null,
     startedAt: null,

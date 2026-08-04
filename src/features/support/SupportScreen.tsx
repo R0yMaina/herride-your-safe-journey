@@ -11,7 +11,8 @@ import {
 import { Container, GlassCard, PageHeader, ScreenWrapper, Section } from "@/components/common";
 import { contact, supportMailto } from "@/config/contact";
 import { cn } from "@/lib/utils";
-import { FAQS } from "./data/faqs";
+import { faqsFor } from "./data/faqs";
+import { useT } from "@/i18n";
 
 /** Per-network glyph; anything we don't recognise still gets a sensible mark. */
 const SOCIAL_ICONS: Record<string, typeof Instagram> = {
@@ -51,6 +52,7 @@ function FaqItem({ question, answer }: { readonly question: string; readonly ans
  * she is actually charged.
  */
 export function SupportScreen() {
+  const { language } = useT();
   return (
     <ScreenWrapper>
       <Container className="space-y-6">
@@ -162,7 +164,7 @@ export function SupportScreen() {
 
         <Section title="Frequently asked">
           <div className="space-y-2">
-            {FAQS.map((faq) => (
+            {faqsFor(language).map((faq) => (
               <FaqItem key={faq.id} question={faq.question} answer={faq.answer} />
             ))}
           </div>

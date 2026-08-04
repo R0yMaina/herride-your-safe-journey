@@ -7,6 +7,7 @@ export const adminDriversService: IAdminDriversService = env.useMocks
   : new SupabaseAdminDriversService();
 
 export type {
+  PendingDriverCheck,
   DriverApplicationSummary,
   DriverVerificationStatus,
   IAdminDriversService,

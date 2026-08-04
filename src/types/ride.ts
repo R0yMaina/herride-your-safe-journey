@@ -16,7 +16,13 @@ export interface Place {
 
 export interface RouteEstimate {
   readonly distanceKm: number;
+  /** Traffic-aware where the provider could see traffic — this is the ETA quoted. */
   readonly durationMin: number;
+  /**
+   * The same drive on empty roads. Absent when no provider could see traffic,
+   * which is deliberately distinct from "the roads are clear".
+   */
+  readonly freeFlowDurationMin?: number;
   readonly polyline: readonly GeoPoint[];
 }
 
@@ -150,6 +156,8 @@ export interface RideRecord {
   readonly fareFinal: number | null;
   readonly distanceKm: number | null;
   readonly cancellationReason: string | null;
+  /** Charged only when a driver was already on her way; paid to that driver. */
+  readonly cancellationFee: number | null;
   readonly requestedAt: ISODateString;
   readonly acceptedAt: ISODateString | null;
   readonly startedAt: ISODateString | null;

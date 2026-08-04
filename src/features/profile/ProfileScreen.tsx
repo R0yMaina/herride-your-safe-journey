@@ -12,6 +12,7 @@ import {
   Clock,
   Wallet,
   Palette,
+  Languages,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { ROUTES } from "@/constants/routes";
@@ -22,14 +23,18 @@ import {
   ScreenWrapper,
   Section,
   ThemeToggle,
+  LanguageToggle,
 } from "@/components/common";
 import { useAuth } from "@/hooks/useAuth";
+import { useT } from "@/i18n";
 import { walletService } from "@/services/wallet";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { TrustedContactsSection } from "./components/TrustedContactsSection";
 import { InviteEarnCard } from "./components/InviteEarnCard";
 import { DeleteAccountCard } from "./components/DeleteAccountCard";
 import { pushEnabled, requestPushPermission } from "@/features/notifications/lib/push";
+import { riderVerificationService } from "@/services/rider-verification";
+import { VERIFICATION_KEY } from "@/features/verification/VerifyIdentityScreen";
 
 interface Row {
   readonly id: string;
@@ -44,6 +49,7 @@ interface Row {
 
 export function ProfileScreen() {
   const { user } = useAuth();
+  const { t } = useT();
   // Read after mount only — Notification API is browser-only (SSR-safe).
   const [pushOn, setPushOn] = useState(false);
   useEffect(() => {
@@ -60,11 +66,32 @@ export function ProfileScreen() {
     queryFn: () => walletService.getBalance(),
   });
 
+  const { data: verification } = useQuery({
+    queryKey: VERIFICATION_KEY,
+    queryFn: () => riderVerificationService.getState(),
+  });
+
   const account: readonly Row[] = [
     {
+      id: "verify",
+      label: t("profile.identityVerification"),
+      sub: verification?.isVerified
+        ? t("profile.identityVerified")
+        : verification?.status === "pending"
+          ? t("profile.identityPending")
+          : t("profile.identityUnverified"),
+      Icon: BadgeCheck,
+      to: ROUTES.verifyIdentity,
+      value: verification?.isVerified
+        ? "Verified"
+        : verification?.status === "pending"
+          ? "Pending"
+          : undefined,
+    },
+    {
       id: "rides",
-      label: "Ride history",
-      sub: "Your trips, receipts & ratings",
+      label: t("profile.rideHistory"),
+      sub: t("profile.rideHistorySub"),
       Icon: Clock,
       to: ROUTES.rides,
     },
@@ -75,16 +102,16 @@ export function ProfileScreen() {
       : ([
           {
             id: "become-driver",
-            label: "Become a driver",
-            sub: "Verified women only — earn on your terms",
+            label: t("profile.becomeDriver"),
+            sub: t("profile.becomeDriverSub"),
             Icon: Car,
             to: ROUTES.driverApply,
           },
         ] as const)),
     {
       id: "wallet",
-      label: "Wallet & payments",
-      sub: "Balance, top-ups & payouts",
+      label: t("profile.walletPayments"),
+      sub: t("profile.walletPaymentsSub"),
       Icon: Wallet,
       to: ROUTES.wallet,
       value: wallet ? formatCurrency(wallet.balance, wallet.currency) : undefined,
@@ -94,15 +121,15 @@ export function ProfileScreen() {
   const preferences: readonly Row[] = [
     {
       id: "safety",
-      label: "Safety suite",
-      sub: "SOS, live trip share & trusted contacts",
+      label: t("profile.safetySuite"),
+      sub: t("profile.safetySuiteSub"),
       Icon: ShieldCheck,
       to: ROUTES.safety,
       value: "On",
     },
     {
       id: "notifications",
-      label: "Notifications",
+      label: t("profile.notifications"),
       sub: pushOn
         ? "Device alerts on for ride, driver & safety updates"
         : "Tap to enable alerts on this device",
@@ -119,22 +146,22 @@ export function ProfileScreen() {
     },
     {
       id: "support",
-      label: "Help & support",
-      sub: "FAQs, report an issue, contact us",
+      label: t("profile.helpSupport"),
+      sub: t("profile.helpSupportSub"),
       Icon: HelpCircle,
       to: ROUTES.support,
     },
     {
       id: "privacy",
-      label: "Privacy",
-      sub: "What we collect, and your rights over it",
+      label: t("profile.privacy"),
+      sub: t("profile.privacySub"),
       Icon: ShieldCheck,
       to: ROUTES.privacy,
     },
     {
       id: "signout",
-      label: "Sign out",
-      sub: "Log out of this device",
+      label: t("profile.signOut"),
+      sub: t("profile.signOutSub"),
       Icon: LogOut,
       to: ROUTES.logout,
     },
@@ -232,7 +259,7 @@ export function ProfileScreen() {
 
         <InviteEarnCard />
 
-        <Section title="Preferences">
+        <Section title={t("profile.preferences")}>
           <div className="space-y-2">
             {/* Appearance is a switch, not a destination — rendered inline. */}
             <GlassCard className="flex items-center gap-4 py-4">
@@ -246,6 +273,23 @@ export function ProfileScreen() {
                 </span>
               </span>
               <ThemeToggle />
+            </GlassCard>
+            {/* Language is a switch too, and it sits above the rest of the
+                preferences: a rider who cannot read this screen needs to reach
+                it before anything else on it. */}
+            <GlassCard className="flex items-center gap-4 py-4">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary">
+                <Languages className="h-5 w-5" />
+              </div>
+              <span className="min-w-0 flex-1">
+                <span className="block font-display text-base text-foreground">
+                  {t("profile.language")}
+                </span>
+                <span className="block text-xs text-muted-foreground">
+                  {t("profile.languageSub")}
+                </span>
+              </span>
+              <LanguageToggle />
             </GlassCard>
             {preferences.map(renderRow)}
           </div>

@@ -142,6 +142,8 @@ export type Database = {
           full_name: string | null;
           gender: Database["public"]["Enums"]["gender"] | null;
           id: string;
+          identity_verified: boolean;
+          identity_verified_at: string | null;
           is_blacklisted: boolean;
           phone: string | null;
           updated_at: string;
@@ -153,6 +155,8 @@ export type Database = {
           full_name?: string | null;
           gender?: Database["public"]["Enums"]["gender"] | null;
           id: string;
+          identity_verified?: boolean;
+          identity_verified_at?: string | null;
           is_blacklisted?: boolean;
           phone?: string | null;
           updated_at?: string;
@@ -164,6 +168,8 @@ export type Database = {
           full_name?: string | null;
           gender?: Database["public"]["Enums"]["gender"] | null;
           id?: string;
+          identity_verified?: boolean;
+          identity_verified_at?: string | null;
           is_blacklisted?: boolean;
           phone?: string | null;
           updated_at?: string;
@@ -404,6 +410,8 @@ export type Database = {
       rides: {
         Row: {
           accepted_at: string | null;
+          arrived_at: string | null;
+          cancellation_fee: number | null;
           cancellation_reason: string | null;
           category_multiplier: number | null;
           completed_at: string | null;
@@ -426,12 +434,18 @@ export type Database = {
           requested_at: string;
           scheduled_for: string | null;
           started_at: string | null;
+          surge_amount: number | null;
+          surge_multiplier: number;
           status: Database["public"]["Enums"]["ride_status"];
           updated_at: string;
+          waiting_fee: number | null;
+          waiting_minutes: number | null;
           waypoints: Json;
         };
         Insert: {
           accepted_at?: string | null;
+          arrived_at?: string | null;
+          cancellation_fee?: number | null;
           cancellation_reason?: string | null;
           category_multiplier?: number | null;
           completed_at?: string | null;
@@ -454,12 +468,18 @@ export type Database = {
           requested_at?: string;
           scheduled_for?: string | null;
           started_at?: string | null;
+          surge_amount?: number | null;
+          surge_multiplier?: number;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
+          waiting_fee?: number | null;
+          waiting_minutes?: number | null;
           waypoints?: Json;
         };
         Update: {
           accepted_at?: string | null;
+          arrived_at?: string | null;
+          cancellation_fee?: number | null;
           cancellation_reason?: string | null;
           category_multiplier?: number | null;
           completed_at?: string | null;
@@ -482,8 +502,12 @@ export type Database = {
           requested_at?: string;
           scheduled_for?: string | null;
           started_at?: string | null;
+          surge_amount?: number | null;
+          surge_multiplier?: number;
           status?: Database["public"]["Enums"]["ride_status"];
           updated_at?: string;
+          waiting_fee?: number | null;
+          waiting_minutes?: number | null;
           waypoints?: Json;
         };
         Relationships: [];
@@ -1040,6 +1064,57 @@ export type Database = {
         Args: Record<string, never>;
         Returns: { what: string; removed: number }[];
       };
+      // Phase 26 — surge pricing.
+      surge_at: {
+        Args: { _lat: number; _lng: number };
+        Returns: number;
+      };
+      current_surge: {
+        Args: { _lat: number; _lng: number };
+        Returns: number;
+      };
+      km_between: {
+        Args: { _lat1: number; _lng1: number; _lat2: number; _lng2: number };
+        Returns: number;
+      };
+      // Phase 25 — rider identity verification.
+      my_rider_verification: {
+        Args: Record<string, never>;
+        Returns: {
+          is_verified: boolean;
+          status: string;
+          reject_reason: string | null;
+          submitted_at: string | null;
+          required: boolean;
+          rides_remaining: number;
+        }[];
+      };
+      submit_rider_verification: {
+        Args: { _selfie_url: string; _id_document_url: string; _id_number?: string };
+        Returns: unknown;
+      };
+      list_pending_rider_verifications: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          user_id: string;
+          full_name: string | null;
+          phone: string | null;
+          gender: string | null;
+          selfie_url: string;
+          id_document_url: string;
+          id_number: string | null;
+          submitted_at: string;
+        }[];
+      };
+      review_rider_verification: {
+        Args: { _verification_id: string; _approve: boolean; _reason?: string };
+        Returns: unknown;
+      };
+      rider_may_book: {
+        Args: { _user_id: string };
+        Returns: boolean;
+      };
       // Phase 19 — periodic driver identity re-check.
       my_driver_check_state: {
         Args: Record<string, never>;
@@ -1234,12 +1309,22 @@ export type Database = {
         Args: { _ride_id: string };
         Returns: {
           ride_id: string;
+          status: string;
           currency: string;
           base_fare: number;
           distance_cost: number;
           time_cost: number;
           booking_fee: number;
+          surge_multiplier: number;
+          surge_amount: number;
+          adjustment: number;
+          discount: number;
+          promo_code: string | null;
+          waiting_minutes: number;
+          waiting_fee: number;
+          cancellation_fee: number;
           total: number;
+          tip: number;
           commission: number;
           driver_earnings: number;
           distance_km: number | null;
@@ -1249,6 +1334,7 @@ export type Database = {
           plate: string | null;
           pickup_address: string | null;
           drop_address: string | null;
+          requested_at: string;
           completed_at: string | null;
         }[];
       };

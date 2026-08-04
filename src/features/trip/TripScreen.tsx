@@ -17,11 +17,13 @@ import { safetyService } from "@/services/safety";
 import { ROUTES } from "@/constants/routes";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm, haversineKm } from "@/lib/geo";
+import { useT } from "@/i18n";
 
 const LIVE_LOCATION_STATUSES = ["accepted", "arrived", "in_progress"];
 
 export function TripScreen({ rideId }: { rideId: string }) {
   const { ride, loading, error } = useRide(rideId);
+  const { t } = useT();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [driver, setDriver] = useState<PublicDriver | null>(null);
@@ -85,7 +87,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
     return (
       <ScreenWrapper>
         <Container className="pt-10 text-center text-sm text-muted-foreground">
-          Loading your trip…
+          {t("common.loading")}
         </Container>
       </ScreenWrapper>
     );
@@ -118,12 +120,12 @@ export function TripScreen({ rideId }: { rideId: string }) {
           eyebrow={completed ? "Trip complete" : cancelled ? "Cancelled" : "Your trip"}
           title={
             completed
-              ? "Thanks for riding"
+              ? t("trip.tripComplete")
               : cancelled
-                ? "Ride cancelled"
+                ? t("trip.cancelled")
                 : ride.status === "requested"
-                  ? "Finding your driver"
-                  : "On your way"
+                  ? t("trip.findingDriver")
+                  : t("trip.onYourWay")
           }
         />
 
@@ -138,7 +140,9 @@ export function TripScreen({ rideId }: { rideId: string }) {
         )}
 
         <GlassCard className="space-y-1">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Route</p>
+          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+            {t("trip.route")}
+          </p>
           <p className="text-sm text-foreground">{ride.pickup.address ?? "Pickup"}</p>
           <p className="text-sm text-foreground">→ {ride.destination.address ?? "Destination"}</p>
           <p className="pt-2 text-sm font-semibold text-primary">
@@ -166,7 +170,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
               <button
                 type="button"
                 onClick={() => setChatOpen(true)}
-                aria-label="Message driver"
+                aria-label={t("trip.messageDriver")}
                 className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/15 text-primary"
               >
                 <MessageCircle className="h-5 w-5" />
@@ -178,13 +182,10 @@ export function TripScreen({ rideId }: { rideId: string }) {
         {pin && awaitingPickup && isPassenger && (
           <GlassCard className="space-y-1 text-center">
             <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-              Your pickup PIN
+              {t("trip.pickupPin")}
             </p>
             <p className="font-display text-4xl tracking-[0.35em] text-primary">{pin}</p>
-            <p className="text-xs text-muted-foreground">
-              Only give this code to your driver once you're safely in the right car — the trip
-              can't start without it.
-            </p>
+            <p className="text-xs text-muted-foreground">{t("trip.pickupPinHelp")}</p>
           </GlassCard>
         )}
 
@@ -224,7 +225,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
           <>
             <GlassCard className="space-y-1 text-center">
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Fare charged
+                {t("trip.fareCharged")}
               </p>
               <p className="font-display text-3xl text-foreground">
                 {formatCurrency(ride.fareFinal ?? ride.fareEstimate ?? 0)}
@@ -239,6 +240,10 @@ export function TripScreen({ rideId }: { rideId: string }) {
           </>
         )}
 
+        {/* A cancelled ride only has a receipt when it actually cost her
+            something — otherwise there is nothing to itemise. */}
+        {cancelled && (ride.cancellationFee ?? 0) > 0 && <TripReceipt rideId={rideId} />}
+
         <div className="flex flex-col gap-2">
           {!completed && !cancelled && (
             <>
@@ -247,14 +252,14 @@ export function TripScreen({ rideId }: { rideId: string }) {
                 className="flex items-center justify-center gap-2 rounded-2xl bg-destructive/15 py-3 text-sm font-semibold text-destructive"
                 onClick={raiseSos}
               >
-                <ShieldAlert className="h-4 w-4" /> Emergency SOS
+                <ShieldAlert className="h-4 w-4" /> {t("trip.emergencySos")}
               </button>
               <button
                 type="button"
                 className="flex items-center justify-center gap-2 rounded-2xl border border-border/70 py-3 text-sm text-foreground"
                 onClick={shareTrip}
               >
-                <Share2 className="h-4 w-4" /> Share trip
+                <Share2 className="h-4 w-4" /> {t("trip.shareTrip")}
               </button>
             </>
           )}
@@ -264,7 +269,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
               onClick={cancel}
               className="flex items-center justify-center gap-2 rounded-2xl border border-border/60 py-3 text-sm text-muted-foreground hover:text-destructive"
             >
-              <X className="h-4 w-4" /> Cancel ride
+              <X className="h-4 w-4" /> {t("trip.cancelRide")}
             </button>
           )}
           {(completed || cancelled) && (
@@ -273,7 +278,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
               onClick={() => navigate({ to: ROUTES.home, replace: true })}
               className="rounded-2xl bg-gradient-pink py-3 text-sm font-semibold text-noir"
             >
-              Back to home
+              {t("trip.backToHome")}
             </button>
           )}
         </div>

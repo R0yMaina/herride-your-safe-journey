@@ -113,11 +113,24 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -
 | phase18-security-hardening.sql | ✅ applied | `rate_limits` answers |
 | phase19-driver-recheck.sql | ✅ applied | `driver_checks` answers |
 | phase20-audit-fixes.sql | ⏳ user must run | driver-location leak, fraud_signals columns, REVOKE FROM PUBLIC |
+| phase21-data-rights.sql | ⏳ user must run | `delete_my_account`, retention sweep (Kenya DPA) |
+| phase22-admin-mfa.sql | ⏳ user must run | second factor on admin actions; keep `enforce_admin_mfa` false until enrolled |
+| phase23-dispatch-offers.sql | ⏳ user must run | sequential offers, `advance_dispatch`, no-show |
+| phase24-receipts.sql | ⏳ user must run | `get_receipt` rebuilt so the lines reconcile with the total |
+| phase25-rider-verification.sql | ⏳ user must run | **closes the self-declared-gender hole**; rider ID checks, `rider-docs` bucket |
+| phase26-surge.sql | ⏳ user must run | demand pricing, locked per ride; `surge_enabled` off by default |
+| phase27-cron.sql | ⏳ user must run | schedules `advance_dispatch` (1 min) and `enforce_retention` (daily) |
 | seed.sql | optional | test accounts for local/staging only |
 
-**Replace this table.** Each script should `INSERT` its own name into a
-`schema_migrations` table on success, so "what is deployed" is a query rather
-than a document someone has to remember to update.
+**Do not trust this table — run the probe.** `npm run verify:deployment` asks
+the database what is actually live: each check hits something only its phase
+creates, so the answer comes from the deployment rather than from someone's
+memory of it. It is read-only, needs any signed-in account, and demands a
+*working* answer from the RPCs a rider should be able to call — an existence
+check is too weak, as `my_rider_verification` proved by shipping deployed,
+callable and broken on every call.
+
+A `schema_migrations` table is still the tidier long-term answer.
 
 ## Known gaps / deliberate v1 scope
 
@@ -128,6 +141,10 @@ than a document someone has to remember to update.
 - In-app voice calls not built — chat covers rider↔driver contact without
   sharing numbers; masked calling needs a telephony provider (Twilio /
   Africa's Talking).
-- Admin driver-approval UI not built (`set_driver_status` RPC exists).
+- Admin verification desks are built: `/admin/drivers` covers driver
+  applications (approve / reject / suspend, signed-URL document viewing) and
+  the phase 19 identity re-check queue; `/admin/riders` covers rider identity
+  verification. Approving a driver or reviewing a re-check requires a second
+  factor once `enforce_admin_mfa` is on.
 - Cloudflare "Workers Builds" check on PRs fails instantly — misconfigured
   integration on the Cloudflare side, unrelated to the code.

@@ -14,7 +14,9 @@ import { TripChatSheet } from "@/features/trip/components/TripChatSheet";
 import { PinPromptSheet } from "./components/PinPromptSheet";
 import { IdentityCheckCard } from "./components/IdentityCheckCard";
 import { RideOfferCard } from "./components/RideOfferCard";
+import { NavigationPanel } from "./components/NavigationPanel";
 import { getCurrentPing } from "./lib/geo";
+import { useT } from "@/i18n";
 
 const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>> = {
   accepted: { to: "arrived", label: "I've arrived" },
@@ -25,6 +27,7 @@ const NEXT_LABEL: Partial<Record<RideStatus, { to: RideStatus; label: string }>>
 const PING_MS = 15000;
 
 export function DriverHomeScreen() {
+  const { t } = useT();
   const [online, setOnline] = useState(false);
   const [busy, setBusy] = useState(false);
   const [openRides, setOpenRides] = useState<readonly RideRecord[]>([]);
@@ -269,10 +272,10 @@ export function DriverHomeScreen() {
         <GlassCard className="flex items-center justify-between">
           <div>
             <p className="font-display text-lg text-foreground">
-              {online ? "You're online" : "You're offline"}
+              {online ? t("driver.online") : t("driver.offline")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {online ? "Receiving ride requests nearby" : "Go online to receive requests"}
+              {online ? t("driver.onlineSub") : t("driver.offlineSub")}
             </p>
           </div>
           <button
@@ -288,7 +291,7 @@ export function DriverHomeScreen() {
         </GlassCard>
 
         {activeRide ? (
-          <Section title="Active trip">
+          <Section title={t("driver.activeTrip")}>
             <TripMap
               pickup={activeRide.pickup}
               destination={activeRide.destination}
@@ -296,6 +299,15 @@ export function DriverHomeScreen() {
               phase={activeRide.status === "in_progress" ? "on_trip" : "to_pickup"}
               className="mb-3"
             />
+            <div className="mb-3">
+              <NavigationPanel
+                from={position}
+                to={
+                  activeRide.status === "in_progress" ? activeRide.destination : activeRide.pickup
+                }
+                label={activeRide.status === "in_progress" ? "To the destination" : "To your rider"}
+              />
+            </div>
             <GlassCard className="space-y-3">
               <div>
                 <p className="text-sm text-foreground">{activeRide.pickup.address ?? "Pickup"}</p>
@@ -334,7 +346,7 @@ export function DriverHomeScreen() {
                 onClick={() => setChatOpen(true)}
                 className="flex w-full items-center justify-center gap-2 rounded-2xl border border-border/70 py-3 text-sm text-foreground"
               >
-                <MessageCircle className="h-4 w-4" /> Message rider
+                <MessageCircle className="h-4 w-4" /> {t("driver.messageRider")}
               </button>
             </GlassCard>
             {chatOpen && (

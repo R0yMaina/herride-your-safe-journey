@@ -31,8 +31,9 @@ dist-ssr
 *.sln
 *.sw?
 
-# NOTE: .env is intentionally tracked — it holds ONLY publishable
-# client-side keys (Supabase publishable key, Maps browser key) that
-# ship in the JS bundle anyway. Real secrets go in *.local files,
-# which are ignored above. Restrict the Maps key by domain in Google
-# Cloud Console rather than treating it as a secret.
+# NOTE: .env is intentionally tracked — it holds ONLY publishable, non-billable
+# client-side values (Supabase URL + publishable key). Anything that can be
+# SPENT belongs in .env.local and in the host's env vars, even when it is
+# technically public: a Google Maps browser key ships in the JS bundle either
+# way, but committing it hands it to every scraper that farms AIza prefixes,
+# and the bill is yours. Mapbox and Google keys both follow that rule.

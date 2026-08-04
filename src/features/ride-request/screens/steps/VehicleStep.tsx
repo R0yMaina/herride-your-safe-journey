@@ -17,6 +17,7 @@ export function VehicleStep() {
   const route = useRideRequestStore((s) => s.route);
   const option = useRideRequestStore((s) => s.option);
   const fare = useRideRequestStore((s) => s.fare);
+  const surge = useRideRequestStore((s) => s.surge);
   const setOption = useRideRequestStore((s) => s.setOption);
   const next = useRideRequestStore((s) => s.next);
 
@@ -41,7 +42,7 @@ export function VehicleStep() {
     if (!route || options.length === 0) return;
     let cancelled = false;
     void Promise.all(
-      options.map(async (o) => [o.id, await fareService.estimate(route, o)] as const),
+      options.map(async (o) => [o.id, await fareService.estimate(route, o, surge)] as const),
     ).then((entries) => {
       if (cancelled) return;
       setFareById(Object.fromEntries(entries) as Partial<Record<RideOption["id"], FareEstimate>>);
@@ -49,7 +50,7 @@ export function VehicleStep() {
     return () => {
       cancelled = true;
     };
-  }, [route, options]);
+  }, [route, options, surge]);
 
   useFareEstimate();
 

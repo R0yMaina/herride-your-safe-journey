@@ -15,6 +15,9 @@ export function mapRideRow(row: RideRow): RideRecord {
     fareFinal: row.fare_final === null ? null : Number(row.fare_final),
     distanceKm: row.distance_km === null ? null : Number(row.distance_km),
     cancellationReason: row.cancellation_reason,
+    // Loose null check on purpose: rows that arrive from an RPC return type
+    // are cast to RideRow and may simply not carry the column.
+    cancellationFee: row.cancellation_fee == null ? null : Number(row.cancellation_fee),
     requestedAt: row.requested_at,
     acceptedAt: row.accepted_at,
     startedAt: row.started_at,

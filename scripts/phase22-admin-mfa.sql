@@ -91,7 +91,7 @@ BEGIN
       WHERE driver_user_id = _driver_user_id;
   END IF;
 
-  PERFORM public.log_audit('set_driver_status', 'drivers', _driver_user_id::text,
+  PERFORM public.log_audit('set_driver_status', 'drivers', _driver_user_id,
     jsonb_build_object('status', _status, 'reason', _reason));
   RETURN d;
 END; $$;
@@ -101,27 +101,46 @@ GRANT EXECUTE ON FUNCTION
   public.set_driver_status(uuid, public.driver_verification_status, text) TO authenticated;
 
 -- Refunds move money out of the platform.
+-- Refunds move money out of the platform, so they need the second factor.
+--
+-- The signature is deliberately unchanged from phase 10. An earlier draft of
+-- this script returned VOID, which Postgres refuses outright ("cannot change
+-- return type of existing function") — and rightly so: `refund_ride` is a
+-- published RPC whose return type is declared in
+-- src/integrations/supabase/types.ts as a transactions row. Dropping and
+-- recreating it to change that would have been a breaking change dressed up as
+-- a security fix. The only additions here are the MFA check and FOR UPDATE.
 CREATE OR REPLACE FUNCTION public.refund_ride(
   _ride_id UUID, _amount NUMERIC, _reason TEXT DEFAULT NULL
-) RETURNS VOID LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+) RETURNS public.transactions LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
   r public.rides;
+  tx public.transactions;
   bal NUMERIC(12,2);
 BEGIN
+  IF NOT public.has_role(auth.uid(), 'admin') THEN
+    RAISE EXCEPTION 'Only admins can issue refunds';
+  END IF;
   PERFORM public.require_admin_mfa();
   IF _amount IS NULL OR _amount <= 0 THEN RAISE EXCEPTION 'Refund amount must be positive'; END IF;
 
+  -- FOR UPDATE is new: two admins refunding the same ride at once would each
+  -- read the pre-refund balance and both credit it.
   SELECT * INTO r FROM public.rides WHERE id = _ride_id FOR UPDATE;
   IF r.id IS NULL THEN RAISE EXCEPTION 'Ride not found'; END IF;
 
   UPDATE public.wallets SET balance = balance + _amount, updated_at = now()
     WHERE user_id = r.passenger_id RETURNING balance INTO bal;
-  INSERT INTO public.transactions (user_id, ride_id, type, status, amount, balance_after, description)
+  INSERT INTO public.transactions
+    (user_id, ride_id, type, status, amount, balance_after, description, metadata)
     VALUES (r.passenger_id, r.id, 'refund', 'completed', _amount, bal,
-            COALESCE(_reason, 'Refund'));
+            COALESCE(_reason, 'Refund'),
+            jsonb_build_object('reason', _reason, 'issued_by', auth.uid()))
+    RETURNING * INTO tx;
 
-  PERFORM public.log_audit('refund_ride', 'rides', _ride_id::text,
-    jsonb_build_object('amount', _amount, 'reason', _reason));
+  PERFORM public.log_audit('refund', 'ride', _ride_id,
+    jsonb_build_object('amount', _amount, 'reason', _reason, 'passenger_id', r.passenger_id));
+  RETURN tx;
 END; $$;
 REVOKE EXECUTE ON FUNCTION public.refund_ride(uuid, numeric, text) FROM PUBLIC, anon;
 GRANT EXECUTE ON FUNCTION public.refund_ride(uuid, numeric, text) TO authenticated;
@@ -158,7 +177,7 @@ BEGIN
       COALESCE(_reason, 'We could not match your photo. Contact support.'), NULL);
   END IF;
 
-  PERFORM public.log_audit('review_driver_check', 'driver_checks', c.id::text,
+  PERFORM public.log_audit('review_driver_check', 'driver_checks', c.id,
     jsonb_build_object('passed', _passed, 'reason', _reason));
   RETURN c;
 END; $$;

@@ -12,7 +12,8 @@
     "format": "prettier --write .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:rls": "node scripts/rls-cross-tenant-test.mjs"
+    "test:rls": "node --env-file-if-exists=.env scripts/rls-cross-tenant-test.mjs",
+    "verify:deployment": "node --env-file-if-exists=.env scripts/verify-deployment.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",
@@ -95,7 +96,10 @@
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^7.3.1",
-    "vitest": "^2.1.9"
+    "vitest": "^3.2.7"
   },
-  "packageManager": "bun@1.2.15"
+  "packageManager": "bun@1.2.15",
+  "overrides": {
+    "undici": "^7.29.0"
+  }
 }

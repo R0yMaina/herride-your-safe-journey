@@ -1,7 +1,10 @@
 import { MapPin, Circle, Clock, Route } from "lucide-react";
 import { GlassCard } from "@/components/common";
+import { useRideRequestStore } from "@/store/ride-request.store";
 import type { TripSummary } from "@/types/ride";
 import { RIDE_PREFERENCES } from "../data/preferences";
+import { TrafficNotice } from "./TrafficNotice";
+import { SurgeNotice } from "./SurgeNotice";
 import { formatCurrency, formatDistance, formatDuration, formatScheduledFor } from "../lib/format";
 
 interface TripSummaryCardProps {
@@ -9,6 +12,7 @@ interface TripSummaryCardProps {
 }
 
 export function TripSummaryCard({ summary }: TripSummaryCardProps) {
+  const surge = useRideRequestStore((s) => s.surge);
   const prefs = RIDE_PREFERENCES.filter((p) => summary.preferences.includes(p.id));
   return (
     <GlassCard className="space-y-4">
@@ -86,6 +90,9 @@ export function TripSummaryCard({ summary }: TripSummaryCardProps) {
             : `Now · ${summary.option.etaMin} min away`}
         </p>
       </div>
+
+      <SurgeNotice multiplier={surge} />
+      <TrafficNotice route={summary.route} />
 
       {prefs.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
