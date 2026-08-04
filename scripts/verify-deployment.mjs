@@ -25,7 +25,10 @@ function fromEnvFile(key) {
     const line = readFileSync(new URL("../.env", import.meta.url), "utf8")
       .split("\n")
       .find((l) => l.startsWith(`${key}=`));
-    return line?.slice(key.length + 1).trim().replace(/^["']|["']$/g, "");
+    return line
+      ?.slice(key.length + 1)
+      .trim()
+      .replace(/^["']|["']$/g, "");
   } catch {
     return undefined;
   }
@@ -53,7 +56,11 @@ if (!res0.ok) {
   console.error(`Sign-in failed: ${auth.error_description ?? res0.status}`);
   process.exit(2);
 }
-const H = { apikey: ANON, Authorization: `Bearer ${auth.access_token}`, "content-type": "application/json" };
+const H = {
+  apikey: ANON,
+  Authorization: `Bearer ${auth.access_token}`,
+  "content-type": "application/json",
+};
 const ZERO_UUID = "00000000-0000-0000-0000-000000000000";
 
 /** A table is deployed if PostgREST knows it — 404/PGRST205 means it does not. */
@@ -138,7 +145,12 @@ const record = (phase, what, ok, note = "") => results.push({ phase, what, ok, n
   const body = await r.json().catch(() => ({}));
   const missing = r.status === 404 || body.code === "PGRST202";
   // Any answer but "missing" proves the rewritten function is live and running.
-  record("20", "validate_promo() runs", !missing, missing ? "not found" : (body.message ?? "").slice(0, 45));
+  record(
+    "20",
+    "validate_promo() runs",
+    !missing,
+    missing ? "not found" : (body.message ?? "").slice(0, 45),
+  );
 }
 
 // ── phase 21 — data rights ─────────────────────────────────────────────────
@@ -184,7 +196,12 @@ record("23", "ride_offers table", await tableExists("ride_offers"));
   const body = await r.json().catch(() => ({}));
   const missing = r.status === 404 || body.code === "PGRST202";
   // "Ride not found" is the phase24 function talking, which is what we want.
-  record("24", "get_receipt()", !missing, missing ? "not found" : (body.message ?? "").slice(0, 40));
+  record(
+    "24",
+    "get_receipt()",
+    !missing,
+    missing ? "not found" : (body.message ?? "").slice(0, 40),
+  );
 }
 
 // ── phase 25 — rider verification ──────────────────────────────────────────
@@ -208,7 +225,12 @@ record("25", "rider_verifications table", await tableExists("rider_verifications
       body: JSON.stringify({ identity_verified: false }),
     });
   }
-  record("25", "identity_verified is not self-settable", !changed, changed ? "WRITE ACCEPTED (reverted)" : "");
+  record(
+    "25",
+    "identity_verified is not self-settable",
+    !changed,
+    changed ? "WRITE ACCEPTED (reverted)" : "",
+  );
 }
 
 // ── phase 26 — surge ───────────────────────────────────────────────────────
@@ -220,7 +242,12 @@ record("25", "rider_verifications table", await tableExists("rider_verifications
   });
   const body = await r.json().catch(() => null);
   const value = typeof body === "number" ? body : Number(body);
-  record("26", "surge_at() returns a multiplier", r.ok && Number.isFinite(value), r.ok ? `= ${value}` : "not found");
+  record(
+    "26",
+    "surge_at() returns a multiplier",
+    r.ok && Number.isFinite(value),
+    r.ok ? `= ${value}` : "not found",
+  );
 }
 {
   const { ok, note } = await rpcWorks("km_between", { _lat1: 0, _lng1: 0, _lat2: 0, _lng2: 1 });
