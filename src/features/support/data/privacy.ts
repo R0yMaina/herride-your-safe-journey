@@ -1,4 +1,6 @@
 import { contact } from "@/config/contact";
+import type { Language } from "@/i18n";
+import { PRIVACY_SECTIONS_SW, PRIVACY_TRANSLATION_NOTE_SW } from "./privacy.sw";
 
 export interface PolicySection {
   readonly id: string;
@@ -91,3 +93,19 @@ export const PRIVACY_SECTIONS: readonly PolicySection[] = [
     ],
   },
 ];
+
+/**
+ * The policy in the reader's language, plus a note when she is not reading the
+ * checked version. Section-by-section fallback, same reasoning as the FAQs.
+ */
+export function privacyFor(language: Language): {
+  readonly sections: readonly PolicySection[];
+  readonly translationNote: string | null;
+} {
+  if (language !== "sw") return { sections: PRIVACY_SECTIONS, translationNote: null };
+  const bySwId = new Map(PRIVACY_SECTIONS_SW.map((s) => [s.id, s]));
+  return {
+    sections: PRIVACY_SECTIONS.map((english) => bySwId.get(english.id) ?? english),
+    translationNote: PRIVACY_TRANSLATION_NOTE_SW,
+  };
+}
