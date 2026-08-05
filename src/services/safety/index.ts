@@ -6,4 +6,9 @@ export const safetyService: ISafetyService = env.useMocks
   ? new MockSafetyService()
   : new SupabaseSafetyService();
 
-export type { ISafetyService, TripShareLink } from "./safety.service";
+export type {
+  EmergencyContact,
+  EmergencyContacts,
+  ISafetyService,
+  TripShareLink,
+} from "./safety.service";

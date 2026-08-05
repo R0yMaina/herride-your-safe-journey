@@ -10,10 +10,11 @@ import { TripMap } from "./components/TripMap";
 import { TripReceipt } from "./components/TripReceipt";
 import { RatingSheet } from "./components/RatingSheet";
 import { TripChatSheet } from "./components/TripChatSheet";
+import { EmergencySheet } from "./components/EmergencySheet";
 import { useAuth } from "@/hooks/useAuth";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService, ridesService } from "@/services/ride";
-import { safetyService } from "@/services/safety";
+import { safetyService, type EmergencyContacts } from "@/services/safety";
 import { ROUTES } from "@/constants/routes";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm, haversineKm } from "@/lib/geo";
@@ -29,6 +30,9 @@ export function TripScreen({ rideId }: { rideId: string }) {
   const [driver, setDriver] = useState<PublicDriver | null>(null);
   const [chatOpen, setChatOpen] = useState(false);
   const [pin, setPin] = useState<string | null>(null);
+  const [sosOpen, setSosOpen] = useState(false);
+  const [contacts, setContacts] = useState<EmergencyContacts | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
   const streamLocation =
     ride?.driverId && LIVE_LOCATION_STATUSES.includes(ride.status) ? ride.driverId : null;
   const driverLocation = useDriverLocation(streamLocation);
@@ -51,6 +55,16 @@ export function TripScreen({ rideId }: { rideId: string }) {
       .catch(() => {});
   }, [awaitingPickup, isPassenger, rideId]);
 
+  // Fetched up front, not on press: she should never watch a spinner while
+  // frightened, and this call can fail without costing her the numbers.
+  useEffect(() => {
+    if (!isPassenger) return;
+    void safetyService
+      .getEmergencyContacts()
+      .then(setContacts)
+      .catch(() => {});
+  }, [isPassenger]);
+
   const cancel = async () => {
     try {
       await rideRequestService.cancel(rideId);
@@ -62,17 +76,24 @@ export function TripScreen({ rideId }: { rideId: string }) {
   };
 
   const raiseSos = async () => {
+    // Open the sheet first. The alarm firing and her being able to dial are
+    // separate things, and the dial buttons must not wait on the network.
+    setSosOpen(true);
     try {
       await safetyService.raiseSos(rideId);
-      toast.success("SOS raised — your emergency alert is active");
     } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not raise SOS");
+      toast.error(
+        e instanceof Error
+          ? `Alert may not have sent: ${e.message}. Call for help directly.`
+          : "Alert may not have sent — call for help directly.",
+      );
     }
   };
 
   const shareTrip = async () => {
     try {
       const link = await safetyService.shareTrip(rideId);
+      setShareUrl(link.url);
       const shared = await navigator.clipboard?.writeText(link.url).then(
         () => true,
         () => false,
@@ -153,9 +174,17 @@ export function TripScreen({ rideId }: { rideId: string }) {
 
         {driver && (
           <GlassCard className="flex items-center gap-4">
-            <div className="grid h-12 w-12 place-items-center rounded-full bg-gradient-pink text-noir">
-              <Car className="h-5 w-5" />
-            </div>
+            {driver.photoUrl ? (
+              <img
+                src={driver.photoUrl}
+                alt={`${driver.name}, the verified driver`}
+                className="h-12 w-12 shrink-0 rounded-full object-cover ring-2 ring-primary/40"
+              />
+            ) : (
+              <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full bg-gradient-pink text-noir">
+                <Car className="h-5 w-5" />
+              </div>
+            )}
             <div className="min-w-0 flex-1">
               <p className="truncate font-display text-base text-foreground">{driver.name}</p>
               <p className="text-xs text-muted-foreground">
@@ -176,6 +205,19 @@ export function TripScreen({ rideId }: { rideId: string }) {
                 <MessageCircle className="h-5 w-5" />
               </button>
             )}
+          </GlassCard>
+        )}
+
+        {driver && awaitingPickup && isPassenger && driver.photoUrl && (
+          <GlassCard className="flex items-start gap-3 border-primary/40">
+            <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+            <p className="text-sm text-muted-foreground">
+              That photo is the one{" "}
+              <span className="font-semibold text-foreground">we verified her on</span>, not one she
+              can change. Check it against whoever pulls up, and check the plate —{" "}
+              {driver.plate ?? "shown above"}. If either is wrong, do not get in: cancel and press
+              the shield.
+            </p>
           </GlassCard>
         )}
 
@@ -282,6 +324,15 @@ export function TripScreen({ rideId }: { rideId: string }) {
             </button>
           )}
         </div>
+
+        {sosOpen && (
+          <EmergencySheet
+            contacts={contacts}
+            shareUrl={shareUrl}
+            onShare={() => void shareTrip()}
+            onClose={() => setSosOpen(false)}
+          />
+        )}
 
         {chatOpen && (
           <TripChatSheet

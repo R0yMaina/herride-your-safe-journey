@@ -1064,6 +1064,41 @@ export type Database = {
         Args: Record<string, never>;
         Returns: { what: string; removed: number }[];
       };
+      // Phase 28 — SOS escalation and driver-identity-at-pickup.
+      get_public_driver: {
+        Args: { _driver_user_id: string };
+        Returns: {
+          user_id: string;
+          name: string | null;
+          rating: number | null;
+          vehicle: string | null;
+          plate: string | null;
+          color: string | null;
+          photo_path: string | null;
+        }[];
+      };
+      my_emergency_contacts: {
+        Args: Record<string, never>;
+        Returns: {
+          name: string;
+          phone: string;
+          is_app_user: boolean;
+          emergency_number: string;
+        }[];
+      };
+      pending_sos_escalations: {
+        Args: { _limit?: number };
+        Returns: {
+          id: string;
+          target_phone: string | null;
+          body: string | null;
+          attempts: number;
+        }[];
+      };
+      mark_escalation: {
+        Args: { _id: string; _ok: boolean; _error?: string };
+        Returns: undefined;
+      };
       // Phase 26 — surge pricing.
       surge_at: {
         Args: { _lat: number; _lng: number };

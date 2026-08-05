@@ -120,6 +120,7 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/<table>?select=*&limit=0" -
 | phase25-rider-verification.sql | ⏳ user must run | **closes the self-declared-gender hole**; rider ID checks, `rider-docs` bucket |
 | phase26-surge.sql | ⏳ user must run | demand pricing, locked per ride; `surge_enabled` off by default |
 | phase27-cron.sql | ⏳ user must run | schedules `advance_dispatch` (1 min) and `enforce_retention` (daily) |
+| phase28-sos-escalation.sql | ⏳ user must run | **SOS fans out to trusted contacts + admins**; driver photo to rider |
 | seed.sql | optional | test accounts for local/staging only |
 
 **Do not trust this table — run the probe.** `npm run verify:deployment` asks

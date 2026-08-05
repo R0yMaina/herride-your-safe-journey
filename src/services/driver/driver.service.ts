@@ -15,6 +15,12 @@ export interface PublicDriver {
   readonly vehicle: string;
   readonly plate: string | null;
   readonly color: string | null;
+  /**
+   * Signed URL of the selfie she was VERIFIED on — not a profile picture she
+   * can change. The rider checks it against whoever pulls up, which is the
+   * only thing standing between a lent account and a stranger at the wheel.
+   */
+  readonly photoUrl: string | null;
 }
 
 /** An available driver near a rider, as returned by nearest_available_drivers. */

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import type { ISafetyService, TripShareLink } from "./safety.service";
+import type { EmergencyContacts, ISafetyService, TripShareLink } from "./safety.service";
 
 function shareUrl(token: string): string {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
@@ -7,6 +7,21 @@ function shareUrl(token: string): string {
 }
 
 export class SupabaseSafetyService implements ISafetyService {
+  async getEmergencyContacts(): Promise<EmergencyContacts> {
+    const { data, error } = await supabase.rpc("my_emergency_contacts");
+    // Never let this failure block the panic screen — she still gets 999.
+    if (error) return { contacts: [], emergencyNumber: "999" };
+    const rows = data ?? [];
+    return {
+      contacts: rows.map((r) => ({
+        name: r.name,
+        phone: r.phone,
+        isAppUser: Boolean(r.is_app_user),
+      })),
+      emergencyNumber: rows[0]?.emergency_number ?? "999",
+    };
+  }
+
   async raiseSos(rideId: string, coords?: { lat: number; lng: number }): Promise<string> {
     const { data, error } = await supabase.rpc("raise_sos", {
       _ride_id: rideId,

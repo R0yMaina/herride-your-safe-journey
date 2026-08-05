@@ -211,24 +211,31 @@ export class SupabaseDriverService implements IDriverService {
   }
 
   async getPublicDriver(userId: string): Promise<PublicDriver | null> {
-    const [driverResult, profileResult] = await Promise.all([
-      supabase
-        .from("drivers")
-        .select("vehicle_make, vehicle_model, vehicle_plate, vehicle_color, rating")
-        .eq("user_id", userId)
-        .maybeSingle(),
-      supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
-    ]);
-    const driver = driverResult.data;
-    if (!driver) return null;
-    const vehicle = [driver.vehicle_make, driver.vehicle_model].filter(Boolean).join(" ");
+    const { data, error } = await supabase.rpc("get_public_driver", {
+      _driver_user_id: userId,
+    });
+    if (error) throw new Error(error.message);
+    const row = Array.isArray(data) ? data[0] : data;
+    if (!row) return null;
+
+    // The selfie lives in a private bucket; the rider gets a short-lived link
+    // scoped to the driver on her own active ride (phase28 storage policy).
+    let photoUrl: string | null = null;
+    if (row.photo_path) {
+      const { data: signed } = await supabase.storage
+        .from("driver-docs")
+        .createSignedUrl(row.photo_path, 900);
+      photoUrl = signed?.signedUrl ?? null;
+    }
+
     return {
       userId,
-      name: profileResult.data?.full_name ?? "Your driver",
-      rating: Number(driver.rating ?? 5),
-      vehicle: vehicle || "Vehicle",
-      plate: driver.vehicle_plate,
-      color: driver.vehicle_color,
+      name: row.name ?? "Your driver",
+      rating: Number(row.rating ?? 5),
+      vehicle: row.vehicle ?? "Vehicle",
+      plate: row.plate,
+      color: row.color,
+      photoUrl,
     };
   }
 
