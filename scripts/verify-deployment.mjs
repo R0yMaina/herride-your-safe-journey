@@ -243,6 +243,55 @@ record("25", "rider_verifications table", await tableExists("rider_verifications
   record("26", "km_between()", ok, note);
 }
 
+// ── phase 28 — SOS escalation + driver identity at pickup ──────────────────
+record("28", "sos_escalations table", await tableExists("sos_escalations"));
+{
+  const { ok, note } = await rpcWorks("my_emergency_contacts");
+  record("28", "my_emergency_contacts() returns her list", ok, note);
+}
+{
+  // Deployed and refusing a non-admin is the correct answer from a rider.
+  const { ok, note } = await rpcExists("pending_sos_escalations", { _limit: 1 });
+  record("28", "pending_sos_escalations() present + admin-gated", ok, note);
+}
+{
+  // get_public_driver must exist AND refuse a driver the caller shares no ride
+  // with — that authorisation check is what stops it being a directory of
+  // every driver's photo and plate.
+  const { ok, note } = await rpcExists("get_public_driver", { _driver_user_id: ZERO_UUID });
+  const refused = /not authoris|not authoriz/i.test(note);
+  record("28", "get_public_driver() refuses a stranger's driver", ok && refused, note);
+}
+
+// ── phase 29 — in-trip anomaly detection ───────────────────────────────────
+record("29", "trip_anomalies table", await tableExists("trip_anomalies"));
+{
+  // Not her ride, so a refusal proves both that it exists and that the
+  // rider-only check works.
+  const { ok, note } = await rpcExists("my_trip_anomalies", { _ride_id: ZERO_UUID });
+  const refused = /not your ride/i.test(note);
+  record("29", "my_trip_anomalies() refuses another rider's trip", ok && refused, note);
+}
+{
+  const { ok, note } = await rpcExists("acknowledge_trip_anomaly", { _id: ZERO_UUID });
+  record("29", "acknowledge_trip_anomaly() present", ok, note);
+}
+{
+  // The monitor itself is revoked from every client role, so invisible = pass,
+  // exactly as with flag_fraud_signal.
+  const r = await fetch(`${URL_}/rest/v1/rpc/monitor_active_trips`, {
+    method: "POST",
+    headers: H,
+    body: JSON.stringify({}),
+  });
+  record(
+    "29",
+    "monitor_active_trips() unreachable by a rider",
+    !r.ok,
+    r.ok ? "CALL SUCCEEDED" : "",
+  );
+}
+
 // ── report ─────────────────────────────────────────────────────────────────
 let phase = "";
 for (const r of results) {
