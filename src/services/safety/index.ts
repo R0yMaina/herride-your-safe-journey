@@ -10,5 +10,7 @@ export type {
   EmergencyContact,
   EmergencyContacts,
   ISafetyService,
+  TripAnomaly,
+  TripAnomalyKind,
   TripShareLink,
 } from "./safety.service";

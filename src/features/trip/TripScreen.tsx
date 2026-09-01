@@ -11,10 +11,12 @@ import { TripReceipt } from "./components/TripReceipt";
 import { RatingSheet } from "./components/RatingSheet";
 import { TripChatSheet } from "./components/TripChatSheet";
 import { EmergencySheet } from "./components/EmergencySheet";
+import { AnomalyPrompt } from "./components/AnomalyPrompt";
+import { primaryAnomaly } from "./lib/anomaly-copy";
 import { useAuth } from "@/hooks/useAuth";
 import { driverService, type PublicDriver } from "@/services/driver";
 import { rideRequestService, ridesService } from "@/services/ride";
-import { safetyService, type EmergencyContacts } from "@/services/safety";
+import { safetyService, type EmergencyContacts, type TripAnomaly } from "@/services/safety";
 import { ROUTES } from "@/constants/routes";
 import { formatCurrency } from "@/features/ride-request/lib/format";
 import { formatDistanceKm, haversineKm } from "@/lib/geo";
@@ -33,6 +35,7 @@ export function TripScreen({ rideId }: { rideId: string }) {
   const [sosOpen, setSosOpen] = useState(false);
   const [contacts, setContacts] = useState<EmergencyContacts | null>(null);
   const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [anomalies, setAnomalies] = useState<readonly TripAnomaly[]>([]);
   const streamLocation =
     ride?.driverId && LIVE_LOCATION_STATUSES.includes(ride.status) ? ride.driverId : null;
   const driverLocation = useDriverLocation(streamLocation);
@@ -64,6 +67,30 @@ export function TripScreen({ rideId }: { rideId: string }) {
       .then(setContacts)
       .catch(() => {});
   }, [isPassenger]);
+
+  const live = ride?.status === "in_progress";
+  useEffect(() => {
+    if (!live || !isPassenger) return;
+    const load = () =>
+      void safetyService
+        .listAnomalies(rideId)
+        .then(setAnomalies)
+        .catch(() => {});
+    load();
+    const t = setInterval(load, 30_000);
+    return () => clearInterval(t);
+  }, [live, isPassenger, rideId]);
+
+  const dismissAnomaly = async (id: string) => {
+    // Clear it locally first: she said she is fine, and the card should go
+    // now rather than after a round-trip.
+    setAnomalies((prev) => prev.filter((a) => a.id !== id));
+    try {
+      await safetyService.acknowledgeAnomaly(id);
+    } catch {
+      /* it will simply reappear on the next poll */
+    }
+  };
 
   const cancel = async () => {
     try {
@@ -149,6 +176,17 @@ export function TripScreen({ rideId }: { rideId: string }) {
                   : t("trip.onYourWay")
           }
         />
+
+        {(() => {
+          const top = primaryAnomaly(anomalies);
+          return top ? (
+            <AnomalyPrompt
+              anomaly={top}
+              onAcknowledge={() => void dismissAnomaly(top.id)}
+              onGetHelp={() => void raiseSos()}
+            />
+          ) : null;
+        })()}
 
         {!cancelled && (
           <TripMap

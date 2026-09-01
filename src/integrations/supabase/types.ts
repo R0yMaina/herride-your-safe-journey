@@ -1064,6 +1064,15 @@ export type Database = {
         Args: Record<string, never>;
         Returns: { what: string; removed: number }[];
       };
+      // Phase 29 — in-trip anomaly detection.
+      my_trip_anomalies: {
+        Args: { _ride_id: string };
+        Returns: { id: string; kind: string; detail: Json; created_at: string }[];
+      };
+      acknowledge_trip_anomaly: {
+        Args: { _id: string };
+        Returns: undefined;
+      };
       // Phase 28 — SOS escalation and driver-identity-at-pickup.
       get_public_driver: {
         Args: { _driver_user_id: string };

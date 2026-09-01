@@ -1,5 +1,5 @@
 -- ============================================================
--- HerRide — Phase 27: the two scheduled jobs
+-- HerRide — Phase 27: the scheduled jobs
 --
 -- `advance_dispatch()` and `enforce_retention()` have existed since phases 23
 -- and 21 and have never run. Both are SECURITY DEFINER, neither reads
@@ -64,7 +64,27 @@ SELECT cron.schedule(
 );
 
 -- ------------------------------------------------------------
--- 3. Confirm both are registered.
+-- 2b. monitor_active_trips — watch live trips for trouble (phase 29).
+--
+--     Every minute, because the thing it is looking for is a car that has
+--     stopped or turned the wrong way, and a five-minute check would mean a
+--     five-minute-old answer to "is she okay?".
+--
+--     Cheap by construction: it only touches rides that are in_progress, past
+--     the grace period, and it dedupes anomalies on a partial unique index, so
+--     a car sitting still raises one question rather than one per minute.
+-- ------------------------------------------------------------
+SELECT cron.unschedule('heride-monitor-trips')
+  WHERE EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'heride-monitor-trips');
+
+SELECT cron.schedule(
+  'heride-monitor-trips',
+  '* * * * *',
+  $$SELECT public.monitor_active_trips();$$
+);
+
+-- ------------------------------------------------------------
+-- 3. Confirm all three are registered.
 -- ------------------------------------------------------------
 SELECT jobname, schedule, active, command
 FROM cron.job
