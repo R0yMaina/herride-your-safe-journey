@@ -1,10 +1,25 @@
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
 import { Button } from "../ui/Button";
 import { FT_ROUTES, SOCIALS } from "../../data/site";
 
 /** What a visitor sees after submitting. It says what happens next, because
  *  "Thanks, we'll be in touch" is not information. */
 export function SuccessState({ onReset }: { onReset: () => void }) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // The form is taller than what replaces it, so submitting from the bottom
+  // of a long page would otherwise leave the visitor looking at the footer
+  // with no idea whether it worked. Bring the confirmation to them, and move
+  // focus to it so it is announced rather than merely displayed.
+  useEffect(() => {
+    const heading = headingRef.current;
+    if (!heading) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    heading.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+    heading.focus();
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -17,7 +32,13 @@ export function SuccessState({ onReset }: { onReset: () => void }) {
         ✓
       </span>
 
-      <h2 className="mt-7 text-2xl font-bold text-ft-navy sm:text-3xl">Your brief is with us.</h2>
+      <h2
+        ref={headingRef}
+        tabIndex={-1}
+        className="mt-7 text-2xl font-bold text-ft-navy outline-none sm:text-3xl"
+      >
+        Your brief is with us.
+      </h2>
       <p className="mt-4 max-w-lg text-base leading-relaxed text-ft-navy-soft">
         We read it properly rather than skimming it, so a reply takes a little longer than an
         auto-responder — expect one within two working days, from a person, with questions about

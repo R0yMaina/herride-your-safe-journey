@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-import { z } from "zod";
 import { cn } from "@/lib/utils";
 import {
   BUDGET_BANDS,
@@ -9,30 +8,19 @@ import {
   projectBriefService,
   type NewProjectBrief,
 } from "@/services/project-briefs";
+import {
+  projectBriefSchema,
+  type ProjectBriefParsed,
+  type ProjectBriefValues,
+} from "./projectBrief.schema";
 import { Button } from "../ui/Button";
 import { Reveal } from "../ui/Reveal";
 import { SuccessState } from "./SuccessState";
 
-const schema = z.object({
-  name: z.string().trim().min(2, "Please tell us your name").max(120),
-  email: z.string().trim().email("That email doesn't look right").max(254),
-  company: z.string().trim().max(160).optional().or(z.literal("")),
-  need: z.enum(PROJECT_NEEDS, { required_error: "Pick the closest option" }),
-  details: z
-    .string()
-    .trim()
-    .min(20, "A sentence or two is enough — what are you trying to build or fix?")
-    .max(4000),
-  // Optional on purpose: a required budget field costs more enquiries than it
-  // filters, and the range is more useful once there is a conversation.
-  budget: z.enum(BUDGET_BANDS).optional(),
-});
-
-type FormValues = z.infer<typeof schema>;
-
 export function ProjectBriefForm() {
   const [submitted, setSubmitted] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [invalid, setInvalid] = useState(false);
 
   const {
     register,
@@ -41,32 +29,40 @@ export function ProjectBriefForm() {
     setValue,
     reset,
     formState: { errors, isSubmitting },
-  } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+    // The schema transforms (null → undefined), so the form holds the input
+    // shape while the submit handler receives the parsed output.
+  } = useForm<ProjectBriefValues, unknown, ProjectBriefParsed>({
+    resolver: zodResolver(projectBriefSchema),
     defaultValues: { name: "", email: "", company: "", details: "" },
   });
 
   const need = watch("need");
   const budget = watch("budget");
 
-  const onSubmit = handleSubmit(async (values) => {
-    setFailed(false);
-    const brief: NewProjectBrief = {
-      name: values.name,
-      email: values.email,
-      company: values.company ? values.company : undefined,
-      need: values.need,
-      details: values.details,
-      budget: values.budget,
-    };
+  const onSubmit = handleSubmit(
+    async (values) => {
+      setFailed(false);
+      setInvalid(false);
+      const brief: NewProjectBrief = {
+        name: values.name,
+        email: values.email,
+        company: values.company,
+        need: values.need,
+        details: values.details,
+        budget: values.budget,
+      };
 
-    try {
-      await projectBriefService.submit(brief);
-      setSubmitted(true);
-    } catch {
-      setFailed(true);
-    }
-  });
+      try {
+        await projectBriefService.submit(brief);
+        setSubmitted(true);
+      } catch {
+        setFailed(true);
+      }
+    },
+    // A submit must never do nothing visible. Field-level messages cover most
+    // of it; this is the backstop for anything that fails without one.
+    () => setInvalid(true),
+  );
 
   if (submitted) {
     return (
@@ -104,11 +100,17 @@ export function ProjectBriefForm() {
         </Field>
       </div>
 
-      <Field label="Company / Organization" optional htmlFor="ft-company">
+      <Field
+        label="Company / Organization"
+        optional
+        htmlFor="ft-company"
+        error={errors.company?.message}
+      >
         <input
           id="ft-company"
           autoComplete="organization"
-          className={inputClass(false)}
+          aria-invalid={Boolean(errors.company)}
+          className={inputClass(Boolean(errors.company))}
           {...register("company")}
         />
       </Field>
@@ -181,6 +183,11 @@ export function ProjectBriefForm() {
             </label>
           ))}
         </div>
+        {errors.budget && (
+          <p role="alert" className="mt-3 text-sm text-ft-gold-deep">
+            {errors.budget.message}
+          </p>
+        )}
         {budget && (
           <button
             type="button"
@@ -191,6 +198,17 @@ export function ProjectBriefForm() {
           </button>
         )}
       </fieldset>
+
+      {invalid && (
+        <Reveal>
+          <p
+            role="alert"
+            className="rounded-xl border border-ft-line bg-ft-cream-deep px-5 py-4 text-sm text-ft-navy"
+          >
+            Some details are missing — the fields above show what to fix.
+          </p>
+        </Reveal>
+      )}
 
       {failed && (
         <Reveal>

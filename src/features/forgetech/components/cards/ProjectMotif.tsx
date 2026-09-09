@@ -23,16 +23,16 @@ export function ProjectMotif({ motif }: { motif: CaseStudy["motif"] }) {
       {motif === "route" && (
         <g className="transition-transform duration-700 group-hover:translate-x-1">
           <path
-            d="M70 240 C 130 240, 120 160, 190 160 S 270 90, 330 70"
+            d="M70 214 C 130 214, 120 155, 190 155 S 270 105, 330 92"
             fill="none"
             stroke="var(--ft-gold)"
             strokeWidth="2"
             strokeLinecap="round"
             strokeDasharray="6 8"
           />
-          <circle cx="70" cy="240" r="7" className="fill-ft-cream" />
-          <circle cx="330" cy="70" r="7" fill="var(--ft-gold)" />
-          <circle cx="190" cy="160" r="4" className="fill-ft-cream/50" />
+          <circle cx="70" cy="214" r="7" className="fill-ft-cream" />
+          <circle cx="330" cy="92" r="7" fill="var(--ft-gold)" />
+          <circle cx="190" cy="155" r="4" className="fill-ft-cream/50" />
         </g>
       )}
 

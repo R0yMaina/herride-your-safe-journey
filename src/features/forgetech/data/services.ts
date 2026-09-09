@@ -5,6 +5,9 @@ export interface ServiceRecord {
   readonly number: string;
   readonly title: string;
   readonly summary: string;
+  /** The CTA label. Spelled out per service rather than derived from the
+   *  title — deriving it produced "Start a AI project". */
+  readonly ctaLabel: string;
   /** What is actually delivered — the homepage card shows these. */
   readonly includes: readonly string[];
   /** Services page only. */
@@ -22,6 +25,7 @@ export const SERVICES: readonly ServiceRecord[] = [
     title: "Websites",
     summary:
       "Modern, fast websites designed to establish credibility, attract customers and convert visitors.",
+    ctaLabel: "Start a website project",
     includes: [
       "Business websites",
       "Landing pages",
@@ -58,6 +62,7 @@ export const SERVICES: readonly ServiceRecord[] = [
     title: "AI",
     summary:
       "Intelligent technology that helps businesses automate decisions, workflows and customer interactions.",
+    ctaLabel: "Start an AI project",
     includes: [
       "AI assistants",
       "AI integrations",
@@ -90,6 +95,7 @@ export const SERVICES: readonly ServiceRecord[] = [
     number: "03",
     title: "Automation",
     summary: "Replace repetitive manual processes with systems that work automatically.",
+    ctaLabel: "Start an automation project",
     includes: [
       "Business automation",
       "API integrations",
@@ -125,6 +131,7 @@ export const SERVICES: readonly ServiceRecord[] = [
     title: "Digital Products",
     summary:
       "From startup idea to working product, we design and build scalable digital experiences.",
+    ctaLabel: "Start a product project",
     includes: ["MVP development", "SaaS", "Startup platforms", "Custom systems"],
     overview:
       "An idea becomes a product the moment someone can use it. We help define what the first version must do, cut what it should not, and build something real enough to put in front of users — architected so version two is not a rewrite.",

@@ -25,12 +25,6 @@ export function CaseStudyPage({ project }: { project: CaseStudy }) {
             </dt>
             <dd className="mt-1.5 text-sm font-medium text-ft-navy">{project.industry}</dd>
           </div>
-          <div>
-            <dt className="text-[0.6875rem] font-semibold uppercase tracking-[0.16em] text-ft-navy-soft">
-              Project
-            </dt>
-            <dd className="mt-1.5 text-sm font-medium text-ft-navy">{project.name}</dd>
-          </div>
         </dl>
       </PageHero>
 

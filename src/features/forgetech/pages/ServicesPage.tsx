@@ -50,7 +50,7 @@ export function ServicesPage() {
                 </p>
                 <div className="mt-8">
                   <Button to={FT_ROUTES.contact} arrow>
-                    Start a {service.title.replace(/s$/, "")} project
+                    {service.ctaLabel}
                   </Button>
                 </div>
               </Reveal>
