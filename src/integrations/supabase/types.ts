@@ -134,6 +134,44 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Forgetech marketing site — contact form inbox.
+      // See scripts/forgetech-project-briefs.sql.
+      project_briefs: {
+        Row: {
+          budget: string | null;
+          company: string | null;
+          created_at: string;
+          details: string;
+          email: string;
+          id: string;
+          name: string;
+          need: string;
+          status: string;
+        };
+        Insert: {
+          budget?: string | null;
+          company?: string | null;
+          created_at?: string;
+          details: string;
+          email: string;
+          id?: string;
+          name: string;
+          need: string;
+          status?: string;
+        };
+        Update: {
+          budget?: string | null;
+          company?: string | null;
+          created_at?: string;
+          details?: string;
+          email?: string;
+          id?: string;
+          name?: string;
+          need?: string;
+          status?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           avatar_url: string | null;

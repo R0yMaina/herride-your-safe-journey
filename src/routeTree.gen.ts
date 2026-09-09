@@ -12,14 +12,20 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as ForgetechRouteImport } from './routes/forgetech'
 import { Route as DriverRouteImport } from './routes/driver'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ForgetechIndexRouteImport } from './routes/forgetech.index'
 import { Route as DriverIndexRouteImport } from './routes/driver.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ShareTokenRouteImport } from './routes/share.$token'
+import { Route as ForgetechServicesRouteImport } from './routes/forgetech.services'
+import { Route as ForgetechProcessRouteImport } from './routes/forgetech.process'
+import { Route as ForgetechContactRouteImport } from './routes/forgetech.contact'
+import { Route as ForgetechAboutRouteImport } from './routes/forgetech.about'
 import { Route as DriverApplyRouteImport } from './routes/driver_.apply'
 import { Route as DriverTripsRouteImport } from './routes/driver.trips'
 import { Route as DriverProfileRouteImport } from './routes/driver.profile'
@@ -47,6 +53,10 @@ import { Route as AppProfileRouteImport } from './routes/_app.profile'
 import { Route as AppPrivacyRouteImport } from './routes/_app.privacy'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
 import { Route as AppBookRouteImport } from './routes/_app.book'
+import { Route as ForgetechWorkIndexRouteImport } from './routes/forgetech.work.index'
+import { Route as ForgetechInsightsIndexRouteImport } from './routes/forgetech.insights.index'
+import { Route as ForgetechWorkSlugRouteImport } from './routes/forgetech.work.$slug'
+import { Route as ForgetechInsightsSlugRouteImport } from './routes/forgetech.insights.$slug'
 import { Route as AppTripRideIdRouteImport } from './routes/_app.trip.$rideId'
 
 const WelcomeRoute = WelcomeRouteImport.update({
@@ -62,6 +72,11 @@ const UnauthorizedRoute = UnauthorizedRouteImport.update({
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgetechRoute = ForgetechRouteImport.update({
+  id: '/forgetech',
+  path: '/forgetech',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DriverRoute = DriverRouteImport.update({
@@ -88,6 +103,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgetechIndexRoute = ForgetechIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => ForgetechRoute,
+} as any)
 const DriverIndexRoute = DriverIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -102,6 +122,26 @@ const ShareTokenRoute = ShareTokenRouteImport.update({
   id: '/share/$token',
   path: '/share/$token',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ForgetechServicesRoute = ForgetechServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => ForgetechRoute,
+} as any)
+const ForgetechProcessRoute = ForgetechProcessRouteImport.update({
+  id: '/process',
+  path: '/process',
+  getParentRoute: () => ForgetechRoute,
+} as any)
+const ForgetechContactRoute = ForgetechContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => ForgetechRoute,
+} as any)
+const ForgetechAboutRoute = ForgetechAboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => ForgetechRoute,
 } as any)
 const DriverApplyRoute = DriverApplyRouteImport.update({
   id: '/driver_/apply',
@@ -238,6 +278,26 @@ const AppBookRoute = AppBookRouteImport.update({
   path: '/book',
   getParentRoute: () => AppRoute,
 } as any)
+const ForgetechWorkIndexRoute = ForgetechWorkIndexRouteImport.update({
+  id: '/work/',
+  path: '/work/',
+  getParentRoute: () => ForgetechRoute,
+} as any)
+const ForgetechInsightsIndexRoute = ForgetechInsightsIndexRouteImport.update({
+  id: '/insights/',
+  path: '/insights/',
+  getParentRoute: () => ForgetechRoute,
+} as any)
+const ForgetechWorkSlugRoute = ForgetechWorkSlugRouteImport.update({
+  id: '/work/$slug',
+  path: '/work/$slug',
+  getParentRoute: () => ForgetechRoute,
+} as any)
+const ForgetechInsightsSlugRoute = ForgetechInsightsSlugRouteImport.update({
+  id: '/insights/$slug',
+  path: '/insights/$slug',
+  getParentRoute: () => ForgetechRoute,
+} as any)
 const AppTripRideIdRoute = AppTripRideIdRouteImport.update({
   id: '/trip/$rideId',
   path: '/trip/$rideId',
@@ -249,6 +309,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
+  '/forgetech': typeof ForgetechRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -279,10 +340,19 @@ export interface FileRoutesByFullPath {
   '/driver/profile': typeof DriverProfileRoute
   '/driver/trips': typeof DriverTripsRoute
   '/driver/apply': typeof DriverApplyRoute
+  '/forgetech/about': typeof ForgetechAboutRoute
+  '/forgetech/contact': typeof ForgetechContactRoute
+  '/forgetech/process': typeof ForgetechProcessRoute
+  '/forgetech/services': typeof ForgetechServicesRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/driver/': typeof DriverIndexRoute
+  '/forgetech/': typeof ForgetechIndexRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
+  '/forgetech/insights/$slug': typeof ForgetechInsightsSlugRoute
+  '/forgetech/work/$slug': typeof ForgetechWorkSlugRoute
+  '/forgetech/insights/': typeof ForgetechInsightsIndexRoute
+  '/forgetech/work/': typeof ForgetechWorkIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -317,10 +387,19 @@ export interface FileRoutesByTo {
   '/driver/profile': typeof DriverProfileRoute
   '/driver/trips': typeof DriverTripsRoute
   '/driver/apply': typeof DriverApplyRoute
+  '/forgetech/about': typeof ForgetechAboutRoute
+  '/forgetech/contact': typeof ForgetechContactRoute
+  '/forgetech/process': typeof ForgetechProcessRoute
+  '/forgetech/services': typeof ForgetechServicesRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin': typeof AdminIndexRoute
   '/driver': typeof DriverIndexRoute
+  '/forgetech': typeof ForgetechIndexRoute
   '/trip/$rideId': typeof AppTripRideIdRoute
+  '/forgetech/insights/$slug': typeof ForgetechInsightsSlugRoute
+  '/forgetech/work/$slug': typeof ForgetechWorkSlugRoute
+  '/forgetech/insights': typeof ForgetechInsightsIndexRoute
+  '/forgetech/work': typeof ForgetechWorkIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -329,6 +408,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/auth': typeof AuthRouteWithChildren
   '/driver': typeof DriverRouteWithChildren
+  '/forgetech': typeof ForgetechRouteWithChildren
   '/onboarding': typeof OnboardingRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/welcome': typeof WelcomeRoute
@@ -359,10 +439,19 @@ export interface FileRoutesById {
   '/driver/profile': typeof DriverProfileRoute
   '/driver/trips': typeof DriverTripsRoute
   '/driver_/apply': typeof DriverApplyRoute
+  '/forgetech/about': typeof ForgetechAboutRoute
+  '/forgetech/contact': typeof ForgetechContactRoute
+  '/forgetech/process': typeof ForgetechProcessRoute
+  '/forgetech/services': typeof ForgetechServicesRoute
   '/share/$token': typeof ShareTokenRoute
   '/admin/': typeof AdminIndexRoute
   '/driver/': typeof DriverIndexRoute
+  '/forgetech/': typeof ForgetechIndexRoute
   '/_app/trip/$rideId': typeof AppTripRideIdRoute
+  '/forgetech/insights/$slug': typeof ForgetechInsightsSlugRoute
+  '/forgetech/work/$slug': typeof ForgetechWorkSlugRoute
+  '/forgetech/insights/': typeof ForgetechInsightsIndexRoute
+  '/forgetech/work/': typeof ForgetechWorkIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -371,6 +460,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/driver'
+    | '/forgetech'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -401,10 +491,19 @@ export interface FileRouteTypes {
     | '/driver/profile'
     | '/driver/trips'
     | '/driver/apply'
+    | '/forgetech/about'
+    | '/forgetech/contact'
+    | '/forgetech/process'
+    | '/forgetech/services'
     | '/share/$token'
     | '/admin/'
     | '/driver/'
+    | '/forgetech/'
     | '/trip/$rideId'
+    | '/forgetech/insights/$slug'
+    | '/forgetech/work/$slug'
+    | '/forgetech/insights/'
+    | '/forgetech/work/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -439,10 +538,19 @@ export interface FileRouteTypes {
     | '/driver/profile'
     | '/driver/trips'
     | '/driver/apply'
+    | '/forgetech/about'
+    | '/forgetech/contact'
+    | '/forgetech/process'
+    | '/forgetech/services'
     | '/share/$token'
     | '/admin'
     | '/driver'
+    | '/forgetech'
     | '/trip/$rideId'
+    | '/forgetech/insights/$slug'
+    | '/forgetech/work/$slug'
+    | '/forgetech/insights'
+    | '/forgetech/work'
   id:
     | '__root__'
     | '/'
@@ -450,6 +558,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/auth'
     | '/driver'
+    | '/forgetech'
     | '/onboarding'
     | '/unauthorized'
     | '/welcome'
@@ -480,10 +589,19 @@ export interface FileRouteTypes {
     | '/driver/profile'
     | '/driver/trips'
     | '/driver_/apply'
+    | '/forgetech/about'
+    | '/forgetech/contact'
+    | '/forgetech/process'
+    | '/forgetech/services'
     | '/share/$token'
     | '/admin/'
     | '/driver/'
+    | '/forgetech/'
     | '/_app/trip/$rideId'
+    | '/forgetech/insights/$slug'
+    | '/forgetech/work/$slug'
+    | '/forgetech/insights/'
+    | '/forgetech/work/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -492,6 +610,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   DriverRoute: typeof DriverRouteWithChildren
+  ForgetechRoute: typeof ForgetechRouteWithChildren
   OnboardingRoute: typeof OnboardingRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WelcomeRoute: typeof WelcomeRoute
@@ -520,6 +639,13 @@ declare module '@tanstack/react-router' {
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgetech': {
+      id: '/forgetech'
+      path: '/forgetech'
+      fullPath: '/forgetech'
+      preLoaderRoute: typeof ForgetechRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/driver': {
@@ -557,6 +683,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgetech/': {
+      id: '/forgetech/'
+      path: '/'
+      fullPath: '/forgetech/'
+      preLoaderRoute: typeof ForgetechIndexRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
     '/driver/': {
       id: '/driver/'
       path: '/'
@@ -577,6 +710,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/share/$token'
       preLoaderRoute: typeof ShareTokenRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/forgetech/services': {
+      id: '/forgetech/services'
+      path: '/services'
+      fullPath: '/forgetech/services'
+      preLoaderRoute: typeof ForgetechServicesRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
+    '/forgetech/process': {
+      id: '/forgetech/process'
+      path: '/process'
+      fullPath: '/forgetech/process'
+      preLoaderRoute: typeof ForgetechProcessRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
+    '/forgetech/contact': {
+      id: '/forgetech/contact'
+      path: '/contact'
+      fullPath: '/forgetech/contact'
+      preLoaderRoute: typeof ForgetechContactRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
+    '/forgetech/about': {
+      id: '/forgetech/about'
+      path: '/about'
+      fullPath: '/forgetech/about'
+      preLoaderRoute: typeof ForgetechAboutRouteImport
+      parentRoute: typeof ForgetechRoute
     }
     '/driver_/apply': {
       id: '/driver_/apply'
@@ -767,6 +928,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppBookRouteImport
       parentRoute: typeof AppRoute
     }
+    '/forgetech/work/': {
+      id: '/forgetech/work/'
+      path: '/work'
+      fullPath: '/forgetech/work/'
+      preLoaderRoute: typeof ForgetechWorkIndexRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
+    '/forgetech/insights/': {
+      id: '/forgetech/insights/'
+      path: '/insights'
+      fullPath: '/forgetech/insights/'
+      preLoaderRoute: typeof ForgetechInsightsIndexRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
+    '/forgetech/work/$slug': {
+      id: '/forgetech/work/$slug'
+      path: '/work/$slug'
+      fullPath: '/forgetech/work/$slug'
+      preLoaderRoute: typeof ForgetechWorkSlugRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
+    '/forgetech/insights/$slug': {
+      id: '/forgetech/insights/$slug'
+      path: '/insights/$slug'
+      fullPath: '/forgetech/insights/$slug'
+      preLoaderRoute: typeof ForgetechInsightsSlugRouteImport
+      parentRoute: typeof ForgetechRoute
+    }
     '/_app/trip/$rideId': {
       id: '/_app/trip/$rideId'
       path: '/trip/$rideId'
@@ -868,12 +1057,41 @@ const DriverRouteChildren: DriverRouteChildren = {
 const DriverRouteWithChildren =
   DriverRoute._addFileChildren(DriverRouteChildren)
 
+interface ForgetechRouteChildren {
+  ForgetechAboutRoute: typeof ForgetechAboutRoute
+  ForgetechContactRoute: typeof ForgetechContactRoute
+  ForgetechProcessRoute: typeof ForgetechProcessRoute
+  ForgetechServicesRoute: typeof ForgetechServicesRoute
+  ForgetechIndexRoute: typeof ForgetechIndexRoute
+  ForgetechInsightsSlugRoute: typeof ForgetechInsightsSlugRoute
+  ForgetechWorkSlugRoute: typeof ForgetechWorkSlugRoute
+  ForgetechInsightsIndexRoute: typeof ForgetechInsightsIndexRoute
+  ForgetechWorkIndexRoute: typeof ForgetechWorkIndexRoute
+}
+
+const ForgetechRouteChildren: ForgetechRouteChildren = {
+  ForgetechAboutRoute: ForgetechAboutRoute,
+  ForgetechContactRoute: ForgetechContactRoute,
+  ForgetechProcessRoute: ForgetechProcessRoute,
+  ForgetechServicesRoute: ForgetechServicesRoute,
+  ForgetechIndexRoute: ForgetechIndexRoute,
+  ForgetechInsightsSlugRoute: ForgetechInsightsSlugRoute,
+  ForgetechWorkSlugRoute: ForgetechWorkSlugRoute,
+  ForgetechInsightsIndexRoute: ForgetechInsightsIndexRoute,
+  ForgetechWorkIndexRoute: ForgetechWorkIndexRoute,
+}
+
+const ForgetechRouteWithChildren = ForgetechRoute._addFileChildren(
+  ForgetechRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AdminRoute: AdminRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   DriverRoute: DriverRouteWithChildren,
+  ForgetechRoute: ForgetechRouteWithChildren,
   OnboardingRoute: OnboardingRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WelcomeRoute: WelcomeRoute,

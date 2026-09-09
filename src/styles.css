@@ -239,3 +239,102 @@ body,
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   FORGETECH — design system
+   ------------------------------------------------------------
+   A second, self-contained token set for the Forgetech marketing
+   site (`/forgetech/*`). It is namespaced `--ft-*` / `ft-` so it can
+   never collide with HeRide's tokens above, and every rule that is
+   not a token is scoped to `.forgetech` so mounting the site inside
+   this app changes nothing for the product screens.
+
+   Palette: warm cream canvas, deep navy type, warm gold as an accent
+   only. Gold is deliberately split into two values — `gold` for
+   surfaces and marks on navy, `gold-deep` for text on cream, which
+   clears 4.5:1.
+   ============================================================ */
+@theme {
+  --color-ft-cream: var(--ft-cream);
+  --color-ft-cream-deep: var(--ft-cream-deep);
+  --color-ft-beige: var(--ft-beige);
+  --color-ft-line: var(--ft-line);
+  --color-ft-navy: var(--ft-navy);
+  --color-ft-navy-deep: var(--ft-navy-deep);
+  --color-ft-navy-soft: var(--ft-navy-soft);
+  --color-ft-navy-line: var(--ft-navy-line);
+  --color-ft-gold: var(--ft-gold);
+  --color-ft-gold-deep: var(--ft-gold-deep);
+  --font-ft-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-ft-serif: "Instrument Serif", "Playfair Display", Georgia, serif;
+}
+
+:root {
+  --ft-cream: oklch(0.975 0.012 85);
+  --ft-cream-deep: oklch(0.947 0.018 82);
+  --ft-beige: oklch(0.898 0.028 80);
+  --ft-line: oklch(0.878 0.021 80);
+  --ft-navy: oklch(0.248 0.042 258);
+  --ft-navy-deep: oklch(0.186 0.038 258);
+  --ft-navy-soft: oklch(0.435 0.04 258);
+  --ft-navy-line: oklch(0.34 0.038 258);
+  --ft-gold: oklch(0.745 0.126 72);
+  --ft-gold-deep: oklch(0.558 0.107 66);
+}
+
+.forgetech {
+  background-color: var(--ft-cream);
+  color: var(--ft-navy);
+  font-family: var(--font-ft-sans);
+  /* Headlines are the primary design element here — tighten the default
+     tracking once, centrally, rather than per-heading. */
+  -webkit-font-smoothing: antialiased;
+}
+
+.forgetech h1,
+.forgetech h2,
+.forgetech h3 {
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.forgetech ::selection {
+  background-color: var(--ft-navy);
+  color: var(--ft-cream);
+}
+
+.forgetech :focus-visible {
+  outline: 2px solid var(--ft-gold-deep);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Editorial serif italic, used only for accent phrases inside a headline. */
+@utility ft-accent {
+  font-family: var(--font-ft-serif);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+/* The single decorative motif of the site: a hairline that draws itself in.
+   Used above section headings; no other ornament is needed. */
+@utility ft-rule {
+  display: block;
+  height: 1px;
+  background-color: var(--ft-gold);
+}
+
+/* Marquee for the technology ticker. Paused for reduced-motion users by the
+   global media query below, which zeroes animation-duration. */
+@keyframes ft-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+@utility ft-marquee {
+  animation: ft-marquee 40s linear infinite;
+}

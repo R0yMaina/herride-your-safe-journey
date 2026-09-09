@@ -47,6 +47,15 @@ RLS_USER_B_EMAIL=… RLS_USER_B_PASSWORD=… npm run test:rls
    client-side keys. Real secrets go in `*.local` files.
 9. Routes use the `ROUTES` constant (`src/constants/routes.ts`); dynamic
    routes use TanStack `params`.
+10. **The Forgetech site (`/forgetech/*`) is a separate product** living in
+    the same app: `src/features/forgetech/` plus `src/routes/forgetech*.tsx`.
+    It has its own `--ft-*` token set (scoped to `.forgetech` at the bottom of
+    `src/styles.css`), its own `FT_ROUTES` constant, and its own `PageHero` /
+    `Section` / `Reveal` primitives. Do not mix the two design systems in
+    either direction, and do not import HeRide screens or services into it —
+    it is meant to be liftable onto forgetech.ke on its own. Content lives in
+    `src/features/forgetech/data/`; **never invent client names, metrics,
+    testimonials or outcomes there** (a test enforces the outcome rule).
 
 ## State of the world
 
