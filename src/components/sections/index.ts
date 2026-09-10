@@ -1,0 +1,11 @@
+export { Hero } from "./Hero";
+export { BrandStatement } from "./BrandStatement";
+export { WhatWeBuild } from "./WhatWeBuild";
+export { ProblemSolutionSection } from "./ProblemSolutionSection";
+export { WorkPreview } from "./WorkPreview";
+export { ProcessSection } from "./ProcessSection";
+export { ProcessTimeline } from "./ProcessTimeline";
+export { WhyForgetech } from "./WhyForgetech";
+export { TechnologyTicker } from "./TechnologyTicker";
+export { InsightsPreview } from "./InsightsPreview";
+export { FinalCTA } from "./FinalCTA";
