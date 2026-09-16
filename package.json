@@ -13,8 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:rls": "node --env-file-if-exists=.env scripts/rls-cross-tenant-test.mjs",
-    "verify:deployment": "node --env-file-if-exists=.env scripts/verify-deployment.mjs",
-    "forgetech:sitemap": "node scripts/forgetech-sitemap.mjs"
+    "verify:deployment": "node --env-file-if-exists=.env scripts/verify-deployment.mjs"
   },
   "dependencies": {
     "@cloudflare/vite-plugin": "^1.25.5",

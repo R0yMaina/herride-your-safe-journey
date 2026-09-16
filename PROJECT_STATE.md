@@ -132,37 +132,26 @@ callable and broken on every call.
 
 A `schema_migrations` table is still the tidier long-term answer.
 
-## Forgetech marketing site (`/forgetech/*`) — added 2026-09-09
+## Forgetech marketing site — extracted 2026-09-16
 
-A second, self-contained site lives in this repo: **Forgetech**, the studio
-site (forgetech.ke). It shares nothing with HeRide except the build.
+The Forgetech studio site briefly lived in this repo under `/forgetech/*`. It
+has been **extracted to its own repository** and removed from here:
 
-- **Where it lives** — `src/features/forgetech/` (data, components, pages) and
-  the `src/routes/forgetech*.tsx` route files. Nine pages: home, services,
-  work + case-study template, process, insights + article template, about,
-  contact.
-- **Design system** — a `--ft-*` token set appended to `src/styles.css`,
-  scoped to `.forgetech`. Cream canvas, deep navy type, warm gold accent,
-  Manrope + Instrument Serif. HeRide's oklch tokens are untouched.
-- **Stack note** — the brief asked for Next.js; this repo is TanStack Start on
-  Vite, so the site is built on the existing stack rather than re-platforming
-  the app (CLAUDE.md, opening paragraph). Nothing about the site depends on
-  the difference.
-- **Contact form** — `src/services/project-briefs/` (interface + mock +
-  Supabase impl, selected by `env.useMocks`), writing to `project_briefs`.
-- **SQL NOT YET APPLIED**: `scripts/forgetech-project-briefs.sql` creates that
-  table (anon INSERT, admin-only SELECT). Until it is run in the Supabase SQL
-  editor, submissions fail against the live project — the form surfaces a
-  retry message rather than a false success. `src/integrations/supabase/types.ts`
-  already carries the hand-written table type.
-- **SEO** — per-page titles/descriptions/OG/canonicals via
-  `src/features/forgetech/seo.ts`; Organization and Article JSON-LD;
-  `npm run forgetech:sitemap` regenerates `public/forgetech/{sitemap.xml,robots.txt}`.
-  Those two files belong at the document root once the site is deployed on
-  forgetech.ke.
-- **Extraction** — nothing in `src/features/forgetech/` imports HeRide code
-  beyond `@/lib/utils` (`cn`) and `@/config/env`, so the folder can be lifted
-  into its own deployment when the domain is ready.
+- **github.com/R0yMaina/forgetech-website** — standalone app, routes at the
+  domain root, deployed to Cloudflare Workers, serving forgetech.ke.
+
+Removed from this repo with it: `src/features/forgetech/`, the
+`src/routes/forgetech*.tsx` routes, `src/services/project-briefs/`, the
+`--ft-*` token block in `src/styles.css`, the `project_briefs` type in
+`src/integrations/supabase/types.ts`, `public/forgetech/`, and the two
+`scripts/forgetech-*` files. HeRide's own tokens and screens were never
+touched by any of it.
+
+One loose end: `project_briefs` may exist in the shared Supabase project if
+`scripts/forgetech-project-briefs.sql` was ever run there. The table is
+harmless to HeRide — anon INSERT, admin-only SELECT, no foreign keys into
+anything here — but it belongs to the Forgetech site, whose repo now carries
+that script. Drop it here only if that site is pointed at its own project.
 
 ## Known gaps / deliberate v1 scope
 
